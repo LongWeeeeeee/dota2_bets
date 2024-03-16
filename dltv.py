@@ -93,58 +93,19 @@ def get_team_ids(radiant_team_name, dire_team_name):
 
 
 def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players):
-    fix_names = {'entity gaming': 'enity', '9 pandas': 'pandas'}
-    main_url = 'https://dota2.ru/esport/team/get_list_by_filter/'
-    for current_team in [radiant_team_name.lower(), dire_team_name.lower()]:
-        if current_team in fix_names:
-            current_team = fix_names[current_team]
-        # The data you want to send in the POST request
-        data = {
-            f'team': f"{current_team}",
-            'region': '0',
-            'sort': ''  # It looks like you want to include a 'sort' parameter, but haven't specified a value.
-        }
+    url = 'https://api.cyberscore.live/api/v1/matches/?limit=20&type=liveOrUpcoming&locale=en'
+    response = requests.get(url)
+    data = json.load(response.text)
+    for match in data['rows']:
+        if match['team_radiant']['name'].lower() in radiant_team_name or match['team_dire']['name'].lower() in dire_team_name:
+            for karta in match['related_matches']:
+                if karta['status'] != 'ended':
+                    map_id = karta['id']
+                    url = f'https://cyberscore.live/en/matches/{map_id}/'
+    response = requests.get(url).text
+    soup = BeautifulSoup(response, 'lxml')
 
-        # The headers you want to include with your request
-        headers = {
-            'Host': 'dota2.ru',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0',
-            'Accept': 'application/json, text/javascript, */*; q=0.01',
-            'Accept-Language': 'en-US,en;q=0.5',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-            'X-Requested-With': 'XMLHttpRequest',
-            'Origin': 'https://dota2.ru',
-            'DNT': '1',
-            'Sec-GPC': '1',
-            'Connection': 'keep-alive',
-            'Referer': 'https://dota2.ru/esport/teams/',
-        }
 
-        # Sending the POST request
-        response = requests.post(main_url, data=data, headers=headers)
-        json_response = json.loads(response.text)
-        soup = BeautifulSoup(json_response['data']['list'], 'lxml')
-        team_url = soup.find('a')
-        if team_url is not None:
-            url_name = 'https://dota2.ru' + team_url['href']
-            response = requests.get(url_name)
-            soup = BeautifulSoup(response.text, 'html.parser')
-            rows = soup.find_all('tr')[1:]  # Пропускаем заголовок
-            if current_team == radiant_team_name:
-                players = radiant_players
-                radiant_players = fill_players_position(rows, players)
-                if radiant_players is None:
-                    return None
-            else:
-                players = dire_players
-                dire_players = fill_players_position(rows, players)
-                if dire_players is None:
-                    return None
-        else:
-            print(f'{current_team} нету на https://dota2.ru/esport/teams/')
-            return None
-    return radiant_players, dire_players
 def fill_players_position(rows, players):
     heroes_and_position = {}
     lst = ['Мидер', 'Сапорт 4', 'Керри', 'Сапорт 5', 'Оффлейнер']

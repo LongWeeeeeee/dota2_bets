@@ -4,9 +4,12 @@
 #Отладка винрейта на старых матчах
 #Проверка того что все правильно работает
 #ранги неправильно работают
+import html
+import re
 import requests
 from bs4 import BeautifulSoup
 import json
+import keys
 
 
 
@@ -27,8 +30,10 @@ def get_live_matches():
                 radiant_players, dire_players = get_player_names_and_heroes(radiant_block, soup)
                 radiant_team_name, dire_team_name = get_team_names(soup)
                 print(f'{radiant_team_name} VS {dire_team_name}')
-                radiant_heroes_and_positions, dire_heroes_and_positions = get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players)
-                dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name)
+                result = get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players)
+                if result is not None:
+                    radiant_heroes_and_positions, dire_heroes_and_positions = result
+                    dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name)
 
 def get_urls(url):
     response = requests.get(url).text
@@ -71,11 +76,11 @@ def get_player_names_and_heroes(radiant_block, soup):
     dire_block = soup.find('div', class_='picks__new-picks__picks dire')
     dire_heroes_block = dire_block.find_all('div', class_='pick player')
     for hero in radiant_heroes_block[0:5]:
-        hero_name = hero.get('data-tippy-content')
+        hero_name = hero.get('data-tippy-content').replace('Outworld Devourer', 'Outworld Destroyer')
         player_name = hero.find('span', class_='pick__player-title').text.lower()
         radiant_players[player_name] = {'hero': hero_name}
     for hero in dire_heroes_block:
-        hero_name = hero.get('data-tippy-content')
+        hero_name = hero.get('data-tippy-content').replace('Outworld Devourer', 'Outworld Destroyer')
         player_name = hero.find('span', class_='pick__player-title').text.lower()
         dire_players[player_name] = {'hero': hero_name}
     return radiant_players, dire_players
@@ -94,25 +99,60 @@ def get_team_ids(radiant_team_name, dire_team_name):
 
 def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players):
     radiant_pick, dire_pick = {}, {}
-    translate = {'Mid': 'pos 2', 'Semi-Support': 'pos 4', 'Carry': 'pos 1', 'Main-Support': 'pos 5', 'Offlaner': 'pos 3'}
-
+    nick_fixes = {'griefy': 'asdekor_r', 'emptiness': 'aind', 'rincyq':'ninamin'}
+    lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
+    radiant_lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
+    dire_lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
+    translate = {'mid': 'pos 2', 'semi-support': 'pos 4', 'carry': 'pos 1', 'main-support': 'pos 5', 'offlaner': 'pos 3'}
     url = 'https://api.cyberscore.live/api/v1/matches/?limit=20&type=liveOrUpcoming&locale=en'
     response = requests.get(url)
     data = json.loads(response.text)
     url = get_map_id(data, radiant_team_name, dire_team_name)
-    response = requests.get(url).text
-    soup = BeautifulSoup(response, 'lxml')
-    players = soup.find_all('div', class_='team-item')
-    for player in players:
-        nick_name = player.find('div', class_='player-name').text.lower()
-        position = player.find('span', class_='truncate').text
-        for radiant_player_name in radiant_players:
-            if are_similar(radiant_player_name, nick_name) or radiant_player_name in nick_name:
-                radiant_pick[translate[position]]=radiant_players[radiant_player_name]['hero']
-        for dire_player_name in dire_players:
-            if are_similar(dire_player_name, nick_name) or dire_player_name in nick_name:
-                dire_pick[translate[position]]=dire_players[dire_player_name]['hero']
-    return radiant_pick, dire_pick
+    if url is not None:
+        response = requests.get(url).text
+        response_html = html.unescape(response)
+        soup = BeautifulSoup(response_html, 'lxml')
+        players = soup.find_all('div', class_='team-item')
+        for player in players:
+            nick_name = player.find('div', class_='player-name').text.lower()
+            position = player.find('span', class_='truncate').text.lower()
+            if nick_name in nick_fixes:
+                nick_name = nick_fixes[nick_name]
+            if position in lst:
+                for radiant_player_name in radiant_players:
+                    if are_similar(radiant_player_name, nick_name) or radiant_player_name in nick_name or nick_name in radiant_player_name:
+                        radiant_pick[translate[position]] = radiant_players[radiant_player_name]['hero']
+                        if position in lst:
+                            radiant_lst.remove(position)
+                        else:
+                            print(f'ошибка позиции {position} не существует')
+                for dire_player_name in dire_players:
+                    if are_similar(dire_player_name, nick_name) or dire_player_name in nick_name:
+                        dire_pick[translate[position]]=dire_players[dire_player_name]['hero']
+                        if position in lst:
+                            dire_lst.remove(position)
+                        else:
+                            print(f'ошибка позиции {position} не существует')
+
+        if len(radiant_pick) == 4:
+            for player in radiant_players.values():
+                hero = player['hero']
+                if hero not in radiant_pick.values():
+                    radiant_pick[translate[radiant_lst[0]]] = hero
+        if len(dire_pick) == 4:
+            for player in dire_players.values():
+                hero = player['hero']
+                if hero not in dire_players.values():
+                    dire_pick[translate[dire_lst[0]]] = hero
+        if len(radiant_pick) != 5:
+            print(f'не удалось выяснить позиции игроков {radiant_pick}')
+            return None
+        if len(dire_pick) != 5:
+            print(f'не удалось выяснить позиции игроков {dire_pick}')
+            return None
+
+        return radiant_pick, dire_pick
+    else: return None
 
 
 def fill_players_position(rows, players):
@@ -207,6 +247,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             i -= 2
         elif len(stats) == 6:
             i -= 4
+        elif len(stats) == 4:
+            i -= 6
         hero_divs = stats[i].find_all('div', attrs={'data-hero': True})
         for div in hero_divs:
             # Extract the values of 'data-hero', 'data-wr', and 'data-pos' attributes
@@ -264,6 +306,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             i -= 2
         elif len(stats) == 6:
             i -= 4
+        elif len(stats) == 4:
+            i -= 6
         hero_divs = stats[i].find_all('div', attrs={'data-hero': True})
         for div in hero_divs:
             # Extract the values of 'data-hero', 'data-wr', and 'data-pos' attributes
@@ -323,6 +367,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             i -= 2
         elif len(stats) == 6:
             i -= 4
+        elif len(stats) == 4:
+            i -= 6
         hero_divs = stats[i].find_all('div', attrs={'data-hero': True})
         for div in hero_divs:
             # Extract the values of 'data-hero', 'data-wr', and 'data-pos' attributes
@@ -412,30 +458,40 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                 elif 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']:
                     radiant_wr_against.append(data_wr)
                     Radiant_Pos5_vs_Dire_pos5 = data_wr
-    sinergy = (sum(radiant_wr_with)/len(dire_wr_with)) - (sum(dire_wr_with)/len(dire_wr_with))
+    sinergy = (sum(radiant_wr_with)/len(radiant_wr_with)) - (sum(dire_wr_with)/len(dire_wr_with))
     counterpick = sum(radiant_wr_against)/len(radiant_wr_against) - 50
     if sinergy > 0 and counterpick > 0:
-        print(f'В среднем {radiant_team_name} сильнее на {(sinergy+counterpick)/2}%')
+        send_message(f'В среднем {radiant_team_name} сильнее на {(sinergy+counterpick)/2}%')
     elif sinergy < 0 and counterpick < 0:
-        print(f'В среднем {dire_team_name} сильнее на {((sinergy + counterpick) / 2)*-1}%')
+        send_message(f'В среднем {dire_team_name} сильнее на {((sinergy + counterpick) / 2)*-1}%')
     else:
-        print(f'C cинергией как у {radiant_team_name} выигрывают на {sinergy} % больше ')
-        print(f'С контрпиками как у {radiant_team_name} выигрывают на {counterpick} % больше')
+        send_message(f'C cинергией как у {radiant_team_name} выигрывают на {sinergy} % больше ')
+        send_message(f'С контрпиками как у {radiant_team_name} выигрывают на {counterpick} % больше')
 
 
 def get_map_id(data, radiant_team_name, dire_team_name):
-    for match in data['rows']:
-        if match['team_radiant']['name'].lower() in radiant_team_name or match['team_dire']['name'].lower() in dire_team_name:
-            for karta in match['related_matches']:
-                if karta['status'] != 'ended':
-                    map_id = karta['id']
-                    url = f'https://cyberscore.live/en/matches/{map_id}/'
-                    return url
+    with open('map_id_check.txt', 'r+') as f:
+        file = json.load(f)
+        for match in data['rows']:
+            if match['team_dire'] is not None:
+                if match['team_radiant']['name'].lower() in radiant_team_name or match['team_dire']['name'].lower() in dire_team_name:
+                    for karta in match['related_matches']:
+                        if karta['status'] != 'ended':
+                            map_id = karta['id']
+                            # if map_id not in file:
+                            #     file.append(map_id)
+                            #     url = f'https://cyberscore.live/en/matches/{map_id}/'
+                            #     f.truncate()
+                            #     f.seek(0)
+                            #     json.dump(file, f)
+                            #     return url
+                            url = f'https://cyberscore.live/en/matches/{map_id}/'
+                            return url
 
 
 def send_message(message):
-    BOT_TOKEN = '6635829285:AAGhpvRdh-6DtnT6DveZEky0tt5U_PejLXs'
-    CHAT_ID = '1091698279'
+    BOT_TOKEN = f'{keys.Token}'
+    CHAT_ID = '6633013204'
     url = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage'
     payload = {
         'chat_id': CHAT_ID,

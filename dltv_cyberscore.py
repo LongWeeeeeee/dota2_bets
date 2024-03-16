@@ -27,10 +27,8 @@ def get_live_matches():
                 radiant_players, dire_players = get_player_names_and_heroes(radiant_block, soup)
                 radiant_team_name, dire_team_name = get_team_names(soup)
                 print(f'{radiant_team_name} VS {dire_team_name}')
-                result = get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players)
-                if result is not None:
-                    radiant_heroes_and_positions, dire_heroes_and_positions = result
-                    dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name)
+                radiant_heroes_and_positions, dire_heroes_and_positions = get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players)
+                dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name)
 
 def get_urls(url):
     response = requests.get(url).text
@@ -65,6 +63,8 @@ def get_team_names(soup):
         else:
             dire_team_name = team_info[0]
     return radiant_team_name.lower(), dire_team_name.lower()
+
+
 def get_player_names_and_heroes(radiant_block, soup):
     radiant_players, dire_players = {}, {}
     radiant_heroes_block = radiant_block.find_all('div', class_='pick player')
@@ -93,17 +93,26 @@ def get_team_ids(radiant_team_name, dire_team_name):
 
 
 def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players):
+    radiant_pick, dire_pick = {}, {}
+    translate = {'Mid': 'pos 2', 'Semi-Support': 'pos 4', 'Carry': 'pos 1', 'Main-Support': 'pos 5', 'Offlaner': 'pos 3'}
+
     url = 'https://api.cyberscore.live/api/v1/matches/?limit=20&type=liveOrUpcoming&locale=en'
     response = requests.get(url)
-    data = json.load(response.text)
-    for match in data['rows']:
-        if match['team_radiant']['name'].lower() in radiant_team_name or match['team_dire']['name'].lower() in dire_team_name:
-            for karta in match['related_matches']:
-                if karta['status'] != 'ended':
-                    map_id = karta['id']
-                    url = f'https://cyberscore.live/en/matches/{map_id}/'
+    data = json.loads(response.text)
+    url = get_map_id(data, radiant_team_name, dire_team_name)
     response = requests.get(url).text
     soup = BeautifulSoup(response, 'lxml')
+    players = soup.find_all('div', class_='team-item')
+    for player in players:
+        nick_name = player.find('div', class_='player-name').text.lower()
+        position = player.find('span', class_='truncate').text
+        for radiant_player_name in radiant_players:
+            if are_similar(radiant_player_name, nick_name) or radiant_player_name in nick_name:
+                radiant_pick[translate[position]]=radiant_players[radiant_player_name]['hero']
+        for dire_player_name in dire_players:
+            if are_similar(dire_player_name, nick_name) or dire_player_name in nick_name:
+                dire_pick[translate[position]]=dire_players[dire_player_name]['hero']
+    return radiant_pick, dire_pick
 
 
 def fill_players_position(rows, players):
@@ -175,12 +184,13 @@ def are_similar(s1, s2, threshold=70):
 
 def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name):
     radiant_wr_with, dire_wr_with, radiant_wr_against = [], [], []
-    
     for position in radiant_heroes_and_positions:
         hero_url = radiant_heroes_and_positions[position].replace(' ', '%20')
         url = f'https://dota2protracker.com/hero/{hero_url}/new'
-        response = requests.get(url).text
-        soup = BeautifulSoup(response, 'lxml')
+        response = requests.get(url)
+        if response.status_code != 200:
+            print(f'Ошибка dota2protracekr\n{url}')
+        soup = BeautifulSoup(response.text, 'lxml')
         stats = soup.find_all('div', class_='overflow-y-scroll tbody h-96')
         # #wr against
         # index = {'Керри': 0, 'Мидер': 2, 'Оффлейнер': 4, 'Сапорт 4': 6, 'Сапорт 5': 8}
@@ -243,8 +253,10 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     for position in dire_heroes_and_positions:
         hero_url = dire_heroes_and_positions[position].replace(' ', '%20')
         url = f'https://dota2protracker.com/hero/{hero_url}/new'
-        response = requests.get(url).text
-        soup = BeautifulSoup(response, 'lxml')
+        response = requests.get(url)
+        if response.status_code != 200:
+            print(f'Ошибка dota2protracekr\n{url}')
+        soup = BeautifulSoup(response.text, 'lxml')
         stats = soup.find_all('div', class_='overflow-y-scroll tbody h-96')
         index = {'pos 1': 1, 'pos 2': 3, 'pos 3': 5, 'pos 4': 7, 'pos 5': 9}
         i = index[position]
@@ -299,8 +311,10 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     for position in radiant_heroes_and_positions:
         hero_url = radiant_heroes_and_positions[position].replace(' ', '%20')
         url = f'https://dota2protracker.com/hero/{hero_url}/new'
-        response = requests.get(url).text
-        soup = BeautifulSoup(response, 'lxml')
+        response = requests.get(url)
+        if response.status_code != 200:
+            print(f'Ошибка dota2protracekr\n{url}')
+        soup = BeautifulSoup(response.text, 'lxml')
         stats = soup.find_all('div', class_='overflow-y-scroll tbody h-96')
         # #wr against
         index = {'pos 1': 0, 'pos 2': 2, 'pos 3': 4, 'pos 4': 6, 'pos 5': 8}
@@ -398,16 +412,25 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                 elif 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']:
                     radiant_wr_against.append(data_wr)
                     Radiant_Pos5_vs_Dire_pos5 = data_wr
-
-    if len(radiant_wr_with) == len(dire_wr_with):
-        print(f'C cинергией как у {radiant_team_name} выигрывают на {sum(radiant_wr_with)/len(dire_wr_with) - sum(dire_wr_with)/len(dire_wr_with)} % больше ')
+    sinergy = (sum(radiant_wr_with)/len(dire_wr_with)) - (sum(dire_wr_with)/len(dire_wr_with))
+    counterpick = sum(radiant_wr_against)/len(radiant_wr_against) - 50
+    if sinergy > 0 and counterpick > 0:
+        print(f'В среднем {radiant_team_name} сильнее на {(sinergy+counterpick)/2}%')
+    elif sinergy < 0 and counterpick < 0:
+        print(f'В среднем {dire_team_name} сильнее на {((sinergy + counterpick) / 2)*-1}%')
     else:
-        print('Ошибка синергий, вероятно пикнуто что-то экстроординарное')
-        print(f'{radiant_team_name}\n{radiant_heroes_and_positions}\n{dire_team_name}\n{dire_heroes_and_positions}')
-    print(f'С контрпиками как у {radiant_team_name} выигрывают на {sum(radiant_wr_against)/len(radiant_wr_against) - 50} % больше')
+        print(f'C cинергией как у {radiant_team_name} выигрывают на {sinergy} % больше ')
+        print(f'С контрпиками как у {radiant_team_name} выигрывают на {counterpick} % больше')
 
 
-
+def get_map_id(data, radiant_team_name, dire_team_name):
+    for match in data['rows']:
+        if match['team_radiant']['name'].lower() in radiant_team_name or match['team_dire']['name'].lower() in dire_team_name:
+            for karta in match['related_matches']:
+                if karta['status'] != 'ended':
+                    map_id = karta['id']
+                    url = f'https://cyberscore.live/en/matches/{map_id}/'
+                    return url
 
 
 def send_message(message):

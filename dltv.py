@@ -8,8 +8,7 @@ import requests
 from bs4 import BeautifulSoup
 import json
 
-
-
+import keys
 
 
 def get_live_matches():
@@ -450,8 +449,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
 
 
 def send_message(message):
-    BOT_TOKEN = '6635829285:AAGhpvRdh-6DtnT6DveZEky0tt5U_PejLXs'
-    CHAT_ID = '1091698279'
+    BOT_TOKEN = f'{keys.Token}'
+    CHAT_ID = f'{keys.Chat_id}'
     url = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage'
     payload = {
         'chat_id': CHAT_ID,

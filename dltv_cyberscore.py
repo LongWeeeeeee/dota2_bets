@@ -459,6 +459,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             send_message(f'Radiant Core matchup сильнее на {core_matchup}%')
         elif core_matchup < 0:
             send_message(f'Dire Core matchup сильнее на {core_matchup}%')
+        else:
+            send_message('Core matchup равный')
 
 
 def get_map_id(data, radiant_team_name, dire_team_name):

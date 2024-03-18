@@ -231,7 +231,7 @@ def are_similar(s1, s2, threshold=70):
     return similarity_percentage(s1, s2) >= threshold
 
 
-def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name):
+def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, core_matchup=0):
     radiant_wr_with, dire_wr_with, radiant_wr_against = [], [], []
     for position in radiant_heroes_and_positions:
         hero_url = radiant_heroes_and_positions[position].replace(' ', '%20')
@@ -385,6 +385,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             #             break
             if position == 'pos 1':
                 if 'pos 1' in data_pos and data_hero == dire_heroes_and_positions['pos 1']:
+                    core_matchup = data_wr
                     radiant_wr_against.append(data_wr)
                 elif 'pos 2' in data_pos and data_hero == dire_heroes_and_positions['pos 2']:
                     radiant_wr_against.append(data_wr)
@@ -441,16 +442,23 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                     radiant_wr_against.append(data_wr)
                 elif 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']:
                     radiant_wr_against.append(data_wr)
-
+    #
+    core_matchup -= 50
     sinergy = (sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))
     counterpick = sum(radiant_wr_against) / len(radiant_wr_against) - 50
-    if sinergy > 0 and counterpick > 0:
+    if sinergy > 0 and counterpick > 0 and core_matchup >= 0:
         send_message(f'В среднем {radiant_team_name} сильнее на {(sinergy + counterpick) / 2}%')
-    elif sinergy < 0 and counterpick < 0:
+        send_message(f'Core matchup сильнее на {core_matchup}%')
+    elif sinergy < 0 and counterpick < 0 and core_matchup <= 0:
         send_message(f'В среднем {dire_team_name} сильнее на {((sinergy + counterpick) / 2) * -1}%')
+        send_message(f'Core matchup сильнее на {core_matchup*-1}%')
     else:
         send_message(f'C cинергией как у {radiant_team_name} выигрывают на {sinergy} % больше ')
         send_message(f'С контрпиками как у {radiant_team_name} выигрывают на {counterpick} % больше')
+        if core_matchup > 0:
+            send_message(f'Radiant Core matchup сильнее на {core_matchup}%')
+        elif core_matchup < 0:
+            send_message(f'Dire Core matchup сильнее на {core_matchup}%')
 
 
 def get_map_id(data, radiant_team_name, dire_team_name):

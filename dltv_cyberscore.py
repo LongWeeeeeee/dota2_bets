@@ -15,9 +15,8 @@ import keys
 
 
 
-def get_live_matches():
+def get_live_matches(url = 'https://dltv.org/matches'):
     print("Функция выполняется...")
-    url = 'https://dltv.org/matches'
     live_matches_urls = get_urls(url)
     for url in live_matches_urls:
         response = requests.get(url).text
@@ -26,14 +25,21 @@ def get_live_matches():
         if radiant_block is not None:
             items = radiant_block.find('div', class_='items')
             # Проверяем, не скрыт ли элемент и содержит ли он другие элементы
-            if items and items.get('style') != 'display: none;' and len(items.find_all('div', class_='pick')) > 0:
+            if items and items.get('style') != 'display: none;' and len(items.find_all('div', class_='pick')) >= 4:
                 radiant_players, dire_players = get_player_names_and_heroes(radiant_block, soup)
                 radiant_team_name, dire_team_name = get_team_names(soup)
-                print(f'{radiant_team_name} VS {dire_team_name}')
                 result = get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players)
                 if result is not None:
-                    radiant_heroes_and_positions, dire_heroes_and_positions = result
-                    dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name)
+                    radiant_heroes_and_positions, dire_heroes_and_positions, url = result
+                    with open('map_id_check.txt', 'r+') as f:
+                        data = json.load(f)
+                        if url not in data:
+                            print(f'{radiant_team_name} VS {dire_team_name}')
+                            data.append(url)
+                            f.truncate()
+                            f.seek(0)
+                            json.dump(data, f)
+                            dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name)
 
 def get_urls(url):
     response = requests.get(url).text
@@ -51,6 +57,7 @@ def get_urls(url):
     #     f.truncate()
     #     f.seek(0)
     #     json.dump(file, f)
+    #     return live_matches_urls
     for match in live_matches:
         url = match.find('a')['href']
         live_matches_urls.add(url)
@@ -99,7 +106,7 @@ def get_team_ids(radiant_team_name, dire_team_name):
 
 def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players):
     radiant_pick, dire_pick = {}, {}
-    nick_fixes = {'griefy': 'asdekor_r', 'emptiness': 'aind', 'rincyq':'ninamin'}
+    nick_fixes = {'griefy': 'asdekor_r', 'emptiness': 'aind', 'rincyq':'ninamin', 'sagiri': 'kcl', 'somnia': 'oushaktian casedrop.com'}
     lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
     radiant_lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
     dire_lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
@@ -114,23 +121,26 @@ def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_
         soup = BeautifulSoup(response_html, 'lxml')
         players = soup.find_all('div', class_='team-item')
         for player in players:
-            nick_name = player.find('div', class_='player-name').text.lower()
+            nick_name = player.find('div', class_='player-name').text.lower().replace('.', '')
             position = player.find('span', class_='truncate').text.lower()
             if nick_name in nick_fixes:
                 nick_name = nick_fixes[nick_name]
             if position in lst:
                 for radiant_player_name in radiant_players:
-                    if are_similar(radiant_player_name, nick_name) or radiant_player_name in nick_name or nick_name in radiant_player_name:
+                     if are_similar(radiant_player_name, nick_name, threshold=55):
                         radiant_pick[translate[position]] = radiant_players[radiant_player_name]['hero']
-                        if position in lst:
+                        if position in radiant_lst:
                             radiant_lst.remove(position)
+                            break
                         else:
                             print(f'ошибка позиции {position} не существует')
+                # or radiant_player_name in nick_name or nick_name in radiant_player_name
                 for dire_player_name in dire_players:
-                    if are_similar(dire_player_name, nick_name) or dire_player_name in nick_name:
+                    if are_similar(dire_player_name, nick_name, threshold=55):
                         dire_pick[translate[position]]=dire_players[dire_player_name]['hero']
-                        if position in lst:
+                        if position in dire_lst:
                             dire_lst.remove(position)
+                            break
                         else:
                             print(f'ошибка позиции {position} не существует')
 
@@ -151,7 +161,7 @@ def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_
             print(f'не удалось выяснить позиции игроков {dire_pick}')
             return None
 
-        return radiant_pick, dire_pick
+        return radiant_pick, dire_pick, url
     else: return None
 
 
@@ -458,6 +468,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                 elif 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']:
                     radiant_wr_against.append(data_wr)
                     Radiant_Pos5_vs_Dire_pos5 = data_wr
+
     sinergy = (sum(radiant_wr_with)/len(radiant_wr_with)) - (sum(dire_wr_with)/len(dire_wr_with))
     counterpick = sum(radiant_wr_against)/len(radiant_wr_against) - 50
     if sinergy > 0 and counterpick > 0:
@@ -491,7 +502,7 @@ def get_map_id(data, radiant_team_name, dire_team_name):
 
 def send_message(message):
     BOT_TOKEN = f'{keys.Token}'
-    CHAT_ID = '6633013204'
+    CHAT_ID = f'{keys.Chat_id}'
     url = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage'
     payload = {
         'chat_id': CHAT_ID,

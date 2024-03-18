@@ -26,14 +26,16 @@ def get_live_matches(url='https://dltv.org/matches'):
             # Проверяем, не скрыт ли элемент и содержит ли он другие элементы
             if items and items.get('style') != 'display: none;' and len(items.find_all('div', class_='pick')) >= 4:
                 radiant_players, dire_players = get_player_names_and_heroes(radiant_block, soup)
-                radiant_team_name, dire_team_name = get_team_names(soup)
-                result = get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players)
+                result = get_team_names(soup)
                 if result is not None:
-                    radiant_heroes_and_positions, dire_heroes_and_positions, url = result
-                    if if_unique(url):
-                        print(f'{radiant_team_name} VS {dire_team_name}')
-                        dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name,
-                                        dire_team_name)
+                    radiant_team_name, dire_team_name = result
+                    result = get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players)
+                    if result is not None:
+                        radiant_heroes_and_positions, dire_heroes_and_positions, url = result
+                        if if_unique(url):
+                            print(f'{radiant_team_name} VS {dire_team_name}')
+                            dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name,
+                                            dire_team_name)
 
 
 def get_urls(url):
@@ -65,11 +67,11 @@ def get_team_names(soup):
     radiant_team_name, dire_team_name = None, None
     for tag in tags:
         team_info = tag.text.strip().split('\n')
-        if team_info[1].replace(' ', '') == 'radiant':
-            radiant_team_name = team_info[0]
+        if team_info[1].replace(' ', '').lower() == 'radiant':
+            radiant_team_name = team_info[0].lower()
         else:
-            dire_team_name = team_info[0]
-    return radiant_team_name.lower(), dire_team_name.lower()
+            dire_team_name = team_info[0].lower()
+    return radiant_team_name, dire_team_name
 
 
 def get_player_names_and_heroes(radiant_block, soup):
@@ -453,14 +455,14 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
 
 def get_map_id(data, radiant_team_name, dire_team_name):
     for match in data['rows']:
-        if match['team_dire'] is not None and match['team_radiant']['name'].lower() in radiant_team_name or \
-                match['team_dire'][
-                    'name'].lower() in dire_team_name:
-            for karta in match['related_matches']:
-                if karta['status'] != 'ended':
-                    map_id = karta['id']
-                    url = f'https://cyberscore.live/en/matches/{map_id}/'
-                    return url
+        if match['team_dire'] is not None and match['team_dire'] is not None:
+            if match ['team_radiant']['name'].lower() in radiant_team_name or \
+            match['team_dire']['name'].lower() in dire_team_name:
+                for karta in match['related_matches']:
+                    if karta['status'] != 'ended':
+                        map_id = karta['id']
+                        url = f'https://cyberscore.live/en/matches/{map_id}/'
+                        return url
 
 
 def if_unique(url):
@@ -485,5 +487,5 @@ def send_message(message):
     requests.post(url, json=payload)
 
 while True:
-    time.sleep(60)
     get_live_matches()
+    time.sleep(90)

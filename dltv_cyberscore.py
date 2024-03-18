@@ -1,21 +1,20 @@
 # Структура приложения: Анализ пиков + анализ игроков + анализ команды
-#можно также попробовать собирать другую статистику такую как продолжительность матча и все такое
-#сверха прошлых матчей и прошлых встреч
-#Отладка винрейта на старых матчах
-#Проверка того что все правильно работает
-#ранги неправильно работают
+# можно также попробовать собирать другую статистику такую как продолжительность матча и все такое
+# сверха прошлых матчей и прошлых встреч
+# Отладка винрейта на старых матчах
+# Проверка того что все правильно работает
+# ранги неправильно работают
 import html
-import re
+import json
+import time
+
 import requests
 from bs4 import BeautifulSoup
-import json
+
 import keys
 
 
-
-
-
-def get_live_matches(url = 'https://dltv.org/matches'):
+def get_live_matches(url='https://dltv.org/matches'):
     print("Функция выполняется...")
     live_matches_urls = get_urls(url)
     for url in live_matches_urls:
@@ -31,15 +30,11 @@ def get_live_matches(url = 'https://dltv.org/matches'):
                 result = get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players)
                 if result is not None:
                     radiant_heroes_and_positions, dire_heroes_and_positions, url = result
-                    with open('map_id_check.txt', 'r+') as f:
-                        data = json.load(f)
-                        if url not in data:
-                            print(f'{radiant_team_name} VS {dire_team_name}')
-                            data.append(url)
-                            f.truncate()
-                            f.seek(0)
-                            json.dump(data, f)
-                            dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name)
+                    if if_unique(url):
+                        print(f'{radiant_team_name} VS {dire_team_name}')
+                        dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name,
+                                        dire_team_name)
+
 
 def get_urls(url):
     response = requests.get(url).text
@@ -70,7 +65,7 @@ def get_team_names(soup):
     radiant_team_name, dire_team_name = None, None
     for tag in tags:
         team_info = tag.text.strip().split('\n')
-        if team_info[1].replace(' ', '') == 'Radiant':
+        if team_info[1].replace(' ', '') == 'radiant':
             radiant_team_name = team_info[0]
         else:
             dire_team_name = team_info[0]
@@ -98,7 +93,8 @@ def get_team_ids(radiant_team_name, dire_team_name):
     response = requests.get(url).text
     matches = json.loads(response)
     for match in matches['rows']:
-        if match['team_radiant']['name'].lower() in radiant_team_name.lower() or match['team_dire']['name'].lower() in dire_team_name.lower():
+        if match['team_radiant']['name'].lower() in radiant_team_name.lower() or match['team_dire'][
+        'name'].lower() in dire_team_name.lower():
             radiant_team_id = match['team_radiant']['id']
             dire_team_id = match['team_dire']['id']
             return radiant_team_id, dire_team_id
@@ -106,11 +102,13 @@ def get_team_ids(radiant_team_name, dire_team_name):
 
 def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players):
     radiant_pick, dire_pick = {}, {}
-    nick_fixes = {'griefy': 'asdekor_r', 'emptiness': 'aind', 'rincyq':'ninamin', 'sagiri': 'kcl', 'somnia': 'oushaktian casedrop.com'}
+    nick_fixes = {'griefy': 'asdekor_r', 'emptiness': 'aind', 'rincyq': 'ninamin', 'sagiri': 'kcl',
+                  'somnia': 'oushaktian casedrop.com'}
     lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
     radiant_lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
     dire_lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
-    translate = {'mid': 'pos 2', 'semi-support': 'pos 4', 'carry': 'pos 1', 'main-support': 'pos 5', 'offlaner': 'pos 3'}
+    translate = {'mid': 'pos 2', 'semi-support': 'pos 4', 'carry': 'pos 1', 'main-support': 'pos 5',
+                 'offlaner': 'pos 3'}
     url = 'https://api.cyberscore.live/api/v1/matches/?limit=20&type=liveOrUpcoming&locale=en'
     response = requests.get(url)
     data = json.loads(response.text)
@@ -127,7 +125,7 @@ def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_
                 nick_name = nick_fixes[nick_name]
             if position in lst:
                 for radiant_player_name in radiant_players:
-                     if are_similar(radiant_player_name, nick_name, threshold=55):
+                    if are_similar(radiant_player_name, nick_name, threshold=55):
                         radiant_pick[translate[position]] = radiant_players[radiant_player_name]['hero']
                         if position in radiant_lst:
                             radiant_lst.remove(position)
@@ -137,7 +135,7 @@ def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_
                 # or radiant_player_name in nick_name or nick_name in radiant_player_name
                 for dire_player_name in dire_players:
                     if are_similar(dire_player_name, nick_name, threshold=55):
-                        dire_pick[translate[position]]=dire_players[dire_player_name]['hero']
+                        dire_pick[translate[position]] = dire_players[dire_player_name]['hero']
                         if position in dire_lst:
                             dire_lst.remove(position)
                             break
@@ -162,13 +160,14 @@ def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_
             return None
 
         return radiant_pick, dire_pick, url
-    else: return None
+    else:
+        return None
 
 
 def fill_players_position(rows, players):
     heroes_and_position = {}
     lst = ['Мидер', 'Сапорт 4', 'Керри', 'Сапорт 5', 'Оффлейнер']
-    translate = {'Мидер':'pos 2', 'Сапорт 4': 'pos 4', 'Керри': 'pos 1', 'Сапорт 5': 'pos 5', 'Оффлейнер': 'pos 3'}
+    translate = {'Мидер': 'pos 2', 'Сапорт 4': 'pos 4', 'Керри': 'pos 1', 'Сапорт 5': 'pos 5', 'Оффлейнер': 'pos 3'}
     for row in rows:
         # Находим ячейку с никнеймом игрока
         player_nick = row.find('span', class_='team-player-nick')
@@ -198,8 +197,6 @@ def fill_players_position(rows, players):
             print('Не удалось узнать позицию, скорее всего команда новая')
             return None
     return heroes_and_position
-
-
 
 
 def levenshtein_distance(s1, s2):
@@ -242,15 +239,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             print(f'Ошибка dota2protracekr\n{url}')
         soup = BeautifulSoup(response.text, 'lxml')
         stats = soup.find_all('div', class_='overflow-y-scroll tbody h-96')
-        # #wr against
-        # index = {'Керри': 0, 'Мидер': 2, 'Оффлейнер': 4, 'Сапорт 4': 6, 'Сапорт 5': 8}
-        # hero_divs = stats[index[position]].find_all('div', attrs={'data-hero': True})
-        # for div in hero_divs:
-        #     # Extract the values of 'data-hero', 'data-wr', and 'data-pos' attributes
-        #     data_hero = div.get('data-hero')
-        #     data_wr = div.get('data-wr')
-        #     data_pos = div.get('data-pos')
-        # wr with
+        # #wr agai
         index = {'pos 1': 1, 'pos 2': 3, 'pos 3': 5, 'pos 4': 7, 'pos 5': 9}
         i = index[position]
         if len(stats) == 8:
@@ -268,40 +257,40 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             if position == 'pos 1':
                 if 'pos 2' in data_pos and data_hero == radiant_heroes_and_positions['pos 2']:
                     radiant_wr_with.append(data_wr)
-                    Radiant_Pos1_with_pos2 = data_wr
+                    radiant_pos1_with_pos2 = data_wr
                 elif 'pos 3' in data_pos and data_hero == radiant_heroes_and_positions['pos 3']:
                     radiant_wr_with.append(data_wr)
-                    Radiant_Pos1_with_pos3 = data_wr
+                    radiant_pos1_with_pos3 = data_wr
                 elif 'pos 4' in data_pos and data_hero == radiant_heroes_and_positions['pos 4']:
                     radiant_wr_with.append(data_wr)
-                    Radiant_Pos1_with_pos4 = data_wr
+                    radiant_pos1_with_pos4 = data_wr
                 elif 'pos 5' in data_pos and data_hero == radiant_heroes_and_positions['pos 5']:
                     radiant_wr_with.append(data_wr)
-                    Radiant_Pos1_with_pos5 = data_wr
+                    radiant_pos1_with_pos5 = data_wr
 
             if position == 'pos 2':
                 if 'pos 3' in data_pos and data_hero == radiant_heroes_and_positions['pos 3']:
                     radiant_wr_with.append(data_wr)
-                    Radiant_Pos2_with_pos3 = data_wr
+                    radiant_pos2_with_pos3 = data_wr
                 elif 'pos 4' in data_pos and data_hero == radiant_heroes_and_positions['pos 4']:
                     radiant_wr_with.append(data_wr)
-                    Radiant_Pos2_with_pos4 = data_wr
+                    radiant_pos2_with_pos4 = data_wr
                 elif 'pos 5' in data_pos and data_hero == radiant_heroes_and_positions['pos 5']:
                     radiant_wr_with.append(data_wr)
-                    Radiant_Pos2_with_pos5 = data_wr
+                    radiant_pos2_with_pos5 = data_wr
 
             if position == 'pos 3':
                 if 'pos 4' in data_pos and data_hero == radiant_heroes_and_positions['pos 4']:
                     radiant_wr_with.append(data_wr)
-                    Radiant_Pos3_with_pos4 = data_wr
+                    radiant_pos3_with_pos4 = data_wr
                 elif 'pos 5' in data_pos and data_hero == radiant_heroes_and_positions['pos 5']:
                     radiant_wr_with.append(data_wr)
-                    Radiant_Pos3_with_pos5 = data_wr
+                    radiant_pos3_with_pos5 = data_wr
 
             if position == 'pos 4':
                 if 'pos 5' in data_pos and data_hero == radiant_heroes_and_positions['pos 5']:
                     radiant_wr_with.append(data_wr)
-                    Radiant_Pos4_with_pos5 = data_wr
+                    radiant_pos4_with_pos5 = data_wr
     for position in dire_heroes_and_positions:
         hero_url = dire_heroes_and_positions[position].replace(' ', '%20')
         url = f'https://dota2protracker.com/hero/{hero_url}/new'
@@ -327,40 +316,40 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
 
             if position == 'pos 1':
                 if 'pos 2' in data_pos and data_hero == dire_heroes_and_positions['pos 2']:
-                    dire_Pos1_with_pos2 = data_wr
+                    dire_pos1_with_pos2 = data_wr
                     dire_wr_with.append(data_wr)
                 elif 'pos 3' in data_pos and data_hero == dire_heroes_and_positions['pos 3']:
-                    dire_Pos1_with_pos3 = data_wr
+                    dire_pos1_with_pos3 = data_wr
                     dire_wr_with.append(data_wr)
                 elif 'pos 4' in data_pos and data_hero == dire_heroes_and_positions['pos 4']:
-                    dire_Pos1_with_pos4 = data_wr
+                    dire_pos1_with_pos4 = data_wr
                     dire_wr_with.append(data_wr)
                 elif 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']:
-                    dire_Pos1_with_pos5 = data_wr
+                    dire_pos1_with_pos5 = data_wr
                     dire_wr_with.append(data_wr)
 
             if position == 'pos 2':
                 if 'pos 3' in data_pos and data_hero == dire_heroes_and_positions['pos 3']:
-                    dire_Pos2_with_pos3 = data_wr
+                    dire_pos2_with_pos3 = data_wr
                     dire_wr_with.append(data_wr)
                 elif 'pos 4' in data_pos and data_hero == dire_heroes_and_positions['pos 4']:
-                    dire_Pos2_with_pos4 = data_wr
+                    dire_pos2_with_pos4 = data_wr
                     dire_wr_with.append(data_wr)
                 elif 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']:
-                    dire_Pos2_with_pos5 = data_wr
+                    dire_pos2_with_pos5 = data_wr
                     dire_wr_with.append(data_wr)
 
             if position == 'pos 3':
                 if 'pos 4' in data_pos and data_hero == dire_heroes_and_positions['pos 4']:
-                    dire_Pos3_with_pos4 = data_wr
+                    dire_pos3_with_pos4 = data_wr
                     dire_wr_with.append(data_wr)
                 elif 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']:
-                    dire_Pos3_with_pos5 = data_wr
+                    dire_pos3_with_pos5 = data_wr
                     dire_wr_with.append(data_wr)
 
             if position == 'pos 4':
                 if 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']:
-                    dire_Pos4_with_pos5 = data_wr
+                    dire_pos4_with_pos5 = data_wr
                     dire_wr_with.append(data_wr)
     for position in radiant_heroes_and_positions:
         hero_url = radiant_heroes_and_positions[position].replace(' ', '%20')
@@ -385,130 +374,116 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             data_hero = div.get('data-hero')
             data_wr = int(float(div.get('data-wr')))
             data_pos = div.get('data-pos')
+            # positions = ['pos 1', 'pos 2', 'pos 3', 'pos 4', 'pos 5']
+            # проверить
+            # if position in positions:
+            #     for pos in positions:
+            #         if pos in data_pos and data_hero == dire_heroes_and_positions[pos]:
+            #             radiant_wr_against.append(data_wr)
+            #             break
             if position == 'pos 1':
                 if 'pos 1' in data_pos and data_hero == dire_heroes_and_positions['pos 1']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos1_vs_Dire_pos1 = data_wr
                 elif 'pos 2' in data_pos and data_hero == dire_heroes_and_positions['pos 2']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos1_vs_Dire_pos2 = data_wr
                 elif 'pos 3' in data_pos and data_hero == dire_heroes_and_positions['pos 3']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos1_vs_Dire_pos3 = data_wr
                 elif 'pos 4' in data_pos and data_hero == dire_heroes_and_positions['pos 4']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos1_vs_Dire_pos4 = data_wr
                 elif 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos1_vs_Dire_pos5 = data_wr
 
             elif position == 'pos 2':
                 if 'pos 1' in data_pos and data_hero == dire_heroes_and_positions['pos 1']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos2_vs_Dire_pos1 = data_wr
                 elif 'pos 2' in data_pos and data_hero == dire_heroes_and_positions['pos 2']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos2_vs_Dire_pos2 = data_wr
                 elif 'pos 3' in data_pos and data_hero == dire_heroes_and_positions['pos 3']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos2_vs_Dire_pos3 = data_wr
                 elif 'pos 4' in data_pos and data_hero == dire_heroes_and_positions['pos 4']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos2_vs_Dire_pos4 = data_wr
                 elif 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos2_vs_Dire_pos5 = data_wr
 
             elif position == 'pos 3':
                 if 'pos 1' in data_pos and data_hero == dire_heroes_and_positions['pos 1']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos3_vs_Dire_pos1 = data_wr
                 elif 'pos 2' in data_pos and data_hero == dire_heroes_and_positions['pos 2']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos3_vs_Dire_pos2 = data_wr
                 elif 'pos 3' in data_pos and data_hero == dire_heroes_and_positions['pos 3']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos3_vs_Dire_pos3 = data_wr
                 elif 'pos 4' in data_pos and data_hero == dire_heroes_and_positions['pos 4']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos3_vs_Dire_pos4 = data_wr
                 elif 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos3_vs_Dire_pos5 = data_wr
 
             elif position == 'pos 4':
                 if 'pos 1' in data_pos and data_hero == dire_heroes_and_positions['pos 1']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos4_vs_Dire_pos1 = data_wr
                 elif 'pos 2' in data_pos and data_hero == dire_heroes_and_positions['pos 2']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos4_vs_Dire_pos2 = data_wr
                 elif 'pos 3' in data_pos and data_hero == dire_heroes_and_positions['pos 3']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos4_vs_Dire_pos3 = data_wr
                 elif 'pos 4' in data_pos and data_hero == dire_heroes_and_positions['pos 4']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos4_vs_Dire_pos4 = data_wr
                 elif 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos4_vs_Dire_pos5 = data_wr
             elif position == 'pos 5':
                 if 'pos 1' in data_pos and data_hero == dire_heroes_and_positions['pos 1']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos5_vs_Dire_pos1 = data_wr
                 elif 'pos 2' in data_pos and data_hero == dire_heroes_and_positions['pos 2']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos5_vs_Dire_pos2 = data_wr
                 elif 'pos 3' in data_pos and data_hero == dire_heroes_and_positions['pos 3']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos5_vs_Dire_pos3 = data_wr
                 elif 'pos 4' in data_pos and data_hero == dire_heroes_and_positions['pos 4']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos5_vs_Dire_pos4 = data_wr
                 elif 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']:
                     radiant_wr_against.append(data_wr)
-                    Radiant_Pos5_vs_Dire_pos5 = data_wr
 
-    sinergy = (sum(radiant_wr_with)/len(radiant_wr_with)) - (sum(dire_wr_with)/len(dire_wr_with))
-    counterpick = sum(radiant_wr_against)/len(radiant_wr_against) - 50
+    sinergy = (sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))
+    counterpick = sum(radiant_wr_against) / len(radiant_wr_against) - 50
     if sinergy > 0 and counterpick > 0:
-        send_message(f'В среднем {radiant_team_name} сильнее на {(sinergy+counterpick)/2}%')
+        send_message(f'В среднем {radiant_team_name} сильнее на {(sinergy + counterpick) / 2}%')
     elif sinergy < 0 and counterpick < 0:
-        send_message(f'В среднем {dire_team_name} сильнее на {((sinergy + counterpick) / 2)*-1}%')
+        send_message(f'В среднем {dire_team_name} сильнее на {((sinergy + counterpick) / 2) * -1}%')
     else:
         send_message(f'C cинергией как у {radiant_team_name} выигрывают на {sinergy} % больше ')
         send_message(f'С контрпиками как у {radiant_team_name} выигрывают на {counterpick} % больше')
 
 
 def get_map_id(data, radiant_team_name, dire_team_name):
+    for match in data['rows']:
+        if match['team_dire'] is not None and match['team_radiant']['name'].lower() in radiant_team_name or \
+                match['team_dire'][
+                    'name'].lower() in dire_team_name:
+            for karta in match['related_matches']:
+                if karta['status'] != 'ended':
+                    map_id = karta['id']
+                    url = f'https://cyberscore.live/en/matches/{map_id}/'
+                    return url
+
+
+def if_unique(url):
     with open('map_id_check.txt', 'r+') as f:
-        file = json.load(f)
-        for match in data['rows']:
-            if match['team_dire'] is not None:
-                if match['team_radiant']['name'].lower() in radiant_team_name or match['team_dire']['name'].lower() in dire_team_name:
-                    for karta in match['related_matches']:
-                        if karta['status'] != 'ended':
-                            map_id = karta['id']
-                            # if map_id not in file:
-                            #     file.append(map_id)
-                            #     url = f'https://cyberscore.live/en/matches/{map_id}/'
-                            #     f.truncate()
-                            #     f.seek(0)
-                            #     json.dump(file, f)
-                            #     return url
-                            url = f'https://cyberscore.live/en/matches/{map_id}/'
-                            return url
+        data = json.load(f)
+        if url not in data:
+            data.append(url)
+            f.truncate()
+            f.seek(0)
+            json.dump(data, f)
+            return True
 
 
 def send_message(message):
-    BOT_TOKEN = f'{keys.Token}'
-    CHAT_ID = f'{keys.Chat_id}'
-    url = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage'
+    bot_token = f'{keys.Token}'
+    chat_id = f'{keys.Chat_id}'
+    url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
     payload = {
-        'chat_id': CHAT_ID,
+        'chat_id': chat_id,
         'text': message
     }
     requests.post(url, json=payload)
 
-
-get_live_matches()
+while True:
+    time.sleep(60)
+    get_live_matches()

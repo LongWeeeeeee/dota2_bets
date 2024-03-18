@@ -456,9 +456,9 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         send_message(f'C cинергией как у {radiant_team_name} выигрывают на {sinergy} % больше ')
         send_message(f'С контрпиками как у {radiant_team_name} выигрывают на {counterpick} % больше')
         if core_matchup > 0:
-            send_message(f'Radiant Core matchup сильнее на {core_matchup}%')
+            send_message(f'В Кор matchup Radiant сильнее на {core_matchup}%')
         elif core_matchup < 0:
-            send_message(f'Dire Core matchup сильнее на {core_matchup}%')
+            send_message(f'В Кор matchup Dire сильнее на {core_matchup}*-1%')
         else:
             send_message('Core matchup равный')
 

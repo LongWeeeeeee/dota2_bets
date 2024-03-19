@@ -49,7 +49,7 @@ def get_urls(url):
         for match in live_matches:
             url = match.find('a')['href']
             live_matches_urls.add(url)
-            return live_matches_urls
+        return live_matches_urls
 
 
 def get_team_names(soup):
@@ -248,6 +248,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             data_hero = div.get('data-hero')
             data_wr = int(float(div.get('data-wr')))
             data_pos = div.get('data-pos')
+
             if position == 'pos 1':
                 if 'pos 2' in data_pos and data_hero == radiant_heroes_and_positions['pos 2']:
                     radiant_wr_with.append(data_wr)
@@ -368,74 +369,17 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             data_hero = div.get('data-hero')
             data_wr = int(float(div.get('data-wr')))
             data_pos = div.get('data-pos')
-            # positions = ['pos 1', 'pos 2', 'pos 3', 'pos 4', 'pos 5']
+            positions = ['pos 1', 'pos 2', 'pos 3', 'pos 4', 'pos 5']
             # проверить
-            # if position in positions:
-            #     for pos in positions:
-            #         if pos in data_pos and data_hero == dire_heroes_and_positions[pos]:
-            #             radiant_wr_against.append(data_wr)
-            #             break
-            if position == 'pos 1':
-                if 'pos 1' in data_pos and data_hero == dire_heroes_and_positions['pos 1']:
-                    core_matchup = data_wr
+            for pos in positions:
+                if pos in data_pos and data_hero == dire_heroes_and_positions[pos]:
+                    if position == 'pos 1' and pos == 'pos 1':
+                        core_matchup = data_wr
                     radiant_wr_against.append(data_wr)
-                elif 'pos 2' in data_pos and data_hero == dire_heroes_and_positions['pos 2']:
-                    radiant_wr_against.append(data_wr)
-                elif 'pos 3' in data_pos and data_hero == dire_heroes_and_positions['pos 3']:
-                    radiant_wr_against.append(data_wr)
-                elif 'pos 4' in data_pos and data_hero == dire_heroes_and_positions['pos 4']:
-                    radiant_wr_against.append(data_wr)
-                elif 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']:
-                    radiant_wr_against.append(data_wr)
-
-            elif position == 'pos 2':
-                if 'pos 1' in data_pos and data_hero == dire_heroes_and_positions['pos 1']:
-                    radiant_wr_against.append(data_wr)
-                elif 'pos 2' in data_pos and data_hero == dire_heroes_and_positions['pos 2']:
-                    radiant_wr_against.append(data_wr)
-                elif 'pos 3' in data_pos and data_hero == dire_heroes_and_positions['pos 3']:
-                    radiant_wr_against.append(data_wr)
-                elif 'pos 4' in data_pos and data_hero == dire_heroes_and_positions['pos 4']:
-                    radiant_wr_against.append(data_wr)
-                elif 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']:
-                    radiant_wr_against.append(data_wr)
-
-            elif position == 'pos 3':
-                if 'pos 1' in data_pos and data_hero == dire_heroes_and_positions['pos 1']:
-                    radiant_wr_against.append(data_wr)
-                elif 'pos 2' in data_pos and data_hero == dire_heroes_and_positions['pos 2']:
-                    radiant_wr_against.append(data_wr)
-                elif 'pos 3' in data_pos and data_hero == dire_heroes_and_positions['pos 3']:
-                    radiant_wr_against.append(data_wr)
-                elif 'pos 4' in data_pos and data_hero == dire_heroes_and_positions['pos 4']:
-                    radiant_wr_against.append(data_wr)
-                elif 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']:
-                    radiant_wr_against.append(data_wr)
-
-            elif position == 'pos 4':
-                if 'pos 1' in data_pos and data_hero == dire_heroes_and_positions['pos 1']:
-                    radiant_wr_against.append(data_wr)
-                elif 'pos 2' in data_pos and data_hero == dire_heroes_and_positions['pos 2']:
-                    radiant_wr_against.append(data_wr)
-                elif 'pos 3' in data_pos and data_hero == dire_heroes_and_positions['pos 3']:
-                    radiant_wr_against.append(data_wr)
-                elif 'pos 4' in data_pos and data_hero == dire_heroes_and_positions['pos 4']:
-                    radiant_wr_against.append(data_wr)
-                elif 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']:
-                    radiant_wr_against.append(data_wr)
-            elif position == 'pos 5':
-                if 'pos 1' in data_pos and data_hero == dire_heroes_and_positions['pos 1']:
-                    radiant_wr_against.append(data_wr)
-                elif 'pos 2' in data_pos and data_hero == dire_heroes_and_positions['pos 2']:
-                    radiant_wr_against.append(data_wr)
-                elif 'pos 3' in data_pos and data_hero == dire_heroes_and_positions['pos 3']:
-                    radiant_wr_against.append(data_wr)
-                elif 'pos 4' in data_pos and data_hero == dire_heroes_and_positions['pos 4']:
-                    radiant_wr_against.append(data_wr)
-                elif 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']:
-                    radiant_wr_against.append(data_wr)
+                    break
     #
-    core_matchup -= 50
+    if core_matchup != 0:
+        core_matchup -= 50
     sinergy = (sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))
     counterpick = sum(radiant_wr_against) / len(radiant_wr_against) - 50
     if sinergy > 0 and counterpick > 0 and core_matchup >= 0:

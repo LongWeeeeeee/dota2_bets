@@ -17,48 +17,39 @@ import keys
 def get_live_matches(url='https://dltv.org/matches'):
     print("Функция выполняется...")
     live_matches_urls = get_urls(url)
-    for url in live_matches_urls:
-        response = requests.get(url).text
-        soup = BeautifulSoup(response, 'lxml')
-        radiant_block = soup.find('div', class_='picks__new-picks__picks radiant')
-        if radiant_block is not None:
-            items = radiant_block.find('div', class_='items')
-            # Проверяем, не скрыт ли элемент и содержит ли он другие элементы
-            if items and items.get('style') != 'display: none;' and len(items.find_all('div', class_='pick')) >= 4:
-                radiant_players, dire_players = get_player_names_and_heroes(radiant_block, soup)
-                result = get_team_names(soup)
-                if result is not None:
-                    radiant_team_name, dire_team_name = result
-                    result = get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players)
+    if live_matches_urls is not None:
+        for url in live_matches_urls:
+            response = requests.get(url).text
+            soup = BeautifulSoup(response, 'lxml')
+            radiant_block = soup.find('div', class_='picks__new-picks__picks radiant')
+            if radiant_block is not None:
+                items = radiant_block.find('div', class_='items')
+                # Проверяем, не скрыт ли элемент и содержит ли он другие элементы
+                if items and items.get('style') != 'display: none;' and len(items.find_all('div', class_='pick')) >= 4:
+                    radiant_players, dire_players = get_player_names_and_heroes(radiant_block, soup)
+                    result = get_team_names(soup)
                     if result is not None:
-                        radiant_heroes_and_positions, dire_heroes_and_positions, url = result
-                        if if_unique(url):
-                            print(f'{radiant_team_name} VS {dire_team_name}')
-                            dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name,
-                                            dire_team_name)
+                        radiant_team_name, dire_team_name = result
+                        result = get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players)
+                        if result is not None:
+                            radiant_heroes_and_positions, dire_heroes_and_positions, url = result
+                            if if_unique(url):
+                                print(f'{radiant_team_name} VS {dire_team_name}')
+                                dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name,
+                                                dire_team_name)
 
 
 def get_urls(url):
-    response = requests.get(url).text
-    soup = BeautifulSoup(response, 'lxml')
-    live_matches_block = soup.find('div', class_='live__matches')
-    live_matches = live_matches_block.find_all('div', class_='live__matches-item__body')
-    live_matches_urls = set()
-    # with open('map_id_check.txt', 'r+') as f:
-    #     file = json.load(f)
-    #     for match in live_matches:
-    #         url = match.find('a')['href']
-    #         if url not in file:
-    #             file.append(url)
-    #             live_matches_urls.add(url)
-    #     f.truncate()
-    #     f.seek(0)
-    #     json.dump(file, f)
-    #     return live_matches_urls
-    for match in live_matches:
-        url = match.find('a')['href']
-        live_matches_urls.add(url)
-    return live_matches_urls
+    response = requests.get(url)
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, 'lxml')
+        live_matches_block = soup.find('div', class_='live__matches')
+        live_matches = live_matches_block.find_all('div', class_='live__matches-item__body')
+        live_matches_urls = set()
+        for match in live_matches:
+            url = match.find('a')['href']
+            live_matches_urls.add(url)
+            return live_matches_urls
 
 
 def get_team_names(soup):
@@ -456,9 +447,9 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         send_message(f'C cинергией как у {radiant_team_name} выигрывают на {sinergy} % больше ')
         send_message(f'С контрпиками как у {radiant_team_name} выигрывают на {counterpick} % больше')
         if core_matchup > 0:
-            send_message(f'В Кор matchup Radiant сильнее на {core_matchup}%')
+            send_message(f'В Кор matchup {radiant_team_name} сильнее на {core_matchup}%')
         elif core_matchup < 0:
-            send_message(f'В Кор matchup Dire сильнее на {core_matchup}*-1%')
+            send_message(f'В Кор matchup {dire_team_name} сильнее на {core_matchup*-1}%')
         else:
             send_message('Core matchup равный')
 

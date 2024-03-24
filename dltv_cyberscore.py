@@ -6,8 +6,6 @@
 # ранги неправильно работают
 import html
 import json
-import time
-
 import requests
 from bs4 import BeautifulSoup
 
@@ -36,7 +34,7 @@ def get_live_matches(url='https://dltv.org/matches'):
                             if if_unique(url):
                                 print(f'{radiant_team_name} VS {dire_team_name}')
                                 dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name,
-                                                dire_team_name)
+                                                dire_team_name, url)
 
 
 def get_urls(url):
@@ -96,7 +94,7 @@ def get_team_ids(radiant_team_name, dire_team_name):
 def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players):
     radiant_pick, dire_pick = {}, {}
     nick_fixes = {'griefy': 'asdekor_r', 'emptiness': 'aind', 'rincyq': 'ninamin', 'sagiri': 'kcl',
-                  'somnia': 'oushaktian casedrop.com'}
+                  'somnia': 'oushaktian casedrop.com', 'yuukichi': 'hiori','neko': 'sh1do', 'ra1ncloud': 'v1necy'}
     lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
     radiant_lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
     dire_lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
@@ -147,9 +145,11 @@ def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_
                     if hero not in dire_players.values():
                         dire_pick[translate[dire_lst[0]]] = hero
             if len(radiant_pick) != 5:
+                print(radiant_team_name)
                 print(f'не удалось выяснить позиции игроков {radiant_pick}')
                 return None
             if len(dire_pick) != 5:
+                print(dire_team_name)
                 print(f'не удалось выяснить позиции игроков {dire_pick}')
                 return None
 
@@ -223,7 +223,7 @@ def are_similar(s1, s2, threshold=70):
     return similarity_percentage(s1, s2) >= threshold
 
 
-def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, core_matchup=0):
+def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, antiplagiat_url, core_matchup=None):
     radiant_wr_with, dire_wr_with, radiant_wr_against = [], [], []
     for position in radiant_heroes_and_positions:
         hero_url = radiant_heroes_and_positions[position].replace(' ', '%20')
@@ -234,14 +234,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         soup = BeautifulSoup(response.text, 'lxml')
         stats = soup.find_all('div', class_='overflow-y-scroll tbody h-96')
         # #wr agai
-        index = {'pos 1': 1, 'pos 2': 3, 'pos 3': 5, 'pos 4': 7, 'pos 5': 9}
+        index = {'pos 1': 1, 'pos 2': 3, 'pos 3': 5, 'pos 4': len(stats) - 3, 'pos 5': len(stats) - 1}
         i = index[position]
-        if len(stats) == 8:
-            i -= 2
-        elif len(stats) == 6:
-            i -= 4
-        elif len(stats) == 4:
-            i -= 6
         hero_divs = stats[i].find_all('div', attrs={'data-hero': True})
         for div in hero_divs:
             # Extract the values of 'data-hero', 'data-wr', and 'data-pos' attributes
@@ -294,14 +288,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             print(f'Ошибка dota2protracekr\n{url}')
         soup = BeautifulSoup(response.text, 'lxml')
         stats = soup.find_all('div', class_='overflow-y-scroll tbody h-96')
-        index = {'pos 1': 1, 'pos 2': 3, 'pos 3': 5, 'pos 4': 7, 'pos 5': 9}
+        index = {'pos 1': 1, 'pos 2': 3, 'pos 3': 5, 'pos 4': len(stats) - 3, 'pos 5': len(stats) - 1}
         i = index[position]
-        if len(stats) == 8:
-            i -= 2
-        elif len(stats) == 6:
-            i -= 4
-        elif len(stats) == 4:
-            i -= 6
         hero_divs = stats[i].find_all('div', attrs={'data-hero': True})
         for div in hero_divs:
             # Extract the values of 'data-hero', 'data-wr', and 'data-pos' attributes
@@ -355,14 +343,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         soup = BeautifulSoup(response.text, 'lxml')
         stats = soup.find_all('div', class_='overflow-y-scroll tbody h-96')
         # #wr against
-        index = {'pos 1': 0, 'pos 2': 2, 'pos 3': 4, 'pos 4': 6, 'pos 5': 8}
+        index = {'pos 1': 0, 'pos 2': 2, 'pos 3': 4, 'pos 4': len(stats) - 4, 'pos 5': len(stats) - 2}
         i = index[position]
-        if len(stats) == 8:
-            i -= 2
-        elif len(stats) == 6:
-            i -= 4
-        elif len(stats) == 4:
-            i -= 6
         hero_divs = stats[i].find_all('div', attrs={'data-hero': True})
         for div in hero_divs:
             # Extract the values of 'data-hero', 'data-wr', and 'data-pos' attributes
@@ -378,25 +360,46 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                     radiant_wr_against.append(data_wr)
                     break
     #
-    if core_matchup != 0:
+    if core_matchup is not None:
         core_matchup -= 50
-    sinergy = (sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))
-    counterpick = sum(radiant_wr_against) / len(radiant_wr_against) - 50
-    if sinergy > 0 and counterpick > 0 and core_matchup >= 0:
-        send_message(f'В среднем {radiant_team_name} сильнее на {(sinergy + counterpick) / 2}%')
-        send_message(f'Core matchup сильнее на {core_matchup}%')
-    elif sinergy < 0 and counterpick < 0 and core_matchup <= 0:
-        send_message(f'В среднем {dire_team_name} сильнее на {((sinergy + counterpick) / 2) * -1}%')
-        send_message(f'Core matchup сильнее на {core_matchup*-1}%')
+    if len(dire_wr_with) >= 4 and len(radiant_wr_with) >= 4 and len(radiant_wr_against) >= 4:
+        sinergy = (sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))
+        counterpick = sum(radiant_wr_against) / len(radiant_wr_against) - 50
+        average = (sinergy + counterpick) / 2
+        if average > 0:
+            send_message(f'В среднем {radiant_team_name} сильнее на {average}%')
+            if core_matchup is not None:
+                if core_matchup > 0:
+                    send_message(f'В Кор matchup {radiant_team_name} сильнее на {core_matchup}%')
+                elif core_matchup < 0:
+                    send_message(f'В Кор matchup {dire_team_name} сильнее на {core_matchup*-1}%')
+                else:
+                    send_message('Core matchup равный')
+            else:
+                send_message('Core_matchup error')
+        elif average < 0:
+            send_message(f'В среднем {dire_team_name} сильнее на {average*-1}%')
+            if core_matchup is not None:
+                if core_matchup > 0:
+                    send_message(f'В Кор matchup {radiant_team_name} сильнее на {core_matchup}%')
+                elif core_matchup < 0:
+                    send_message(f'В Кор matchup {dire_team_name} сильнее на {core_matchup*-1}%')
+                else:
+                    send_message('Core matchup равный')
+            else:
+                send_message('Core_matchup error')
     else:
-        send_message(f'C cинергией как у {radiant_team_name} выигрывают на {sinergy} % больше ')
-        send_message(f'С контрпиками как у {radiant_team_name} выигрывают на {counterpick} % больше')
-        if core_matchup > 0:
-            send_message(f'В Кор matchup {radiant_team_name} сильнее на {core_matchup}%')
-        elif core_matchup < 0:
-            send_message(f'В Кор matchup {dire_team_name} сильнее на {core_matchup*-1}%')
-        else:
-            send_message('Core matchup равный')
+        if core_matchup is None:
+            print(f'{radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions["pos 1"]} нету на dota2protracker')
+        if len(dire_wr_with) < 4:
+            print(f'Недостаточная выборка винрейтов у {dire_team_name} между командой\n{dire_heroes_and_positions}')
+        if len(radiant_wr_with) < 4:
+            print(f'Недостаточная выборка винрейтов у {radiant_team_name} между командой\n{radiant_heroes_and_positions}')
+        if len(radiant_wr_against) < 4:
+            print(
+                f'Недостаточная выборка винрейтов у команду между друг друга\n{radiant_heroes_and_positions}\n{dire_heroes_and_positions}')
+    add_url(antiplagiat_url)
+
 
 
 def get_map_id(data, radiant_team_name, dire_team_name):
@@ -415,11 +418,21 @@ def if_unique(url):
     with open('map_id_check.txt', 'r+') as f:
         data = json.load(f)
         if url not in data:
+            # data.append(url)
+            # f.truncate()
+            # f.seek(0)
+            # json.dump(data, f)
+            return True
+
+
+def add_url(url):
+    with open('map_id_check.txt', 'r+') as f:
+        data = json.load(f)
+        if url not in data:
             data.append(url)
             f.truncate()
             f.seek(0)
             json.dump(data, f)
-            return True
 
 
 def send_message(message):
@@ -432,6 +445,4 @@ def send_message(message):
     }
     requests.post(url, json=payload)
 
-while True:
-    get_live_matches()
-    time.sleep(90)
+get_live_matches()

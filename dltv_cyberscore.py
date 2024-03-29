@@ -17,7 +17,7 @@ def get_live_matches(url='https://dltv.org/matches'):
     live_matches_urls = get_urls(url)
     if live_matches_urls is not None:
         for url in live_matches_urls:
-            response = requests.get(url).text
+            response = requests.get(url, verify=False).text
             soup = BeautifulSoup(response, 'lxml')
             radiant_block = soup.find('div', class_='picks__new-picks__picks radiant')
             if radiant_block is not None:
@@ -38,7 +38,7 @@ def get_live_matches(url='https://dltv.org/matches'):
 
 
 def get_urls(url):
-    response = requests.get(url)
+    response = requests.get(url, verify=False)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'lxml')
         live_matches_block = soup.find('div', class_='live__matches')
@@ -81,7 +81,7 @@ def get_player_names_and_heroes(radiant_block, soup):
 
 def get_team_ids(radiant_team_name, dire_team_name):
     url = 'https://api.cyberscore.live/api/v1/matches/?limit=20&type=liveOrUpcoming&locale=en'
-    response = requests.get(url).text
+    response = requests.get(url, verify=False).text
     matches = json.loads(response)
     for match in matches['rows']:
         if match['team_radiant']['name'].lower() in radiant_team_name.lower() or match['team_dire'][
@@ -101,11 +101,11 @@ def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_
     translate = {'mid': 'pos 2', 'semi-support': 'pos 4', 'carry': 'pos 1', 'main-support': 'pos 5',
                  'offlaner': 'pos 3'}
     url = 'https://api.cyberscore.live/api/v1/matches/?limit=20&type=liveOrUpcoming&locale=en'
-    response = requests.get(url)
+    response = requests.get(url, verify=False)
     data = json.loads(response.text)
     url = get_map_id(data, radiant_team_name, dire_team_name)
     if url is not None:
-        response = requests.get(url)
+        response = requests.get(url, verify=False)
         if response.status_code == 200:
             response_html = html.unescape(response.text)
             soup = BeautifulSoup(response_html, 'lxml')
@@ -228,7 +228,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     for position in radiant_heroes_and_positions:
         hero_url = radiant_heroes_and_positions[position].replace(' ', '%20')
         url = f'https://dota2protracker.com/hero/{hero_url}/new'
-        response = requests.get(url)
+        response = requests.get(url, verify=False)
         if response.status_code != 200:
             print(f'Ошибка dota2protracekr\n{url}')
         soup = BeautifulSoup(response.text, 'lxml')
@@ -283,7 +283,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     for position in dire_heroes_and_positions:
         hero_url = dire_heroes_and_positions[position].replace(' ', '%20')
         url = f'https://dota2protracker.com/hero/{hero_url}/new'
-        response = requests.get(url)
+        response = requests.get(url, verify=False)
         if response.status_code != 200:
             print(f'Ошибка dota2protracekr\n{url}')
         soup = BeautifulSoup(response.text, 'lxml')
@@ -337,7 +337,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     for position in radiant_heroes_and_positions:
         hero_url = radiant_heroes_and_positions[position].replace(' ', '%20')
         url = f'https://dota2protracker.com/hero/{hero_url}/new'
-        response = requests.get(url)
+        response = requests.get(url, verify=False)
         if response.status_code != 200:
             print(f'Ошибка dota2protracekr\n{url}')
         soup = BeautifulSoup(response.text, 'lxml')

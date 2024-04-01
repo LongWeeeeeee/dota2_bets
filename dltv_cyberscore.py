@@ -98,7 +98,7 @@ def get_team_ids(radiant_team_name, dire_team_name):
 
 def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players):
     radiant_pick, dire_pick = {}, {}
-    nick_fixes = {'griefy': 'asdekor_r', 'emptiness': 'aind','red2' :'nico' ,'bnc' :'xxxblincc', 'xdddd':'fachero','sagiri': 'kcl',
+    nick_fixes = {'griefy': 'asdekor_r', '999xu': 'imitator', 'emptiness': 'aind','red2' :'nico' ,'bnc' :'xxxblincc', 'xdddd':'fachero','sagiri': 'kcl',
                   'somnia': 'oushaktian casedrop.com', 'yuukichi': 'hiori','neko': 'sh1do', 'ra1ncloud': 'v1necy', 'qjy': 'newbie', 'young ame is back': 'a1one', 'ksh':'raz', 'xn丶e': 'xne-'}
     lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
     radiant_lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
@@ -225,7 +225,7 @@ def are_similar(s1, s2, threshold=70):
 
 
 def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, antiplagiat_url, core_matchup=None):
-    radiant_wr_with, dire_wr_with, radiant_wr_against = [], [], []
+    radiant_wr_with, dire_wr_with, radiant_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team = [], [], [], [] ,[]
     for position in radiant_heroes_and_positions:
         hero_url = radiant_heroes_and_positions[position].replace(' ', '%20')
         url = f'https://dota2protracker.com/hero/{hero_url}/new'
@@ -369,6 +369,11 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                         core_matchup = data_wr
                     radiant_wr_against.append(data_wr)
                     break
+            if position == 'pos 1' and data_hero in list(dire_heroes_and_positions.values()):
+                radiant_pos1_vs_team.append(data_wr)
+
+            if data_pos == 'pos 1' and data_hero == radiant_heroes_and_positions['pos 1']:
+                dire_pos1_vs_team.append(data_wr)
     #
     if core_matchup is not None:
         core_matchup -= 50
@@ -476,5 +481,5 @@ def send_message(message):
     requests.post(url, json=payload)
 while True:
     get_live_matches()
-    print('сплю 60 секунд')
-    time.sleep(60)
+    print('сплю 120 секунд')
+    time.sleep(120)

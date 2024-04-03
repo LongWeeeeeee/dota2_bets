@@ -224,7 +224,7 @@ def are_similar(s1, s2, threshold=70):
     return similarity_percentage(s1, s2) >= threshold
 
 
-def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, antiplagiat_url, core_matchup=None):
+def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, antiplagiat_url=None, core_matchup=None):
     radiant_wr_with, dire_wr_with, radiant_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team = [], [], [], [] ,[]
     for position in radiant_heroes_and_positions:
         hero_url = radiant_heroes_and_positions[position].replace(' ', '%20')
@@ -363,17 +363,19 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             data_pos = div.get('data-pos')
             positions = ['pos 1', 'pos 2', 'pos 3', 'pos 4', 'pos 5']
             # проверить
-            for pos in positions:
-                if pos in data_pos and data_hero == dire_heroes_and_positions[pos]:
-                    if position == 'pos 1' and pos == 'pos 1':
-                        core_matchup = data_wr
-                    radiant_wr_against.append(data_wr)
-                    break
-            if position == 'pos 1' and data_hero in list(dire_heroes_and_positions.values()):
-                radiant_pos1_vs_team.append(data_wr)
+            if data_pos.split(',')[0] in positions:
+                for pos in positions:
+                    if pos in data_pos and data_hero == dire_heroes_and_positions[pos]:
+                        if position == 'pos 1' and pos == 'pos 1':
+                            core_matchup = data_wr
+                        radiant_wr_against.append(data_wr)
+                try:
+                    if position == 'pos 1' and data_hero == dire_heroes_and_positions[data_pos.split(',')[0]]:
+                        radiant_pos1_vs_team.append(data_wr)
+                except: pass
 
-            if data_pos == 'pos 1' and data_hero == radiant_heroes_and_positions['pos 1']:
-                dire_pos1_vs_team.append(data_wr)
+                if 'pos 1' in data_pos and data_hero == dire_heroes_and_positions['pos 1']:
+                    dire_pos1_vs_team.append(100-data_wr)
     #
     if core_matchup is not None:
         core_matchup -= 50
@@ -381,8 +383,10 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         sinergy = (sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))
         counterpick = sum(radiant_wr_against) / len(radiant_wr_against) - 50
         average = (sinergy + counterpick) / 2
-        if average > 0:
-            send_message(f'В среднем {radiant_team_name} сильнее на {average}%')
+        pos1_vs_team = sum(radiant_pos1_vs_team) / len(radiant_pos1_vs_team) - sum(dire_pos1_vs_team) / len(
+            dire_pos1_vs_team)
+        if average > 0 and pos1_vs_team > 0:
+            send_message(f'В среднем {radiant_team_name} сильнее на {average}%\nPos1 vs team: {pos1_vs_team}')
             if core_matchup is not None:
                 if core_matchup > 0:
                     send_message(f'В Кор matchup {radiant_team_name} СИЛЬНЕЕ на {core_matchup}%')
@@ -393,8 +397,10 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             else:
                 send_message(f"{radiant_heroes_and_positions['pos 1']} vs {dire_heroes_and_positions['pos 1']}")
                 send_message('Core_matchup error')
-        elif average < 0:
-            send_message(f'В среднем {dire_team_name} сильнее на {average*-1}%')
+
+
+        elif average < 0 and pos1_vs_team < 0:
+            send_message(f'В среднем {dire_team_name} сильнее на {average*-1}%\nPos1 vs team: {pos1_vs_team*-1}')
             if core_matchup is not None:
                 if core_matchup > 0:
                     send_message(f'В Кор matchup {dire_team_name} СЛАБЕЕ на {core_matchup}%')
@@ -404,7 +410,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                     send_message('Core matchup равный')
             else:
                 send_message('Core_matchup error')
-        if average < 4 and average > -4:
+        else:
+            send_message(f'average: {average}, pos1_vs_team: {pos1_vs_team}')
             send_message('плохая ставка!!!')
     else:
         if core_matchup is None:
@@ -481,5 +488,9 @@ def send_message(message):
     requests.post(url, json=payload)
 while True:
     get_live_matches()
-    print('сплю 120 секунд')
-    time.sleep(120)
+    print('сплю 60 секунд')
+    time.sleep(60)
+#testing
+# radiant_heroes_and_positions={'pos 1': 'Troll Warlord', 'pos 2': 'Tiny', 'pos 3': 'Enigma', 'pos 4': 'Hoodwink', 'pos 5': 'Crystal Maiden'}
+# dire_heroes_and_positions={'pos 1': 'Lifestealer', 'pos 2': 'Leshrac', 'pos 3': 'Brewmaster', 'pos 4': 'Batrider', 'pos 5': 'Shadow Demon'}
+# dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_positions, dire_heroes_and_positions=dire_heroes_and_positions, radiant_team_name='Boom', dire_team_name='Talon')

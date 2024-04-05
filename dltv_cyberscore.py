@@ -10,14 +10,14 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import re
-
+import datetime
 import keys
 
 
 def get_live_matches(url='https://dltv.org/matches'):
-    print("Функция выполняется...")
-    live_matches_urls = get_urls(url)
+    live_matches_urls, sleep_time = get_urls(url)
     if live_matches_urls is not None:
+        print(f'Сейчас идут {len(live_matches_urls)} матча')
         for url in live_matches_urls:
             response = requests.get(url).text
             soup = BeautifulSoup(response, 'lxml')
@@ -37,10 +37,14 @@ def get_live_matches(url='https://dltv.org/matches'):
                                 print(f'{radiant_team_name} VS {dire_team_name}')
                                 dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name,
                                                 dire_team_name, url)
-    else: print('Live матчей нет')
+    else:
+        now = datetime.datetime.now()
+        wait_seconds = (sleep_time - now).total_seconds()
+        print(f'Live матчей нет, сплю {wait_seconds/60} минут')
+        time.sleep(wait_seconds)
 
 
-def get_urls(url):
+def get_urls(url, target_datetime = 0):
     response = requests.get(url)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'lxml')
@@ -50,7 +54,13 @@ def get_urls(url):
         for match in live_matches:
             url = match.find('a')['href']
             live_matches_urls.add(url)
-        return live_matches_urls
+        if not len(live_matches_urls):
+            upcoming_matches = soup.find_all('div', class_="upcoming__matches-item")
+            if upcoming_matches:
+                target_datetime_str = upcoming_matches[0]['data-matches-odd']
+                target_datetime = datetime.datetime.strptime(target_datetime_str, '%Y-%m-%d %H:%M:%S')
+
+        return live_matches_urls, target_datetime
 
 
 def get_team_names(soup):
@@ -503,7 +513,6 @@ def send_message(message):
     requests.post(url, json=payload)
 while True:
     get_live_matches()
-    print('сплю 120 секунд')
     time.sleep(120)
 #testing
 # radiant_heroes_and_positions={'pos 1': 'Troll Warlord', 'pos 2': 'Tiny', 'pos 3': 'Enigma', 'pos 4': 'Hoodwink', 'pos 5': 'Crystal Maiden'}

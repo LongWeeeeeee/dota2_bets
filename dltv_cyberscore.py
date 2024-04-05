@@ -59,7 +59,7 @@ def get_urls(url, target_datetime = 0):
             upcoming_matches = soup.find_all('div', class_="upcoming__matches-item")
             if upcoming_matches:
                 target_datetime_str = upcoming_matches[0]['data-matches-odd']
-                target_datetime = datetime.datetime.strptime(target_datetime_str, '%Y-%m-%d %H:%M:%S')
+                target_datetime = datetime.datetime.strptime(target_datetime_str, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(hours=3)
         if not len(live_matches_urls):
             live_matches_urls = None
         return live_matches_urls, target_datetime

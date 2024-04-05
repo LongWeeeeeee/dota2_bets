@@ -424,14 +424,19 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                 send_message('Core_matchup error')
             send_message('плохая ставка!!!')
     else:
+        send_message(f'{radiant_team_name} vs {dire_team_name}')
+        if len(radiant_pos1_vs_team) < 3:
+            send_message(f'Недостаточно данных {radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions}')
+        if len(dire_pos1_vs_team) < 3:
+            send_message(f'Недостаточно данных {dire_heroes_and_positions["pos 1"]} vs {radiant_heroes_and_positions}')
         if core_matchup is None:
-            print(f'{radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions["pos 1"]} нету на dota2protracker')
+            send_message(f'{radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions["pos 1"]} нету на dota2protracker')
         if len(dire_wr_with) < 5:
-            print(f'Недостаточная выборка винрейтов у {dire_team_name} между командой\n{dire_heroes_and_positions}')
+            send_message(f'Недостаточная выборка винрейтов у {dire_team_name} между командой\n{dire_heroes_and_positions}')
         if len(radiant_wr_with) < 5:
-            print(f'Недостаточная выборка винрейтов у {radiant_team_name} между командой\n{radiant_heroes_and_positions}')
+            send_message(f'Недостаточная выборка винрейтов у {radiant_team_name} между командой\n{radiant_heroes_and_positions}')
         if len(radiant_wr_against) < 5:
-            print(
+            send_message(
                 f'Недостаточная выборка винрейтов у команду между друг друга\n{radiant_heroes_and_positions}\n{dire_heroes_and_positions}')
     add_url(antiplagiat_url)
 

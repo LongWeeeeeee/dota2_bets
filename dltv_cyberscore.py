@@ -98,7 +98,7 @@ def get_team_ids(radiant_team_name, dire_team_name):
 
 def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players):
     radiant_pick, dire_pick = {}, {}
-    nick_fixes = {'griefy': 'asdekor_r', '999xu': 'imitator', 'emptiness': 'aind','red2' :'nico' ,'bnc' :'xxxblincc', 'xdddd':'fachero','sagiri': 'kcl',
+    nick_fixes = {'griefy': 'asdekor_r', 'satanic':'king', '999xu': 'imitator', 'emptiness': 'aind','red2' :'nico' ,'bnc' :'xxxblincc', 'xdddd':'fachero','sagiri': 'kcl',
                   'somnia': 'oushaktian casedrop.com', 'yuukichi': 'hiori','neko': 'sh1do', 'ra1ncloud': 'v1necy', 'qjy': 'newbie', 'young ame is back': 'a1one', 'ksh':'raz', 'xn丶e': 'xne-'}
     lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
     radiant_lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
@@ -379,7 +379,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     #
     if core_matchup is not None:
         core_matchup -= 50
-    if len(dire_wr_with) >= 4 and len(radiant_wr_with) >= 4 and len(radiant_wr_against) >= 4:
+    if len(dire_wr_with) >= 4 and len(radiant_wr_with) >= 4 and len(radiant_wr_against) >= 4 and len(radiant_pos1_vs_team) >= 3 and len(dire_pos1_vs_team) >= 3:
         sinergy = (sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))
         counterpick = sum(radiant_wr_against) / len(radiant_wr_against) - 50
         average = (sinergy + counterpick) / 2
@@ -406,12 +406,22 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                     send_message(f'В Кор matchup {dire_team_name} СЛАБЕЕ на {core_matchup}%')
                 elif core_matchup < 0:
                     send_message(f'В Кор matchup {dire_team_name} СИЛЬНЕЕ на {core_matchup*-1}%')
-                else:
-                    send_message('Core matchup равный')
             else:
+                send_message('Core matchup равный')
+                send_message(f"{radiant_heroes_and_positions['pos 1']} vs {dire_heroes_and_positions['pos 1']}")
                 send_message('Core_matchup error')
         else:
+            send_message(f'{radiant_team_name} vs {dire_team_name}')
             send_message(f'average: {average}, pos1_vs_team: {pos1_vs_team}')
+            if core_matchup is not None:
+                if core_matchup > 0:
+                    send_message(f'В Кор matchup {dire_team_name} СЛАБЕЕ на {core_matchup}%')
+                elif core_matchup < 0:
+                    send_message(f'В Кор matchup {dire_team_name} СИЛЬНЕЕ на {core_matchup*-1}%')
+            else:
+                send_message('Core matchup равный')
+                send_message(f"{radiant_heroes_and_positions['pos 1']} vs {dire_heroes_and_positions['pos 1']}")
+                send_message('Core_matchup error')
             send_message('плохая ставка!!!')
     else:
         if core_matchup is None:

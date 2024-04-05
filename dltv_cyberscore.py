@@ -513,6 +513,7 @@ def send_message(message):
     requests.post(url, json=payload)
 while True:
     get_live_matches()
+    print('сплю 2 минуты')
     time.sleep(120)
 #testing
 # radiant_heroes_and_positions={'pos 1': 'Troll Warlord', 'pos 2': 'Tiny', 'pos 3': 'Enigma', 'pos 4': 'Hoodwink', 'pos 5': 'Crystal Maiden'}

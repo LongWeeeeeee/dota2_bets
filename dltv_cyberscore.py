@@ -50,6 +50,7 @@ def get_urls(url, target_datetime = 0):
         soup = BeautifulSoup(response.text, 'lxml')
         live_matches_block = soup.find('div', class_='live__matches')
         live_matches = live_matches_block.find_all('div', class_='live__matches-item__body')
+
         live_matches_urls = set()
         for match in live_matches:
             url = match.find('a')['href']
@@ -59,7 +60,8 @@ def get_urls(url, target_datetime = 0):
             if upcoming_matches:
                 target_datetime_str = upcoming_matches[0]['data-matches-odd']
                 target_datetime = datetime.datetime.strptime(target_datetime_str, '%Y-%m-%d %H:%M:%S')
-
+        if not len(live_matches_urls):
+            live_matches_urls = None
         return live_matches_urls, target_datetime
 
 

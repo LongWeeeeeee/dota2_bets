@@ -39,9 +39,10 @@ def get_live_matches(url='https://dltv.org/matches'):
                                                 dire_team_name, url)
     else:
         now = datetime.datetime.now()
-        wait_seconds = (sleep_time - now).total_seconds()
-        print(f'Live матчей нет, сплю {wait_seconds/60} минут')
-        time.sleep(wait_seconds)
+        if sleep_time > now:
+            wait_seconds = (sleep_time - now).total_seconds()
+            print(f'Live матчей нет, сплю {wait_seconds/60} минут')
+            time.sleep(wait_seconds)
 
 
 def get_urls(url, target_datetime = 0):
@@ -56,9 +57,9 @@ def get_urls(url, target_datetime = 0):
             url = match.find('a')['href']
             live_matches_urls.add(url)
         if not len(live_matches_urls):
-            upcoming_matches = soup.find_all('div', class_="upcoming__matches-item")
+            upcoming_matches = soup.find('div', class_="upcoming__matches-item")
             if upcoming_matches:
-                target_datetime_str = upcoming_matches[0]['data-matches-odd']
+                target_datetime_str = upcoming_matches['data-matches-odd']
                 target_datetime = datetime.datetime.strptime(target_datetime_str, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(hours=3)
         if not len(live_matches_urls):
             live_matches_urls = None

@@ -129,19 +129,21 @@ def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_
             soup = BeautifulSoup(response_html, 'lxml')
             players = soup.find_all('div', class_='team-item')
             for player in players:
-                nick_name = player.find('div', class_='player-name').text.lower().replace('.', '')
-                nick_name = re.sub(r'[^\w\s\u4e00-\u9fff]+', '', nick_name)
-                position = player.find('span', class_='truncate').text.lower()
-                if nick_name in nick_fixes:
-                    nick_name = nick_fixes[nick_name]
-                if position in lst:
-                    result = find_in_radiant(radiant_players, nick_name, translate, position, radiant_pick, radiant_lst)
-                    if result is not None:
-                        radiant_lst, radiant_pick = result
-                    else:
-                        result = find_in_dire(dire_players, nick_name, translate, position, dire_pick, dire_lst)
+                nick_name = player.find('div', class_='player-name')
+                if nick_name is not None:
+                    nick_name = nick_name.text.lower().replace('.', '')
+                    nick_name = re.sub(r'[^\w\s\u4e00-\u9fff]+', '', nick_name)
+                    position = player.find('span', class_='truncate').text.lower()
+                    if nick_name in nick_fixes:
+                        nick_name = nick_fixes[nick_name]
+                    if position in lst:
+                        result = find_in_radiant(radiant_players, nick_name, translate, position, radiant_pick, radiant_lst)
                         if result is not None:
-                            dire_lst, dire_pick = result
+                            radiant_lst, radiant_pick = result
+                        else:
+                            result = find_in_dire(dire_players, nick_name, translate, position, dire_pick, dire_lst)
+                            if result is not None:
+                                dire_lst, dire_pick = result
 
 
             if len(radiant_pick) == 4:
@@ -390,52 +392,19 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                 if 'pos 1' in data_pos and data_hero == dire_heroes_and_positions['pos 1']:
                     dire_pos1_vs_team.append(100-data_wr)
     #
-    if core_matchup is not None:
+    if core_matchup is not None and len(dire_wr_with) >= 4 and len(radiant_wr_with) >= 4 and len(radiant_wr_against) >= 4 and len(radiant_pos1_vs_team) >= 3 and len(dire_pos1_vs_team) >= 3:
         core_matchup -= 50
-    if len(dire_wr_with) >= 4 and len(radiant_wr_with) >= 4 and len(radiant_wr_against) >= 4 and len(radiant_pos1_vs_team) >= 3 and len(dire_pos1_vs_team) >= 3:
         sinergy = (sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))
         counterpick = sum(radiant_wr_against) / len(radiant_wr_against) - 50
         average = (sinergy + counterpick) / 2
         pos1_vs_team = sum(radiant_pos1_vs_team) / len(radiant_pos1_vs_team) - sum(dire_pos1_vs_team) / len(
             dire_pos1_vs_team)
-        if average > 0 and pos1_vs_team > 0:
-            send_message(f'В среднем {radiant_team_name} сильнее на {average}%\nPos1 vs team: {pos1_vs_team}')
-            if core_matchup is not None:
-                if core_matchup > 0:
-                    send_message(f'В Кор matchup {radiant_team_name} СИЛЬНЕЕ на {core_matchup}%')
-                elif core_matchup < 0:
-                    send_message(f'В Кор matchup {radiant_team_name} СЛАБЕЕ на {core_matchup*-1}%')
-                else:
-                    send_message('Core matchup равный')
-            else:
-                send_message(f"{radiant_heroes_and_positions['pos 1']} vs {dire_heroes_and_positions['pos 1']}")
-                send_message('Core_matchup error')
-
-
-        elif average < 0 and pos1_vs_team < 0:
-            send_message(f'В среднем {dire_team_name} сильнее на {average*-1}%\nPos1 vs team: {pos1_vs_team*-1}')
-            if core_matchup is not None:
-                if core_matchup > 0:
-                    send_message(f'В Кор matchup {dire_team_name} СЛАБЕЕ на {core_matchup}%')
-                elif core_matchup < 0:
-                    send_message(f'В Кор matchup {dire_team_name} СИЛЬНЕЕ на {core_matchup*-1}%')
-            else:
-                send_message('Core matchup равный')
-                send_message(f"{radiant_heroes_and_positions['pos 1']} vs {dire_heroes_and_positions['pos 1']}")
-                send_message('Core_matchup error')
+        if average > 0 and pos1_vs_team > 0 and core_matchup > 0:
+            send_message(f'В среднем {radiant_team_name} сильнее на {average}%\nPos1 vs team: {pos1_vs_team}\nCore matchup: {core_matchup}')
+        elif average < 0 and pos1_vs_team < 0 and core_matchup < 0:
+            send_message(f'В среднем {dire_team_name} сильнее на {average*-1}%\nPos1 vs team: {pos1_vs_team*-1}\nCore matchup: {core_matchup*-1}')
         else:
-            send_message(f'{radiant_team_name} vs {dire_team_name}')
-            send_message(f'average: {average}, pos1_vs_team: {pos1_vs_team}')
-            if core_matchup is not None:
-                if core_matchup > 0:
-                    send_message(f'В Кор matchup {dire_team_name} СЛАБЕЕ на {core_matchup}%')
-                elif core_matchup < 0:
-                    send_message(f'В Кор matchup {dire_team_name} СИЛЬНЕЕ на {core_matchup*-1}%')
-            else:
-                send_message('Core matchup равный')
-                send_message(f"{radiant_heroes_and_positions['pos 1']} vs {dire_heroes_and_positions['pos 1']}")
-                send_message('Core_matchup error')
-            send_message('плохая ставка!!!')
+            send_message(f'{radiant_team_name} vs {dire_team_name}\naverage: {average}, pos1_vs_team: {pos1_vs_team}\nCore matchup: {core_matchup}\nПлохая ставка!!!')
     else:
         send_message(f'{radiant_team_name} vs {dire_team_name}')
         if len(radiant_pos1_vs_team) < 3:
@@ -515,7 +484,11 @@ def send_message(message):
     }
     requests.post(url, json=payload)
 while True:
-    get_live_matches()
+    try:
+        get_live_matches()
+    except Exception as e:
+        with open('errors.txt', 'r+' ) as f:
+            f.write(str(e))
     print('сплю 2 минуты')
     time.sleep(120)
 #testing

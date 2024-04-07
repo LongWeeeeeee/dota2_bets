@@ -240,6 +240,7 @@ def are_similar(s1, s2, threshold=70):
 
 
 def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, antiplagiat_url=None, core_matchup=None):
+    print('dota2protracker')
     radiant_wr_with, dire_wr_with, radiant_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team = [], [], [], [] ,[]
     for position in radiant_heroes_and_positions:
         hero_url = radiant_heroes_and_positions[position].replace(' ', '%20')

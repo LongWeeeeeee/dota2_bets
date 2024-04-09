@@ -506,8 +506,8 @@ while True:
         with open('errors.txt', 'r+' ) as f:
             f.write(str(e))
     # get_live_matches()
-    # print('сплю 2 минуты')
-    # time.sleep(120)
+    print('сплю 2 минуты')
+    time.sleep(120)
 #testing
 # radiant_heroes_and_positions={'pos 1': 'Troll Warlord', 'pos 2': 'Tiny', 'pos 3': 'Enigma', 'pos 4': 'Hoodwink', 'pos 5': 'Crystal Maiden'}
 # dire_heroes_and_positions={'pos 1': 'Lifestealer', 'pos 2': 'Leshrac', 'pos 3': 'Brewmaster', 'pos 4': 'Batrider', 'pos 5': 'Shadow Demon'}

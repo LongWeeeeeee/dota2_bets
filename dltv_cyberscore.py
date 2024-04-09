@@ -14,6 +14,8 @@ import datetime
 import keys
 
 
+game_changer_list = ['Faceless Void', 'Enigma', 'Phoenix', 'Disruptor', 'Bane', 'Magnus', 'Bristleback', 'Doom', 'Lone Druid', 'Tusk', 'Arc Warden', 'Kunkka', 'Phantom Lancer', 'Axe', 'Storm Spirit', 'Tinker', 'Huskar']
+
 def get_live_matches(url='https://dltv.org/matches'):
     live_matches_urls, sleep_time = get_urls(url)
     if live_matches_urls is not None:
@@ -241,7 +243,7 @@ def are_similar(s1, s2, threshold=70):
 
 def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, antiplagiat_url=None, core_matchup=None):
     print('dota2protracker')
-    radiant_wr_with, dire_wr_with, radiant_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team = [], [], [], [] ,[]
+    radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team = [], [], [], [] ,[], [], [], [], []
     for position in radiant_heroes_and_positions:
         hero_url = radiant_heroes_and_positions[position].replace(' ', '%20')
         url = f'https://dota2protracker.com/hero/{hero_url}/new'
@@ -253,12 +255,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         # #wr agai
         index = {'pos 1': 1, 'pos 2': 3, 'pos 3': 5, 'pos 4': len(stats) - 3, 'pos 5': len(stats) - 1}
         i = index[position]
-        if radiant_heroes_and_positions[position] == 'Dark Seer':
-            i = 3
-        try:
-            hero_divs = stats[i].find_all('div', attrs={'data-hero': True})
-        except:
-            pass
+        hero_divs = stats[i].find_all('div', attrs={'data-hero': True})
         for div in hero_divs:
             # Extract the values of 'data-hero', 'data-wr', and 'data-pos' attributes
             data_hero = div.get('data-hero')
@@ -312,8 +309,6 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         stats = soup.find_all('div', class_='overflow-y-scroll tbody h-96')
         index = {'pos 1': 1, 'pos 2': 3, 'pos 3': 5, 'pos 4': len(stats) - 3, 'pos 5': len(stats) - 1}
         i = index[position]
-        if dire_heroes_and_positions[position] == 'Dark Seer':
-            i = 3
         hero_divs = stats[i].find_all('div', attrs={'data-hero': True})
         for div in hero_divs:
             # Extract the values of 'data-hero', 'data-wr', and 'data-pos' attributes
@@ -369,8 +364,6 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         # #wr against
         index = {'pos 1': 0, 'pos 2': 2, 'pos 3': 4, 'pos 4': len(stats) - 4, 'pos 5': len(stats) - 2}
         i = index[position]
-        if radiant_heroes_and_positions[position] == 'Dark Seer':
-            i = 2
         hero_divs = stats[i].find_all('div', attrs={'data-hero': True})
         for div in hero_divs:
             # Extract the values of 'data-hero', 'data-wr', and 'data-pos' attributes
@@ -388,26 +381,47 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                 try:
                     if position == 'pos 1' and data_hero == dire_heroes_and_positions[data_pos.split(',')[0]]:
                         radiant_pos1_vs_team.append(data_wr)
+                    if position == 'pos 2' and data_hero == dire_heroes_and_positions[data_pos.split(',')[0]]:
+                        radiant_pos2_vs_team.append(data_wr)
+                    if position == 'pos 3' and data_hero == dire_heroes_and_positions[data_pos.split(',')[0]]:
+                        radiant_pos3_vs_team.append(data_wr)
                 except: pass
 
                 if 'pos 1' in data_pos and data_hero == dire_heroes_and_positions['pos 1']:
                     dire_pos1_vs_team.append(100-data_wr)
+                if 'pos 2' in data_pos and data_hero == dire_heroes_and_positions['pos 2']:
+                    dire_pos2_vs_team.append(100-data_wr)
+                if 'pos 3' in data_pos and data_hero == dire_heroes_and_positions['pos 3']:
+                    dire_pos3_vs_team.append(100-data_wr)
     #
-    if core_matchup is not None and len(dire_wr_with) >= 4 and len(radiant_wr_with) >= 4 and len(radiant_wr_against) >= 4 and len(radiant_pos1_vs_team) >= 3 and len(dire_pos1_vs_team) >= 3:
+    if core_matchup is not None and len(dire_wr_with) >= 4 and len(radiant_wr_with) >= 4 and len(radiant_wr_against) >= 4 and len(radiant_pos1_vs_team) >= 3 and len(dire_pos1_vs_team) >= 3 and len(radiant_pos2_vs_team) >= 3 and len(dire_pos2_vs_team) >= 3 and len(radiant_pos3_vs_team) >= 3 and len(dire_pos3_vs_team) >= 3:
         core_matchup -= 50
         sinergy = (sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))
         counterpick = sum(radiant_wr_against) / len(radiant_wr_against) - 50
-        average = (sinergy + counterpick) / 2
         pos1_vs_team = sum(radiant_pos1_vs_team) / len(radiant_pos1_vs_team) - sum(dire_pos1_vs_team) / len(
             dire_pos1_vs_team)
-        if average > 0 and pos1_vs_team > 0 and core_matchup > 0:
-            send_message(f'В среднем {radiant_team_name} сильнее на {average}%\nPos1 vs team: {pos1_vs_team}\nCore matchup: {core_matchup}')
-        elif average < 0 and pos1_vs_team < 0 and core_matchup < 0:
-            send_message(f'В среднем {dire_team_name} сильнее на {average*-1}%\nPos1 vs team: {pos1_vs_team*-1}\nCore matchup: {core_matchup*-1}')
+        pos2_vs_team = sum(radiant_pos2_vs_team) / len(radiant_pos2_vs_team) - sum(dire_pos2_vs_team) / len(dire_pos2_vs_team)
+        pos3_vs_team = sum(radiant_pos3_vs_team) / len(radiant_pos3_vs_team) - sum(dire_pos3_vs_team) / len(dire_pos3_vs_team)
+        try:
+            sups = radiant_pos4_with_pos5 - dire_pos4_with_pos5
+        except:
+            sups = 0
+        if sinergy > 0 and counterpick > 0 and pos1_vs_team > 0 and core_matchup > 0 and pos2_vs_team > 0 and pos3_vs_team > 0 and sups > 0:
+            send_message(f'Синергия {radiant_team_name} сильнее на {sinergy}%\nCounterpick: {counterpick}\nPos1 vs team: {pos1_vs_team}\nPos2 vs team: {pos2_vs_team}\nPos3 vs team: {pos3_vs_team}\nSups: {sups}\nCore matchup: {core_matchup}')
+        elif sinergy < 0 and counterpick < 0 and pos1_vs_team < 0 and core_matchup < 0 and pos2_vs_team < 0 and pos3_vs_team < 0 and sups < 0:
+            send_message(f'Синергия {dire_team_name} сильнее на {sinergy*-1}%\nCounterpick: {counterpick*-1}\nPos1 vs team: {pos1_vs_team*-1}\nPos2 vs team: {pos2_vs_team*-1}\nPos3 vs team: {pos3_vs_team*-1}\nSups: {sups*-1}\nCore matchup: {core_matchup*-1}')
         else:
-            send_message(f'{radiant_team_name} vs {dire_team_name}\naverage: {average}, pos1_vs_team: {pos1_vs_team}\nCore matchup: {core_matchup}\nПлохая ставка!!!')
+            send_message(f'{radiant_team_name} vs {dire_team_name}\nSinergy: {sinergy}\nCounterpick: {counterpick}\npos1_vs_team: {pos1_vs_team}\nPos2 vs team: {pos2_vs_team}\nPos3 vs team: {pos3_vs_team}\nCore matchup: {core_matchup}\nSups: {sups}\nПлохая ставка!!!')
     else:
         send_message(f'{radiant_team_name} vs {dire_team_name}')
+        if len(radiant_pos3_vs_team) < 3:
+            send_message(f'Недостаточно данных {radiant_heroes_and_positions["pos 3"]} vs {dire_heroes_and_positions}')
+        if len(dire_pos3_vs_team) < 3:
+            send_message(f'Недостаточно данных {dire_heroes_and_positions["pos 3"]} vs {radiant_heroes_and_positions}')
+        if len(dire_pos2_vs_team) < 3:
+            send_message(f'Недостаточно данных {dire_heroes_and_positions["pos 2"]} vs {radiant_heroes_and_positions}')
+        if len(radiant_pos2_vs_team) < 3:
+            send_message(f'Недостаточно данных {radiant_heroes_and_positions["pos 2"]} vs {dire_heroes_and_positions}')
         if len(radiant_pos1_vs_team) < 3:
             send_message(f'Недостаточно данных {radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions}')
         if len(dire_pos1_vs_team) < 3:
@@ -488,10 +502,12 @@ while True:
     try:
         get_live_matches()
     except Exception as e:
+        print(e)
         with open('errors.txt', 'r+' ) as f:
             f.write(str(e))
-    print('сплю 2 минуты')
-    time.sleep(120)
+    # get_live_matches()
+    # print('сплю 2 минуты')
+    # time.sleep(120)
 #testing
 # radiant_heroes_and_positions={'pos 1': 'Troll Warlord', 'pos 2': 'Tiny', 'pos 3': 'Enigma', 'pos 4': 'Hoodwink', 'pos 5': 'Crystal Maiden'}
 # dire_heroes_and_positions={'pos 1': 'Lifestealer', 'pos 2': 'Leshrac', 'pos 3': 'Brewmaster', 'pos 4': 'Batrider', 'pos 5': 'Shadow Demon'}

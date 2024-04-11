@@ -39,6 +39,8 @@ def get_live_matches(url='https://dltv.org/matches'):
                                 print(f'{radiant_team_name} VS {dire_team_name}')
                                 dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name,
                                                 dire_team_name, url)
+                else:
+                    print('Пики еще не закончились')
     else:
         now = datetime.datetime.now()
         if sleep_time > now:
@@ -113,7 +115,7 @@ def get_team_ids(radiant_team_name, dire_team_name):
 
 def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players):
     radiant_pick, dire_pick = {}, {}
-    nick_fixes = {'griefy': 'asdekor_r', 'faker':'kxy', 'satanic':'king', '999xu': 'imitator', 'emptiness': 'aind','red2' :'nico' ,'bnc' :'xxxblincc', 'xdddd':'fachero','sagiri': 'kcl',
+    nick_fixes = {'griefy': 'asdekor_r', 'placebo':'egxrdemxn', 'faker':'kxy', 'satanic':'king', '999xu': 'imitator', 'emptiness': 'aind','red2' :'nico' ,'bnc' :'xxxblincc', 'xdddd':'fachero','sagiri': 'kcl',
                   'somnia': 'oushaktian casedrop.com', 'yuukichi': 'hiori','neko': 'sh1do', 'ra1ncloud': 'v1necy', 'qjy': 'newbie', 'young ame is back': 'a1one', 'ksh':'raz', 'xn丶e': 'xne-'}
     lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
     radiant_lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
@@ -498,16 +500,16 @@ def send_message(message):
         'text': message
     }
     requests.post(url, json=payload)
-while True:
-    try:
-        get_live_matches()
-    except Exception as e:
-        print(e)
-        with open('errors.txt', 'r+' ) as f:
-            f.write(str(e))
-    # get_live_matches()
-    print('сплю 2 минуты')
-    time.sleep(120)
+# while True:
+#     try:
+#         get_live_matches()
+#     except Exception as e:
+#         print(e)
+#         with open('errors.txt', 'r+' ) as f:
+#             f.write(str(e))
+#     # get_live_matches()
+#     print('сплю 2 минуты')
+#     time.sleep(120)
 #testing
 # radiant_heroes_and_positions={'pos 1': 'Troll Warlord', 'pos 2': 'Tiny', 'pos 3': 'Enigma', 'pos 4': 'Hoodwink', 'pos 5': 'Crystal Maiden'}
 # dire_heroes_and_positions={'pos 1': 'Lifestealer', 'pos 2': 'Leshrac', 'pos 3': 'Brewmaster', 'pos 4': 'Batrider', 'pos 5': 'Shadow Demon'}

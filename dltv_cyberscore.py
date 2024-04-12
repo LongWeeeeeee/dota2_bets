@@ -23,24 +23,21 @@ def get_live_matches(url='https://dltv.org/matches'):
         for url in live_matches_urls:
             response = requests.get(url).text
             soup = BeautifulSoup(response, 'lxml')
-            radiant_block = soup.find('div', class_='picks__new-picks__picks radiant')
-            if radiant_block is not None:
-                items = radiant_block.find('div', class_='items')
-                # Проверяем, не скрыт ли элемент и содержит ли он другие элементы
-                if items and items.get('style') != 'display: none;' and len(items.find_all('div', class_='pick')) >= 4:
-                    radiant_players, dire_players = get_player_names_and_heroes(radiant_block, soup)
-                    result = get_team_names(soup)
+            result = get_team_names(soup)
+            if result is not None:
+                radiant_team_name, dire_team_name = result
+                if if_picks_are_done(soup):
+                    # Проверяем, не скрыт ли элемент и содержит ли он другие элементы
+                    radiant_players, dire_players = get_player_names_and_heroes(soup)
+                    result = get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players)
                     if result is not None:
-                        radiant_team_name, dire_team_name = result
-                        result = get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players)
-                        if result is not None:
-                            radiant_heroes_and_positions, dire_heroes_and_positions, url = result
-                            if if_unique(url):
-                                print(f'{radiant_team_name} VS {dire_team_name}')
-                                dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name,
-                                                dire_team_name, url)
+                        radiant_heroes_and_positions, dire_heroes_and_positions, url = result
+                        if if_unique(url):
+                            print(f'{radiant_team_name} VS {dire_team_name}')
+                            dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name,
+                                            dire_team_name, url)
                 else:
-                    print('Пики еще не закончились')
+                    print(f'{radiant_team_name} vs {dire_team_name}\nПики еще не закончились')
     else:
         now = datetime.datetime.now()
         if sleep_time > now:
@@ -83,8 +80,9 @@ def get_team_names(soup):
     return radiant_team_name, dire_team_name
 
 
-def get_player_names_and_heroes(radiant_block, soup):
+def get_player_names_and_heroes(soup):
     radiant_players, dire_players = {}, {}
+    radiant_block = soup.find('div', class_='picks__new-picks__picks radiant')
     radiant_heroes_block = radiant_block.find_all('div', class_='pick player')
     dire_block = soup.find('div', class_='picks__new-picks__picks dire')
     dire_heroes_block = dire_block.find_all('div', class_='pick player')
@@ -494,6 +492,16 @@ def find_in_dire(dire_players, nick_name, translate, position, dire_pick, dire_l
             if position in dire_lst:
                 dire_lst.remove(position)
                 return dire_lst, dire_pick
+
+
+def if_picks_are_done(soup):
+    dire_block = soup.find('div', class_='picks__new-picks__picks dire')
+    radiant_block = soup.find('div', class_='picks__new-picks__picks radiant')
+    if radiant_block is not None and dire_block is not None:
+        items_radiant = radiant_block.find('div', class_='items').find_all('div', class_='pick')
+        items_dire = dire_block.find('div', class_='items').find_all('div', class_='pick')
+        if len(items_dire) == 5 and len(items_radiant) == 5:
+            return True
 
 def send_message(message):
     bot_token = f'{keys.Token}'

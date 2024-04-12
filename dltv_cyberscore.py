@@ -453,7 +453,8 @@ def get_map_id(data, radiant_team_name, dire_team_name):
                     if karta['status'] != 'ended':
                         map_id = karta['id']
                         url = f'https://cyberscore.live/en/matches/{map_id}/'
-                        return url
+                        if if_unique(url) is not None:
+                            return url
 
 
 def if_unique(url):

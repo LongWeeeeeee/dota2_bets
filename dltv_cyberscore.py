@@ -14,7 +14,28 @@ import datetime
 import keys
 
 
-game_changer_list = ['Faceless Void', 'Enigma', 'Phoenix', 'Disruptor', 'Bane', 'Magnus', 'Bristleback', 'Doom', 'Lone Druid', 'Tusk', 'Arc Warden', 'Kunkka', 'Phantom Lancer', 'Axe', 'Storm Spirit', 'Tinker', 'Huskar']
+game_changer_list = [
+    'Faceless Void',
+    'Enigma',
+    'Phoenix',
+    'Disruptor',
+    'Bane',
+    'Shaker',
+    'Tinker',
+    'Doom',
+    'Chen',
+    'Ancient Apparation',
+    'Magnus',
+    'Bristleback',
+    'Doom',
+    'Lone Druid',
+    'Tusk',
+    'Arc Warden',
+    'Phantom Lancer',
+    'Axe',
+    'Storm Spirit',
+    'Tinker',
+    'Huskar']
 
 def get_live_matches(url='https://dltv.org/matches'):
     live_matches_urls, sleep_time = get_urls(url)
@@ -438,6 +459,12 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         if len(radiant_wr_against) < 5:
             send_message(
                 f'Недостаточная выборка винрейтов у команду между друг друга\n{radiant_heroes_and_positions}\n{dire_heroes_and_positions}')
+    for hero in list(radiant_heroes_and_positions.values()):
+        if hero in game_changer_list:
+            send_message(f'Аккуратно! У {radiant_team_name} есть {hero}, который может изменить исход боя')
+    for hero in list(dire_heroes_and_positions.values()):
+        if hero in game_changer_list:
+            send_message(f'Аккуратно! У {dire_team_name} есть {hero}, который может изменить исход боя')
     add_url(antiplagiat_url)
 
 

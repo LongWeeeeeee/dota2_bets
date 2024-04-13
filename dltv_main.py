@@ -16,5 +16,5 @@ while True:
 
         with open('errors.txt', 'r+') as f:
             f.write(error_info)
-    print('Сплю 2 минуты')
-    time.sleep(120)
+    print('Сплю 1 минуту')
+    time.sleep(60)

@@ -12,35 +12,15 @@ import time
 import re
 import datetime
 import keys
+from id_to_name import game_changer_list
 
 
-game_changer_list = [
-    'Faceless Void',
-    'Enigma',
-    'Phoenix',
-    'Disruptor',
-    'Bane',
-    'Shaker',
-    'Tinker',
-    'Doom',
-    'Chen',
-    'Ancient Apparation',
-    'Magnus',
-    'Bristleback',
-    'Doom',
-    'Lone Druid',
-    'Tusk',
-    'Arc Warden',
-    'Phantom Lancer',
-    'Axe',
-    'Storm Spirit',
-    'Tinker',
-    'Huskar']
+
 
 def get_live_matches(url='https://dltv.org/matches'):
     live_matches_urls, sleep_time = get_urls(url)
     if live_matches_urls is not None:
-        print(f'Сейчас идут {len(live_matches_urls)} матча')
+        print(f'Количество live матчей: {len(live_matches_urls)}')
         for url in live_matches_urls:
             response = requests.get(url).text
             soup = BeautifulSoup(response, 'lxml')
@@ -61,10 +41,14 @@ def get_live_matches(url='https://dltv.org/matches'):
                     print(f'{radiant_team_name} vs {dire_team_name}\nПики еще не закончились')
     else:
         now = datetime.datetime.now()
-        if sleep_time > now:
-            wait_seconds = (sleep_time - now).total_seconds()
-            print(f'Live матчей нет, сплю {wait_seconds/60} минут')
-            time.sleep(wait_seconds)
+        try:
+            if sleep_time > now:
+                wait_seconds = (sleep_time - now).total_seconds()
+                print(f'Live матчей нет, сплю {wait_seconds/60} минут')
+                time.sleep(wait_seconds)
+        except:
+            send_message(f"sleep_time = {sleep_time}, now = {now}")
+
 
 
 def get_urls(url, target_datetime = 0):
@@ -134,7 +118,7 @@ def get_team_ids(radiant_team_name, dire_team_name):
 
 def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players):
     radiant_pick, dire_pick = {}, {}
-    nick_fixes = {'griefy': 'asdekor_r', 'placebo':'egxrdemxn', 'faker':'kxy', 'satanic':'king', '999xu': 'imitator', 'emptiness': 'aind','red2' :'nico' ,'bnc' :'xxxblincc', 'xdddd':'fachero','sagiri': 'kcl',
+    nick_fixes = {'griefy': 'asdekor_r', 'yabyooo':'yabby', 'placebo':'egxrdemxn', 'faker':'kxy', 'satanic':'king', '999xu': 'imitator', 'emptiness': 'aind','red2' :'nico' ,'bnc' :'xxxblincc', 'xdddd':'fachero','sagiri': 'kcl',
                   'somnia': 'oushaktian casedrop.com', 'yuukichi': 'hiori','neko': 'sh1do', 'ra1ncloud': 'v1necy', 'qjy': 'newbie', 'young ame is back': 'a1one', 'ksh':'raz', 'xn丶e': 'xne-'}
     lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
     radiant_lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
@@ -265,7 +249,7 @@ def are_similar(s1, s2, threshold=70):
     return similarity_percentage(s1, s2) >= threshold
 
 
-def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, antiplagiat_url=None, core_matchup=None):
+def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, antiplagiat_url=None, core_matchup=None, output_message=''):
     print('dota2protracker')
     radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team = [], [], [], [] ,[], [], [], [], []
     for position in radiant_heroes_and_positions:
@@ -431,40 +415,40 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         except:
             sups = 0
         if sinergy > 0 and counterpick > 0 and pos1_vs_team > 0 and core_matchup > 0 and pos2_vs_team > 0 and pos3_vs_team > 0 and sups > 0:
-            send_message(f'Синергия {radiant_team_name} сильнее на {sinergy}%\nCounterpick: {counterpick}\nPos1 vs team: {pos1_vs_team}\nPos2 vs team: {pos2_vs_team}\nPos3 vs team: {pos3_vs_team}\nSups: {sups}\nCore matchup: {core_matchup}')
+            output_message+= f'Синергия {radiant_team_name} сильнее на {sinergy}%\nCounterpick: {counterpick}\nPos1 vs team: {pos1_vs_team}\nPos2 vs team: {pos2_vs_team}\nPos3 vs team: {pos3_vs_team}\nSups: {sups}\nCore matchup: {core_matchup}'
         elif sinergy < 0 and counterpick < 0 and pos1_vs_team < 0 and core_matchup < 0 and pos2_vs_team < 0 and pos3_vs_team < 0 and sups < 0:
-            send_message(f'Синергия {dire_team_name} сильнее на {sinergy*-1}%\nCounterpick: {counterpick*-1}\nPos1 vs team: {pos1_vs_team*-1}\nPos2 vs team: {pos2_vs_team*-1}\nPos3 vs team: {pos3_vs_team*-1}\nSups: {sups*-1}\nCore matchup: {core_matchup*-1}')
+            output_message+= f'Синергия {dire_team_name} сильнее на {sinergy*-1}%\nCounterpick: {counterpick*-1}\nPos1 vs team: {pos1_vs_team*-1}\nPos2 vs team: {pos2_vs_team*-1}\nPos3 vs team: {pos3_vs_team*-1}\nSups: {sups*-1}\nCore matchup: {core_matchup*-1}'
         else:
-            send_message(f'{radiant_team_name} vs {dire_team_name}\nSinergy: {sinergy}\nCounterpick: {counterpick}\npos1_vs_team: {pos1_vs_team}\nPos2 vs team: {pos2_vs_team}\nPos3 vs team: {pos3_vs_team}\nCore matchup: {core_matchup}\nSups: {sups}\nПлохая ставка!!!')
+            output_message+= f'{radiant_team_name} vs {dire_team_name}\nSinergy: {sinergy}\nCounterpick: {counterpick}\npos1_vs_team: {pos1_vs_team}\nPos2 vs team: {pos2_vs_team}\nPos3 vs team: {pos3_vs_team}\nCore matchup: {core_matchup}\nSups: {sups}\nПлохая ставка!!!'
     else:
-        send_message(f'{radiant_team_name} vs {dire_team_name}')
+        output_message+=f'{radiant_team_name} vs {dire_team_name}\n'
         if len(radiant_pos3_vs_team) < 3:
-            send_message(f'Недостаточно данных {radiant_heroes_and_positions["pos 3"]} vs {dire_heroes_and_positions}')
+            output_message+= f'Недостаточно данных {radiant_heroes_and_positions["pos 3"]} vs {dire_heroes_and_positions}'
         if len(dire_pos3_vs_team) < 3:
-            send_message(f'Недостаточно данных {dire_heroes_and_positions["pos 3"]} vs {radiant_heroes_and_positions}')
+            output_message+= f'Недостаточно данных {dire_heroes_and_positions["pos 3"]} vs {radiant_heroes_and_positions}'
         if len(dire_pos2_vs_team) < 3:
-            send_message(f'Недостаточно данных {dire_heroes_and_positions["pos 2"]} vs {radiant_heroes_and_positions}')
+            output_message+= f'Недостаточно данных {dire_heroes_and_positions["pos 2"]} vs {radiant_heroes_and_positions}'
         if len(radiant_pos2_vs_team) < 3:
-            send_message(f'Недостаточно данных {radiant_heroes_and_positions["pos 2"]} vs {dire_heroes_and_positions}')
+            output_message+=f'Недостаточно данных {radiant_heroes_and_positions["pos 2"]} vs {dire_heroes_and_positions}'
         if len(radiant_pos1_vs_team) < 3:
-            send_message(f'Недостаточно данных {radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions}')
+            output_message+=f'Недостаточно данных {radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions}'
         if len(dire_pos1_vs_team) < 3:
-            send_message(f'Недостаточно данных {dire_heroes_and_positions["pos 1"]} vs {radiant_heroes_and_positions}')
+            output_message+=f'Недостаточно данных {dire_heroes_and_positions["pos 1"]} vs {radiant_heroes_and_positions}'
         if core_matchup is None:
-            send_message(f'{radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions["pos 1"]} нету на dota2protracker')
+            output_message+=f'{radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions["pos 1"]} нету на dota2protracker'
         if len(dire_wr_with) < 5:
-            send_message(f'Недостаточная выборка винрейтов у {dire_team_name} между командой\n{dire_heroes_and_positions}')
+            output_message+=f'Недостаточная выборка винрейтов у {dire_team_name} между командой\n{dire_heroes_and_positions}'
         if len(radiant_wr_with) < 5:
-            send_message(f'Недостаточная выборка винрейтов у {radiant_team_name} между командой\n{radiant_heroes_and_positions}')
+            output_message+=f'Недостаточная выборка винрейтов у {radiant_team_name} между командой\n{radiant_heroes_and_positions}'
         if len(radiant_wr_against) < 5:
-            send_message(
-                f'Недостаточная выборка винрейтов у команду между друг друга\n{radiant_heroes_and_positions}\n{dire_heroes_and_positions}')
+            output_message+=f'Недостаточная выборка винрейтов у команду между друг друга\n{radiant_heroes_and_positions}\n{dire_heroes_and_positions}'
     for hero in list(radiant_heroes_and_positions.values()):
         if hero in game_changer_list:
-            send_message(f'Аккуратно! У {radiant_team_name} есть {hero}, который может изменить исход боя')
+            output_message+=f'\nАккуратно! У {radiant_team_name} есть {hero}, который может изменить исход боя'
     for hero in list(dire_heroes_and_positions.values()):
         if hero in game_changer_list:
-            send_message(f'Аккуратно! У {dire_team_name} есть {hero}, который может изменить исход боя')
+            output_message+=f'\nАккуратно! У {dire_team_name} есть {hero}, который может изменить исход боя'
+    send_message(output_message)
     add_url(antiplagiat_url)
 
 

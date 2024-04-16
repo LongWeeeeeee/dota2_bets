@@ -424,7 +424,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         else:
             output_message+= f'{radiant_team_name} vs {dire_team_name}\nSinergy: {sinergy}\nCounterpick: {counterpick}\npos1_vs_team: {pos1_vs_team}\nPos2 vs team: {pos2_vs_team}\nPos3 vs team: {pos3_vs_team}\nCore matchup: {core_matchup}\nSups: {sups}\nПлохая ставка!!!'
     else:
-        output_message+=f'{radiant_team_name} vs {dire_team_name}'
+        output_message+=f'{radiant_team_name} vs {dire_team_name}\n'
         if radiant_pos4_with_pos5 is None:
             output_message += f'{radiant_heroes_and_positions["pos 4"]} with {radiant_heroes_and_positions["pos 5"]} Нету на dota2protracker'
         if dire_pos4_with_pos5 is None:

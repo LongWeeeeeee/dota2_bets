@@ -26,7 +26,7 @@ def get_live_matches(url='https://dltv.org/matches'):
             soup = BeautifulSoup(response, 'lxml')
             result = get_team_names(soup)
             if result is not None:
-                radiant_team_name, dire_team_name = result
+                radiant_team_name, dire_team_name, score = result
                 if if_picks_are_done(soup):
                     # Проверяем, не скрыт ли элемент и содержит ли он другие элементы
                     radiant_players, dire_players = get_player_names_and_heroes(soup)
@@ -36,7 +36,7 @@ def get_live_matches(url='https://dltv.org/matches'):
                         if if_unique(url):
                             print(f'{radiant_team_name} VS {dire_team_name}')
                             dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name,
-                                            dire_team_name, url)
+                                            dire_team_name, score, url)
                 else:
                     print(f'{radiant_team_name} vs {dire_team_name}\nПики еще не закончились')
     else:
@@ -75,6 +75,8 @@ def get_urls(url, target_datetime = 0):
 def get_team_names(soup):
     tags_block = soup.find('div', class_='plus__stats-details desktop-none')
     tags = tags_block.find_all('span', class_='title')
+    scores = soup.find('div', class_='score__scores live').find_all('span')
+    score = [i.text.strip() for i in scores]
     radiant_team_name, dire_team_name = None, None
     for tag in tags:
         team_info = tag.text.strip().split('\n')
@@ -82,7 +84,7 @@ def get_team_names(soup):
             radiant_team_name = team_info[0].lower()
         else:
             dire_team_name = team_info[0].lower()
-    return radiant_team_name, dire_team_name
+    return radiant_team_name, dire_team_name, score
 
 
 def get_player_names_and_heroes(soup):
@@ -249,9 +251,9 @@ def are_similar(s1, s2, threshold=70):
     return similarity_percentage(s1, s2) >= threshold
 
 
-def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, antiplagiat_url=None, core_matchup=None, output_message=''):
+def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, score, antiplagiat_url=None, core_matchup=None, output_message=''):
     print('dota2protracker')
-    radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team = [], [], [], [] ,[], [], [], [], []
+    radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team, radiant_pos4_with_pos5, dire_pos4_with_pos5 = [], [], [], [] ,[], [], [], [], [], None, None
     for position in radiant_heroes_and_positions:
         hero_url = radiant_heroes_and_positions[position].replace(' ', '%20')
         url = f'https://dota2protracker.com/hero/{hero_url}/new'
@@ -402,7 +404,12 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                 if 'pos 3' in data_pos and data_hero == dire_heroes_and_positions['pos 3']:
                     dire_pos3_vs_team.append(100-data_wr)
     #
-    if core_matchup is not None and len(dire_wr_with) >= 4 and len(radiant_wr_with) >= 4 and len(radiant_wr_against) >= 4 and len(radiant_pos1_vs_team) >= 3 and len(dire_pos1_vs_team) >= 3 and len(radiant_pos2_vs_team) >= 3 and len(dire_pos2_vs_team) >= 3 and len(radiant_pos3_vs_team) >= 3 and len(dire_pos3_vs_team) >= 3:
+    output_message += f'Счет: {" : ".join(score)}\n'
+    try:
+        sups = radiant_pos4_with_pos5 - dire_pos4_with_pos5
+    except:
+        sups = None
+    if core_matchup is not None and len(dire_wr_with) >= 4 and len(radiant_wr_with) >= 4 and len(radiant_wr_against) >= 4 and len(radiant_pos1_vs_team) >= 3 and len(dire_pos1_vs_team) >= 3 and len(radiant_pos2_vs_team) >= 3 and len(dire_pos2_vs_team) >= 3 and len(radiant_pos3_vs_team) >= 3 and len(dire_pos3_vs_team) >= 3 and sups is not None:
         core_matchup -= 50
         sinergy = (sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))
         counterpick = sum(radiant_wr_against) / len(radiant_wr_against) - 50
@@ -410,10 +417,6 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             dire_pos1_vs_team)
         pos2_vs_team = sum(radiant_pos2_vs_team) / len(radiant_pos2_vs_team) - sum(dire_pos2_vs_team) / len(dire_pos2_vs_team)
         pos3_vs_team = sum(radiant_pos3_vs_team) / len(radiant_pos3_vs_team) - sum(dire_pos3_vs_team) / len(dire_pos3_vs_team)
-        try:
-            sups = radiant_pos4_with_pos5 - dire_pos4_with_pos5
-        except:
-            sups = 0
         if sinergy > 0 and counterpick > 0 and pos1_vs_team > 0 and core_matchup > 0 and pos2_vs_team > 0 and pos3_vs_team > 0 and sups > 0:
             output_message+= f'Синергия {radiant_team_name} сильнее на {sinergy}%\nCounterpick: {counterpick}\nPos1 vs team: {pos1_vs_team}\nPos2 vs team: {pos2_vs_team}\nPos3 vs team: {pos3_vs_team}\nSups: {sups}\nCore matchup: {core_matchup}'
         elif sinergy < 0 and counterpick < 0 and pos1_vs_team < 0 and core_matchup < 0 and pos2_vs_team < 0 and pos3_vs_team < 0 and sups < 0:
@@ -421,7 +424,11 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         else:
             output_message+= f'{radiant_team_name} vs {dire_team_name}\nSinergy: {sinergy}\nCounterpick: {counterpick}\npos1_vs_team: {pos1_vs_team}\nPos2 vs team: {pos2_vs_team}\nPos3 vs team: {pos3_vs_team}\nCore matchup: {core_matchup}\nSups: {sups}\nПлохая ставка!!!'
     else:
-        output_message+=f'{radiant_team_name} vs {dire_team_name}\n'
+        output_message+=f'{radiant_team_name} vs {dire_team_name}'
+        if radiant_pos4_with_pos5 is None:
+            output_message += f'{radiant_heroes_and_positions["pos 4"]} with {radiant_heroes_and_positions["pos 5"]} Нету на dota2protracker'
+        if dire_pos4_with_pos5 is None:
+            output_message += f'{dire_heroes_and_positions["pos 4"]} with {dire_heroes_and_positions["pos 5"]} Нету на dota2protracker'
         if len(radiant_pos3_vs_team) < 3:
             output_message+= f'Недостаточно данных {radiant_heroes_and_positions["pos 3"]} vs {dire_heroes_and_positions}'
         if len(dire_pos3_vs_team) < 3:

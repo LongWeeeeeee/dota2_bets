@@ -41,13 +41,11 @@ def get_live_matches(url='https://dltv.org/matches'):
                     print(f'{radiant_team_name} vs {dire_team_name}\nПики еще не закончились')
     else:
         now = datetime.datetime.now()
-        try:
+        if sleep_time != 0:
             if sleep_time > now:
                 wait_seconds = (sleep_time - now).total_seconds()
                 print(f'Live матчей нет, сплю {wait_seconds/60} минут')
                 time.sleep(wait_seconds)
-        except:
-            send_message(f"sleep_time = {sleep_time}, now = {now}")
 
 
 

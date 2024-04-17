@@ -11,6 +11,7 @@ game_changer_list = [
     'Ancient Apparation',
     'Magnus',
     'Bristleback',
+    'Winter Wyvern'
     'Doom',
     'Lone Druid',
     'Tusk',

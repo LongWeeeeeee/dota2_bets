@@ -31,10 +31,9 @@ def get_live_matches(url='https://dltv.org/matches'):
                 result = get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players)
                 if result is not None:
                     radiant_heroes_and_positions, dire_heroes_and_positions, url = result
-                    if if_unique(url):
-                        print(f'{radiant_team_name} VS {dire_team_name}')
-                        dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name,
-                                        dire_team_name, score, url)
+                    print(f'{radiant_team_name} VS {dire_team_name}')
+                    dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name,
+                                    dire_team_name, score, url)
             else:
                 print(f'\nПики еще не закончились')
     else:
@@ -77,9 +76,9 @@ def get_team_names(soup):
     for tag in tags:
         team_info = tag.text.strip().split('\n')
         if team_info[1].replace(' ', '').lower() == 'radiant':
-            radiant_team_name = team_info[0].lower()
+            radiant_team_name = team_info[0].lower().replace(' ', '')
         else:
-            dire_team_name = team_info[0].lower()
+            dire_team_name = team_info[0].lower().replace(' ', '')
     return radiant_team_name, dire_team_name, score
 
 
@@ -450,9 +449,11 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             output_message+=f'Недостаточная выборка винрейтов у {radiant_team_name} между командой\n{radiant_heroes_and_positions}\n'
         if len(radiant_wr_against) < 5:
             output_message+=f'Недостаточная выборка винрейтов у команду между друг друга\n{radiant_heroes_and_positions}\n{dire_heroes_and_positions}\n'
+    output_message += '\n'
     for hero in list(radiant_heroes_and_positions.values()):
         if hero in game_changer_list:
             output_message+=f'Аккуратно! У {radiant_team_name} есть {hero}, который может изменить исход боя\n'
+    output_message += '\n'
     for hero in list(dire_heroes_and_positions.values()):
         if hero in game_changer_list:
             output_message+=f'Аккуратно! У {dire_team_name} есть {hero}, который может изменить исход боя\n'
@@ -464,15 +465,16 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
 def get_map_id(data, radiant_team_name, dire_team_name):
     for match in data['rows']:
         if match['team_dire'] is not None and match['team_dire'] is not None:
-            radi_team = match['team_radiant']['name'].lower()
-            dire_team = match['team_dire']['name'].lower()
-            if radi_team in radiant_team_name or radiant_team_name in radi_team or \
-            dire_team in dire_team_name or dire_team_name in dire_team:
+            radi_team = match['team_radiant']['name'].lower().replace(' ', '')
+            dire_team = match['team_dire']['name'].lower().replace(' ', '')
+            if (radi_team in radiant_team_name or radiant_team_name in radi_team) and \
+                    (dire_team in dire_team_name or dire_team_name in dire_team):
                 for karta in match['related_matches']:
-                    if karta['status'] != 'ended':
+                    if karta['status'] not in ['ended', 'waiting']:
                         map_id = karta['id']
                         url = f'https://cyberscore.live/en/matches/{map_id}/'
-                        if if_unique(url) is not None:
+                        result = if_unique(url)
+                        if result is not None:
                             return url
 
 

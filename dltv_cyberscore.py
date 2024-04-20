@@ -35,7 +35,7 @@ def get_live_matches(url='https://dltv.org/matches'):
                     dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name,
                                     dire_team_name, score, url)
             else:
-                print(f'\nПики еще не закончились')
+                print(f'Пики еще не закончились')
     else:
         now = datetime.datetime.now()
         if sleep_time != 0:

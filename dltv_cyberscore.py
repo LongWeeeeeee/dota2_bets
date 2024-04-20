@@ -467,10 +467,10 @@ def get_map_id(data, radiant_team_name, dire_team_name):
         if match['team_dire'] is not None and match['team_dire'] is not None:
             radi_team = match['team_radiant']['name'].lower().replace(' ', '')
             dire_team = match['team_dire']['name'].lower().replace(' ', '')
-            if (radi_team in radiant_team_name or radiant_team_name in radi_team) and \
+            if (radi_team in radiant_team_name or radiant_team_name in radi_team) or \
                     (dire_team in dire_team_name or dire_team_name in dire_team):
                 for karta in match['related_matches']:
-                    if karta['status'] not in ['ended', 'waiting']:
+                    if karta['status'] == 'online':
                         map_id = karta['id']
                         url = f'https://cyberscore.live/en/matches/{map_id}/'
                         result = if_unique(url)

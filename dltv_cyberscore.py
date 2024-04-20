@@ -61,7 +61,7 @@ def get_urls(url, target_datetime = 0):
             upcoming_matches = soup.find('div', class_="upcoming__matches-item")
             if upcoming_matches:
                 target_datetime_str = upcoming_matches['data-matches-odd']
-                target_datetime = datetime.datetime.strptime(target_datetime_str, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(hours=3)
+                target_datetime = datetime.datetime.strptime(target_datetime_str, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(hours=2, minutes=54)
         if not len(live_matches_urls):
             live_matches_urls = None
         return live_matches_urls, target_datetime
@@ -430,7 +430,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         if dire_pos4_with_pos5 is None:
             output_message += f'{dire_heroes_and_positions["pos 4"]} with {dire_heroes_and_positions["pos 5"]} Нету на dota2protracker'
         if len(radiant_pos3_vs_cores) < 3:
-            output_message+= f'111 данных {radiant_heroes_and_positions["pos 3"]} vs {dire_heroes_and_positions}\n'
+            output_message+= f'Недостаточно данных {radiant_heroes_and_positions["pos 3"]} vs {dire_heroes_and_positions}\n'
         if len(dire_pos3_vs_cores) < 3:
             output_message+= f'Недостаточно данных {dire_heroes_and_positions["pos 3"]} vs {radiant_heroes_and_positions}\n'
         if len(dire_pos2_vs_cores) < 3:

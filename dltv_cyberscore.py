@@ -118,7 +118,7 @@ def get_team_ids(radiant_team_name, dire_team_name):
 
 def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players):
     radiant_pick, dire_pick = {}, {}
-    nick_fixes = {'griefy': 'asdekor_r', 'panda':'pandachertq','yabyooo':'yabby', 'placebo':'egxrdemxn', 'faker':'kxy', 'satanic':'king', '999xu': 'imitator', 'emptiness': 'aind','red2' :'nico' ,'bnc' :'xxxblincc', 'xdddd':'fachero','sagiri': 'kcl',
+    nick_fixes = {'griefy': 'asdekor_r','xiaoyu':'d', '?':'invoker','panda':'pandachertq','yabyooo':'yabby', 'placebo':'egxrdemxn', 'faker':'kxy', 'satanic':'king', '999xu': 'imitator', 'emptiness': 'aind','red2' :'nico' ,'bnc' :'xxxblincc', 'xdddd':'fachero','sagiri': 'kcl',
                   'somnia': 'oushaktian casedrop.com', 'yuukichi': 'hiori','neko': 'sh1do', 'ra1ncloud': 'v1necy', 'qjy': 'newbie', 'young ame is back': 'a1one', 'ksh':'raz', 'xn丶e': 'xne-'}
     lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
     radiant_lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
@@ -168,12 +168,10 @@ def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_
             if len(radiant_pick) != 5:
                 print(f'{radiant_team_name}\nНе удалось выяснить позиции игроков {radiant_pick}')
                 send_message(f'{radiant_team_name}\nНе удалось выяснить позиции игроков {radiant_pick}')
-                add_url(url)
                 return None
             if len(dire_pick) != 5:
                 print((f'{dire_team_name}\nНе удалось выяснить позиции игроков {dire_pick}'))
                 send_message(f'{dire_team_name}\nНе удалось выяснить позиции игроков {dire_pick}')
-                add_url(url)
                 return None
 
 
@@ -426,9 +424,9 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     else:
         output_message+=f'{radiant_team_name} vs {dire_team_name}\n'
         if radiant_pos4_with_pos5 is None:
-            output_message += f'{radiant_heroes_and_positions["pos 4"]} with {radiant_heroes_and_positions["pos 5"]} Нету на dota2protracker'
+            output_message += f'{radiant_heroes_and_positions["pos 4"]} with {radiant_heroes_and_positions["pos 5"]} Нету на dota2protracker\n'
         if dire_pos4_with_pos5 is None:
-            output_message += f'{dire_heroes_and_positions["pos 4"]} with {dire_heroes_and_positions["pos 5"]} Нету на dota2protracker'
+            output_message += f'{dire_heroes_and_positions["pos 4"]} with {dire_heroes_and_positions["pos 5"]} Нету на dota2protracker\n'
         if len(radiant_pos3_vs_cores) < 3:
             output_message+= f'Недостаточно данных {radiant_heroes_and_positions["pos 3"]} vs {dire_heroes_and_positions}\n'
         if len(dire_pos3_vs_cores) < 3:

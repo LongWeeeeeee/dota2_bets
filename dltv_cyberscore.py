@@ -85,23 +85,22 @@ def get_team_names(soup):
 def get_player_names_and_heroes(soup):
     radiant_players, dire_players = {}, {}
     radiant_block = soup.find('div', class_='picks__new-picks__picks radiant')
-    radiant_heroes_block = radiant_block.find_all('div', class_='pick player')
     dire_block = soup.find('div', class_='picks__new-picks__picks dire')
-    dire_heroes_block = dire_block.find_all('div', class_='pick player')
-    for hero in radiant_heroes_block[0:5]:
-        hero_name = hero.get('data-tippy-content').replace('Outworld Devourer', 'Outworld Destroyer')
-        player_name = hero.find('span', class_='pick__player-title').text.lower()
-        player_name = re.sub(r'[^\w\s\u4e00-\u9fff]+', '', player_name)
-        radiant_players[player_name] = {'hero': hero_name}
-    for hero in dire_heroes_block:
-        hero_name = hero.get('data-tippy-content').replace('Outworld Devourer', 'Outworld Destroyer')
-        player_name = hero.find('span', class_='pick__player-title').text.lower()
-        player_name = re.sub(r'[^\w\s\u4e00-\u9fff]+', '', player_name)
-        dire_players[player_name] = {'hero': hero_name}
-    if len(radiant_players) == 5 and len(dire_players) == 5:
-        return radiant_players, dire_players
-    else:
-        return None
+    if radiant_block is not None and dire_block is not None:
+        radiant_heroes_block = radiant_block.find_all('div', class_='pick player')
+        dire_heroes_block = dire_block.find_all('div', class_='pick player')
+        for hero in radiant_heroes_block[0:5]:
+            hero_name = hero.get('data-tippy-content').replace('Outworld Devourer', 'Outworld Destroyer')
+            player_name = hero.find('span', class_='pick__player-title').text.lower()
+            player_name = re.sub(r'[^\w\s\u4e00-\u9fff]+', '', player_name)
+            radiant_players[player_name] = {'hero': hero_name}
+        for hero in dire_heroes_block:
+            hero_name = hero.get('data-tippy-content').replace('Outworld Devourer', 'Outworld Destroyer')
+            player_name = hero.find('span', class_='pick__player-title').text.lower()
+            player_name = re.sub(r'[^\w\s\u4e00-\u9fff]+', '', player_name)
+            dire_players[player_name] = {'hero': hero_name}
+        if len(radiant_players) == 5 and len(dire_players) == 5:
+            return radiant_players, dire_players
 
 
 def get_team_ids(radiant_team_name, dire_team_name):
@@ -118,7 +117,7 @@ def get_team_ids(radiant_team_name, dire_team_name):
 
 def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players):
     radiant_pick, dire_pick = {}, {}
-    nick_fixes = {'griefy': 'asdekor_r','xiaoyu':'d', '?':'invoker','panda':'pandachertq','yabyooo':'yabby', 'placebo':'egxrdemxn', 'faker':'kxy', 'satanic':'king', '999xu': 'imitator', 'emptiness': 'aind','red2' :'nico' ,'bnc' :'xxxblincc', 'xdddd':'fachero','sagiri': 'kcl',
+    nick_fixes = {'griefy': 'asdekor_r', 'wein666':'alone','xiaoyu':'d', '?':'invoker','panda':'pandachertq','yabyooo':'yabby', 'placebo':'egxrdemxn', 'faker':'kxy', 'satanic':'king', '999xu': 'imitator', 'emptiness': 'aind','red2' :'nico' ,'bnc' :'xxxblincc', 'xdddd':'fachero','sagiri': 'kcl',
                   'somnia': 'oushaktian casedrop.com', 'yuukichi': 'hiori','neko': 'sh1do', 'ra1ncloud': 'v1necy', 'qjy': 'newbie', 'young ame is back': 'a1one', 'ksh':'raz', 'xn丶e': 'xne-'}
     lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
     radiant_lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']

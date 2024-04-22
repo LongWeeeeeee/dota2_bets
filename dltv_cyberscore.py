@@ -126,57 +126,56 @@ def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_
                  'offlaner': 'pos 3'}
     url = 'https://api.cyberscore.live/api/v1/matches/?limit=20&type=liveOrUpcoming&locale=en'
     response = requests.get(url)
-    data = json.loads(response.text)
-    url = get_map_id(data, radiant_team_name, dire_team_name)
-    if url is not None:
-        response = requests.get(url)
-        if response.status_code == 200:
-            response_html = html.unescape(response.text)
-            soup = BeautifulSoup(response_html, 'lxml')
-            players = soup.find_all('div', class_='team-item')
-            for player in players:
-                nick_name = player.find('div', class_='player-name')
-                if nick_name is not None:
-                    nick_name = nick_name.text.lower().replace('.', '')
-                    nick_name = re.sub(r'[^\w\s\u4e00-\u9fff]+', '', nick_name)
-                    position = player.find('span', class_='truncate').text.lower()
-                    if nick_name in nick_fixes:
-                        nick_name = nick_fixes[nick_name]
-                    if position in lst:
-                        result = find_in_radiant(radiant_players, nick_name, translate, position, radiant_pick, radiant_lst)
-                        if result is not None:
-                            radiant_lst, radiant_pick = result
-                        else:
-                            result = find_in_dire(dire_players, nick_name, translate, position, dire_pick, dire_lst)
+    if response.status_code == 200:
+        data = json.loads(response.text)
+        url = get_map_id(data, radiant_team_name, dire_team_name)
+        if url is not None:
+            response = requests.get(url)
+            if response.status_code == 200:
+                response_html = html.unescape(response.text)
+                soup = BeautifulSoup(response_html, 'lxml')
+                players = soup.find_all('div', class_='team-item')
+                for player in players:
+                    nick_name = player.find('div', class_='player-name')
+                    if nick_name is not None:
+                        nick_name = nick_name.text.lower().replace('.', '')
+                        nick_name = re.sub(r'[^\w\s\u4e00-\u9fff]+', '', nick_name)
+                        position = player.find('span', class_='truncate').text.lower()
+                        if nick_name in nick_fixes:
+                            nick_name = nick_fixes[nick_name]
+                        if position in lst:
+                            result = find_in_radiant(radiant_players, nick_name, translate, position, radiant_pick, radiant_lst)
                             if result is not None:
-                                dire_lst, dire_pick = result
+                                radiant_lst, radiant_pick = result
+                            else:
+                                result = find_in_dire(dire_players, nick_name, translate, position, dire_pick, dire_lst)
+                                if result is not None:
+                                    dire_lst, dire_pick = result
 
 
-            if len(radiant_pick) == 4:
-                for player in radiant_players.values():
-                    hero = player['hero']
-                    p_list = list(radiant_pick.values())
-                    if hero not in p_list:
-                        radiant_pick[translate[radiant_lst[0]]] = hero
-            if len(dire_pick) == 4:
-                for player in dire_players.values():
-                    hero = player['hero']
-                    p_list = list(dire_pick.values())
-                    if hero not in p_list:
-                        dire_pick[translate[dire_lst[0]]] = hero
-            if len(radiant_pick) != 5:
-                print(f'{radiant_team_name}\nНе удалось выяснить позиции игроков {radiant_pick}')
-                send_message(f'{radiant_team_name}\nНе удалось выяснить позиции игроков {radiant_pick}')
-                return None
-            if len(dire_pick) != 5:
-                print((f'{dire_team_name}\nНе удалось выяснить позиции игроков {dire_pick}'))
-                send_message(f'{dire_team_name}\nНе удалось выяснить позиции игроков {dire_pick}')
-                return None
+                if len(radiant_pick) == 4:
+                    for player in radiant_players.values():
+                        hero = player['hero']
+                        p_list = list(radiant_pick.values())
+                        if hero not in p_list:
+                            radiant_pick[translate[radiant_lst[0]]] = hero
+                if len(dire_pick) == 4:
+                    for player in dire_players.values():
+                        hero = player['hero']
+                        p_list = list(dire_pick.values())
+                        if hero not in p_list:
+                            dire_pick[translate[dire_lst[0]]] = hero
+                if len(radiant_pick) != 5:
+                    print(f'{radiant_team_name}\nНе удалось выяснить позиции игроков {radiant_pick}')
+                    send_message(f'{radiant_team_name}\nНе удалось выяснить позиции игроков {radiant_pick}')
+                    return None
+                if len(dire_pick) != 5:
+                    print((f'{dire_team_name}\nНе удалось выяснить позиции игроков {dire_pick}'))
+                    send_message(f'{dire_team_name}\nНе удалось выяснить позиции игроков {dire_pick}')
+                    return None
 
 
             return radiant_pick, dire_pick, url
-    else:
-        return None
 
 
 def fill_players_position(rows, players):

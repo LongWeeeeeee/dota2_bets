@@ -117,7 +117,7 @@ def get_team_ids(radiant_team_name, dire_team_name):
 
 def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players):
     radiant_pick, dire_pick = {}, {}
-    nick_fixes = {'griefy': 'asdekor_r', 'wein666':'alone','xiaoyu':'d', '?':'invoker','panda':'pandachertq','yabyooo':'yabby', 'placebo':'egxrdemxn', 'faker':'kxy', 'satanic':'king', '999xu': 'imitator', 'emptiness': 'aind','red2' :'nico' ,'bnc' :'xxxblincc', 'xdddd':'fachero','sagiri': 'kcl',
+    nick_fixes = {'griefy': 'asdekor_r', 'wein666':'alone','blance':'haw','xiaoyu':'d', '?':'invoker','panda':'pandachertq','yabyooo':'yabby', 'placebo':'egxrdemxn', 'faker':'kxy', 'satanic':'king', '999xu': 'imitator', 'emptiness': 'aind','red2' :'nico' ,'bnc' :'xxxblincc', 'xdddd':'fachero','sagiri': 'kcl',
                   'somnia': 'oushaktian casedrop.com', 'yuukichi': 'hiori','neko': 'sh1do', 'ra1ncloud': 'v1necy', 'qjy': 'newbie', 'young ame is back': 'a1one', 'ksh':'raz', 'xn丶e': 'xne-'}
     lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
     radiant_lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
@@ -168,10 +168,12 @@ def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_
                 if len(radiant_pick) != 5:
                     print(f'{radiant_team_name}\nНе удалось выяснить позиции игроков {radiant_pick}')
                     send_message(f'{radiant_team_name}\nНе удалось выяснить позиции игроков {radiant_pick}')
+                    add_url(url)
                     return None
                 if len(dire_pick) != 5:
                     print((f'{dire_team_name}\nНе удалось выяснить позиции игроков {dire_pick}'))
                     send_message(f'{dire_team_name}\nНе удалось выяснить позиции игроков {dire_pick}')
+                    add_url(url)
                     return None
 
 

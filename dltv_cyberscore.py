@@ -11,43 +11,52 @@ from bs4 import BeautifulSoup
 import time
 import re
 import datetime
+
+import id_to_name
 import keys
 from id_to_name import game_changer_list
 
 
 
 
-def get_live_matches(url='https://dltv.org/matches'):
-    live_matches_urls, sleep_time = get_urls(url)
-    if live_matches_urls is not None:
-        print(f'Количество live матчей: {len(live_matches_urls)}')
-        for url in live_matches_urls:
-            response = requests.get(url).text
-            soup = BeautifulSoup(response, 'lxml')
-            result = get_player_names_and_heroes(soup)
-            if result is not None:
-                radiant_players, dire_players = result
-                radiant_team_name, dire_team_name, score  = get_team_names(soup)
-                result = get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players)
-                if result is not None:
-                    radiant_heroes_and_positions, dire_heroes_and_positions, url = result
-                    print(f'{radiant_team_name} VS {dire_team_name}')
-                    dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name,
-                                    dire_team_name, score, url)
-            else:
-                print(f'Пики еще не закончились')
-    else:
-        now = datetime.datetime.now()
-        if sleep_time != 0:
-            if sleep_time > now:
-                wait_seconds = (sleep_time - now).total_seconds()
-                print(f'Live матчей нет, сплю {wait_seconds/60} минут')
-                time.sleep(wait_seconds)
+def get_live_matches():
+    result = get_team_positions()
+    if result is not None:
+        radiant_heroes_and_pos, dire_heroes_and_pos, radiant_team_name, dire_team_name, url, score = result
+        print(f'{radiant_team_name} VS {dire_team_name}')
+        dota2protracker(radiant_heroes_and_pos, dire_heroes_and_pos, radiant_team_name,
+                        dire_team_name, score, url)
+    #         else:
+    #             print(f'Пики еще не закончились')
+    # else:
+    #     now = datetime.datetime.now()
+    #     if sleep_time != 0:
+    #         if sleep_time > now:
+    #             wait_seconds = (sleep_time - now).total_seconds()
+    #             print(f'Live матчей нет, сплю {wait_seconds/60} минут')
+    #             time.sleep(wait_seconds)
 
 
 
 def get_urls(url, target_datetime = 0):
-    response = requests.get(url)
+    headers = {
+        'Host': 'dltv.org',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/jxl,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.5',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Cookie': '__locales_redirect=1; XSRF-TOKEN=CrRD7ES3D0bOZ9rCcCDqXjRDETjzT7rytDBsmfbF; dltv_session=VIa6gs6CP1ciQ98qtbhaVoX6uOMgNjxgb05zpcQy; cookie__accept=true; ___user_timezone=Europe%2FMoscow; ___user_results=all; ___user_theme=light; ___user_scoreboard=1; ___user_date_filter=0; comments-language=ru; cf_clearance=uBbl2syqVW4y5hDhHZFFkMIfWp9NMXI_UWukOGWnO.Q-1713899154-1.0.1.1-LnK08BCCVLFjL04pwXmh2HdwezwQVazx5TctcyX9NAr9pkhAkl3jWEWGt.UPz48tG5WT4BU_TrBkchn6Vl3tOA; banners_stats_1=3_1; banners_stats_6=107_1; banners_stats_2=112_1; banners_stats_4=92_1; banners_stats_3=99_1; banners_stats_0=79_1%3B94_1; banners_stats_5=113_1',
+        'DNT': '1',
+        'Sec-GPC': '1',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'same-origin',
+        'Sec-Fetch-User': '?1',
+        'TE': 'trailers'
+    }
+    response = requests.get(url=url, headers=headers)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'lxml')
         live_matches_block = soup.find('div', class_='live__matches')
@@ -65,6 +74,7 @@ def get_urls(url, target_datetime = 0):
         if not len(live_matches_urls):
             live_matches_urls = None
         return live_matches_urls, target_datetime
+    else: print(f'{response.status_code}')
 
 
 def get_team_names(soup):
@@ -115,67 +125,84 @@ def get_team_ids(radiant_team_name, dire_team_name):
             return radiant_team_id, dire_team_id
 
 
-def get_team_positions(radiant_team_name, dire_team_name, radiant_players, dire_players):
-    radiant_pick, dire_pick = {}, {}
-    nick_fixes = {'griefy': 'asdekor_r', 'ulti':'melluyulunj','wein666':'alone','blance':'haw','xiaoyu':'d', '?':'invoker','panda':'pandachertq','yabyooo':'yabby', 'placebo':'egxrdemxn', 'faker':'kxy', 'satanic':'king', '999xu': 'imitator', 'emptiness': 'aind','red2' :'nico' ,'bnc' :'xxxblincc', 'xdddd':'fachero','sagiri': 'kcl',
-                  'somnia': 'oushaktian casedrop.com', 'yuukichi': 'hiori','neko': 'sh1do', 'ra1ncloud': 'v1necy', 'qjy': 'newbie', 'young ame is back': 'a1one', 'ksh':'raz', 'xn丶e': 'xne-'}
-    lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
-    radiant_lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
-    dire_lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
-    translate = {'mid': 'pos 2', 'semi-support': 'pos 4', 'carry': 'pos 1', 'main-support': 'pos 5',
-                 'offlaner': 'pos 3'}
+def get_team_positions():
+    # radiant_pick, dire_pick = {}, {}
+    # nick_fixes = {'griefy': 'asdekor_r', 'ulti':'melluyulunj','wein666':'alone','blance':'haw','xiaoyu':'d', '?':'invoker','panda':'pandachertq','yabyooo':'yabby', 'placebo':'egxrdemxn', 'faker':'kxy', 'satanic':'king', '999xu': 'imitator', 'emptiness': 'aind','red2' :'nico' ,'bnc' :'xxxblincc', 'xdddd':'fachero','sagiri': 'kcl',
+    #               'somnia': 'oushaktian casedrop.com', 'yuukichi': 'hiori','neko': 'sh1do', 'ra1ncloud': 'v1necy', 'qjy': 'newbie', 'young ame is back': 'a1one', 'ksh':'raz', 'xn丶e': 'xne-'}
+    # lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
+    # radiant_lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
+    # dire_lst = ['mid', 'semi-support', 'carry', 'main-support', 'offlaner']
+    # translate = {'mid': 'pos 2', 'semi-support': 'pos 4', 'carry': 'pos 1', 'main-support': 'pos 5',
+    #              'offlaner': 'pos 3'}
     url = 'https://api.cyberscore.live/api/v1/matches/?limit=20&type=liveOrUpcoming&locale=en'
     response = requests.get(url)
     if response.status_code == 200:
         data = json.loads(response.text)
-        url = get_map_id(data, radiant_team_name, dire_team_name)
-        if url is not None:
+        result = get_map_id(data)
+        if result is not None:
+            url, radiant_team_name, dire_team_name, score = result
             response = requests.get(url)
             if response.status_code == 200:
                 response_html = html.unescape(response.text)
                 soup = BeautifulSoup(response_html, 'lxml')
-                players = soup.find_all('div', class_='team-item')
-                for player in players:
-                    nick_name = player.find('div', class_='player-name')
-                    if nick_name is not None:
-                        nick_name = nick_name.text.lower().replace('.', '')
-                        nick_name = re.sub(r'[^\w\s\u4e00-\u9fff]+', '', nick_name)
-                        position = player.find('span', class_='truncate').text.lower()
-                        if nick_name in nick_fixes:
-                            nick_name = nick_fixes[nick_name]
-                        if position in lst:
-                            result = find_in_radiant(radiant_players, nick_name, translate, position, radiant_pick, radiant_lst)
-                            if result is not None:
-                                radiant_lst, radiant_pick = result
-                            else:
-                                result = find_in_dire(dire_players, nick_name, translate, position, dire_pick, dire_lst)
-                                if result is not None:
-                                    dire_lst, dire_pick = result
+                picks_item = soup.find_all('div', class_='picks-item with-match-players-tooltip')
+                heroes = []
+                for hero_block in picks_item:
+                    for hero in list(id_to_name.translate.values()):
+                        if hero in hero_block.text:
+                            heroes.append(hero)
+                radiant_heroes_and_pos = {}
+                dire_heroes_and_pos = {}
+                for i in range(5):
+                    radiant_heroes_and_pos[f'pos {i+1}'] = heroes[i]
+
+                for i in range(5):
+                    dire_heroes_and_pos[f'pos {i+1}'] = heroes[i+5]
+                # players = soup.find_all('div', class_='team-item')
+                # for player in players:
+                #     nick_name = player.find('div', class_='player-name')
+                #     if nick_name is not None:
+                #         nick_name = nick_name.text.lower().replace('.', '')
+                #         nick_name = re.sub(r'[^\w\s\u4e00-\u9fff]+', '', nick_name)
+                #         position = player.find('span', class_='truncate').text.lower()
+                #         if nick_name in nick_fixes:
+                #             nick_name = nick_fixes[nick_name]
+                #         if position in lst:
+                #             result = find_in_radiant(radiant_players, nick_name, translate, position, radiant_pick, radiant_lst)
+                #             if result is not None:
+                #                 radiant_lst, radiant_pick = result
+                #             else:
+                #                 result = find_in_dire(dire_players, nick_name, translate, position, dire_pick, dire_lst)
+                #                 if result is not None:
+                #                     dire_lst, dire_pick = result
+                #
+                #
+                # if len(radiant_pick) == 4:
+                #     for player in radiant_players.values():
+                #         hero = player['hero']
+                #         p_list = list(radiant_pick.values())
+                #         if hero not in p_list:
+                #             radiant_pick[translate[radiant_lst[0]]] = hero
+                # if len(dire_pick) == 4:
+                #     for player in dire_players.values():
+                #         hero = player['hero']
+                #         p_list = list(dire_pick.values())
+                #         if hero not in p_list:
+                #             dire_pick[translate[dire_lst[0]]] = hero
+                # if len(radiant_pick) != 5:
+                #     print(f'{radiant_team_name}\nНе удалось выяснить позиции игроков {radiant_pick}')
+                #     # send_message(f'{radiant_team_name}\nНе удалось выяснить позиции игроков {radiant_pick}')
+                #     return None
+                # if len(dire_pick) != 5:
+                #     print((f'{dire_team_name}\nНе удалось выяснить позиции игроков {dire_pick}'))
+                #     # send_message(f'{dire_team_name}\nНе удалось выяснить позиции игроков {dire_pick}')
+                #     return None
 
 
-                if len(radiant_pick) == 4:
-                    for player in radiant_players.values():
-                        hero = player['hero']
-                        p_list = list(radiant_pick.values())
-                        if hero not in p_list:
-                            radiant_pick[translate[radiant_lst[0]]] = hero
-                if len(dire_pick) == 4:
-                    for player in dire_players.values():
-                        hero = player['hero']
-                        p_list = list(dire_pick.values())
-                        if hero not in p_list:
-                            dire_pick[translate[dire_lst[0]]] = hero
-                if len(radiant_pick) != 5:
-                    print(f'{radiant_team_name}\nНе удалось выяснить позиции игроков {radiant_pick}')
-                    # send_message(f'{radiant_team_name}\nНе удалось выяснить позиции игроков {radiant_pick}')
-                    return None
-                if len(dire_pick) != 5:
-                    print((f'{dire_team_name}\nНе удалось выяснить позиции игроков {dire_pick}'))
-                    # send_message(f'{dire_team_name}\nНе удалось выяснить позиции игроков {dire_pick}')
-                    return None
+                return radiant_heroes_and_pos, dire_heroes_and_pos, radiant_team_name, dire_team_name, url, score
+        else:
+            print('нету live матчей')
 
-
-            return radiant_pick, dire_pick, url
 
 
 def fill_players_position(rows, players):
@@ -260,12 +287,21 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         index = {'pos 1': 1, 'pos 2': 3, 'pos 3': 5, 'pos 4': len(stats) - 3, 'pos 5': len(stats) - 1}
         i = index[position]
         hero_divs = stats[i].find_all('div', attrs={'data-hero': True})
+        if len(hero_divs) == 0:
+            divs_dict = dict()
+            for i, digit in enumerate(list(index.values())):
+                hero_divs = stats[i].find_all('div', attrs={'data-hero': True})
+                divs_dict[digit] = hero_divs
+            c = 0
+            for i in divs_dict:
+                if len(divs_dict[i]) > c:
+                    c = len(divs_dict[i])
+                    hero_divs = divs_dict[i]
         for div in hero_divs:
             # Extract the values of 'data-hero', 'data-wr', and 'data-pos' attributes
             data_hero = div.get('data-hero')
             data_wr = int(float(div.get('data-wr')))
             data_pos = div.get('data-pos')
-
             if position == 'pos 1':
                 if 'pos 2' in data_pos and data_hero == radiant_heroes_and_positions['pos 2']:
                     radiant_wr_with.append(data_wr)
@@ -314,12 +350,21 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         index = {'pos 1': 1, 'pos 2': 3, 'pos 3': 5, 'pos 4': len(stats) - 3, 'pos 5': len(stats) - 1}
         i = index[position]
         hero_divs = stats[i].find_all('div', attrs={'data-hero': True})
+        if len(hero_divs) == 0:
+            divs_dict = dict()
+            for i, digit in enumerate(list(index.values())):
+                hero_divs = stats[i].find_all('div', attrs={'data-hero': True})
+                divs_dict[digit] = hero_divs
+            c = 0
+            for i in divs_dict:
+                if len(divs_dict[i]) > c:
+                    c = len(divs_dict[i])
+                    hero_divs = divs_dict[i]
         for div in hero_divs:
             # Extract the values of 'data-hero', 'data-wr', and 'data-pos' attributes
             data_hero = div.get('data-hero')
             data_wr = int(float(div.get('data-wr')))
             data_pos = div.get('data-pos')
-
             if position == 'pos 1':
                 if 'pos 2' in data_pos and data_hero == dire_heroes_and_positions['pos 2']:
                     dire_pos1_with_pos2 = data_wr
@@ -352,7 +397,6 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                 elif 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']:
                     dire_pos3_with_pos5 = data_wr
                     dire_wr_with.append(data_wr)
-
             if position == 'pos 4':
                 if 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']:
                     dire_pos4_with_pos5 = data_wr
@@ -370,42 +414,60 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         index = {'pos 1': 0, 'pos 2': 2, 'pos 3': 4, 'pos 4': len(stats) - 4, 'pos 5': len(stats) - 2}
         i = index[position]
         hero_divs = stats[i].find_all('div', attrs={'data-hero': True})
+        if len(hero_divs) == 0:
+            divs_dict = dict()
+            for i, digit in enumerate(list(index.values())):
+                hero_divs = stats[i].find_all('div', attrs={'data-hero': True})
+                divs_dict[digit] = hero_divs
+            c = 0
+            for i in divs_dict:
+                if len(divs_dict[i]) > c:
+                    c = len(divs_dict[i])
+                    hero_divs = divs_dict[i]
         for div in hero_divs:
-            # Extract the values of 'data-hero', 'data-wr', and 'data-pos' attributes
-            data_hero = div.get('data-hero')
-            data_wr = int(float(div.get('data-wr')))
-            data_pos = div.get('data-pos')
-            positions = ['pos 1', 'pos 2', 'pos 3', 'pos 4', 'pos 5']
-            protracker_pos = data_pos.split(',')[0]
-            # проверить
-            if data_pos.split(',')[0] in positions:
-                for pos in positions:
-                    if pos in data_pos and data_hero == dire_heroes_and_positions[pos]:
-                        if position == 'pos 1' and pos == 'pos 1':
-                            core_matchup = data_wr
-                        radiant_wr_against.append(data_wr)
-                try:
-                    if position == 'pos 1'  and data_hero == dire_heroes_and_positions[protracker_pos]:
+                # Extract the values of 'data-hero', 'data-wr', and 'data-pos' attributes
+                data_hero = div.get('data-hero')
+                data_wr = int(float(div.get('data-wr')))
+                data_pos = div.get('data-pos')
+                positions = ['pos 1', 'pos 2', 'pos 3', 'pos 4', 'pos 5']
+                protracker_pos = data_pos.split(',')[0]
+                # проверить
+                if protracker_pos in positions:
+                    for pos in positions:
+                        if pos in data_pos and data_hero == dire_heroes_and_positions[pos]:
+                            if position == 'pos 1' and pos == 'pos 1':
+                                core_matchup = data_wr
+                            radiant_wr_against.append(data_wr)
+                    if position == 'pos 1' and data_hero == dire_heroes_and_positions[protracker_pos]:
                         radiant_pos1_vs_team.append(data_wr)
-                    if position == 'pos 2'and data_hero == dire_heroes_and_positions[protracker_pos]:
+                    if position == 'pos 2' and data_hero == dire_heroes_and_positions[protracker_pos]:
                         radiant_pos2_vs_team.append(data_wr)
                     if position == 'pos 3' and data_hero == dire_heroes_and_positions[protracker_pos]:
                         radiant_pos3_vs_team.append(data_wr)
-                except: pass
 
-                if 'pos 1' in data_pos and data_hero == dire_heroes_and_positions['pos 1']:
-                    dire_pos1_vs_team.append(100-data_wr)
-                if 'pos 2' in data_pos and data_hero == dire_heroes_and_positions['pos 2']:
-                    dire_pos2_vs_team.append(100-data_wr)
-                if 'pos 3' in data_pos and data_hero == dire_heroes_and_positions['pos 3']:
-                    dire_pos3_vs_team.append(100-data_wr)
+                    if 'pos 1' in data_pos and data_hero == dire_heroes_and_positions['pos 1']:
+                        dire_pos1_vs_team.append(100-data_wr)
+                    if 'pos 2' in data_pos and data_hero == dire_heroes_and_positions['pos 2']:
+                        dire_pos2_vs_team.append(100-data_wr)
+                    if 'pos 3' in data_pos and data_hero == dire_heroes_and_positions['pos 3']:
+                        dire_pos3_vs_team.append(100-data_wr)
     #
-    output_message += f'Счет: {" : ".join(score)}\n'
-    try:
+    output_message += f'Счет: {score}\n'
+    if radiant_pos4_with_pos5 is not None and dire_pos4_with_pos5 is not None:
         sups = radiant_pos4_with_pos5 - dire_pos4_with_pos5
-    except:
+    else:
         sups = None
-    if core_matchup is not None and len(dire_wr_with) >= 4 and len(radiant_wr_with) >= 4 and len(radiant_wr_against) >= 4 and len(radiant_pos1_vs_team) >= 3 and len(dire_pos1_vs_team) >= 3 and len(radiant_pos2_vs_team) >= 3 and len(dire_pos2_vs_team) >= 3 and len(radiant_pos3_vs_team) >= 3 and len(dire_pos3_vs_team) >= 3 and sups is not None:
+        if radiant_pos4_with_pos5 is None:
+            output_message+=f'{radiant_heroes_and_positions["pos 4"]} with {radiant_heroes_and_positions["pos 5"]} нету на proracker'
+        if dire_pos4_with_pos5 is None:
+            output_message+=f'{dire_heroes_and_positions["pos 4"]} with {dire_heroes_and_positions["pos 5"]} нету на proracker'
+    radiant_pos1_vs_team = clean_up(radiant_pos1_vs_team)
+    dire_pos1_vs_team = clean_up(dire_pos1_vs_team)
+    radiant_pos2_vs_team = clean_up(radiant_pos2_vs_team)
+    dire_pos2_vs_team = clean_up(dire_pos2_vs_team)
+    radiant_pos3_vs_team = clean_up(radiant_pos3_vs_team)
+    dire_pos3_vs_team = clean_up(dire_pos3_vs_team)
+    if core_matchup is not None and len(dire_wr_with) >= 1 and len(radiant_wr_with) >= 1 and len(radiant_wr_against) >= 1 and len(radiant_pos1_vs_team) >= 1 and len(dire_pos1_vs_team) >= 1 and len(radiant_pos2_vs_team) >= 1 and len(dire_pos2_vs_team) >= 1 and len(radiant_pos3_vs_team) >= 1 and len(dire_pos3_vs_team) >= 1 and sups is not None:
         core_matchup -= 50
         sinergy = (sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))
         counterpick = sum(radiant_wr_against) / len(radiant_wr_against) - 50
@@ -421,30 +483,31 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             output_message+= f'{radiant_team_name} vs {dire_team_name}\nSinergy: {sinergy}\nCounterpick: {counterpick}\nPos1_vs_team: {pos1_vs_team}\nPos2vs_team: {pos2_vs_team}\nPos3vs_team: {pos3_vs_team}\nCore matchup: {core_matchup}\nSups: {sups}\nПлохая ставка!!!\n'
     else:
         output_message+=f'{radiant_team_name} vs {dire_team_name}\n'
-        if radiant_pos4_with_pos5 is None:
-            output_message += f'{radiant_heroes_and_positions["pos 4"]} with {radiant_heroes_and_positions["pos 5"]} Нету на dota2protracker\n'
-        if dire_pos4_with_pos5 is None:
-            output_message += f'{dire_heroes_and_positions["pos 4"]} with {dire_heroes_and_positions["pos 5"]} Нету на dota2protracker\n'
-        if len(radiant_pos3_vs_team) < 3:
-            output_message+= f'Недостаточно данных {radiant_heroes_and_positions["pos 3"]} vs {dire_heroes_and_positions}\n'
-        if len(dire_pos3_vs_team) < 3:
-            output_message+= f'Недостаточно данных {dire_heroes_and_positions["pos 3"]} vs {radiant_heroes_and_positions}\n'
-        if len(dire_pos2_vs_team) < 3:
-            output_message+= f'Недостаточно данных {dire_heroes_and_positions["pos 2"]} vs {radiant_heroes_and_positions}\n'
-        if len(radiant_pos2_vs_team) < 3:
-            output_message+=f'Недостаточно данных {radiant_heroes_and_positions["pos 2"]} vs {dire_heroes_and_positions}\n'
-        if len(radiant_pos1_vs_team) < 3:
-            output_message+=f'Недостаточно данных {radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions}\n'
-        if len(dire_pos1_vs_team) < 3:
-            output_message+=f'Недостаточно данных {dire_heroes_and_positions["pos 1"]} vs {radiant_heroes_and_positions}\n'
-        if core_matchup is None:
-            output_message+=f'{radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions["pos 1"]} нету на dota2protracker\n'
-        if len(dire_wr_with) < 5:
-            output_message+=f'Недостаточная выборка винрейтов у {dire_team_name} между командой\n{dire_heroes_and_positions}\n'
-        if len(radiant_wr_with) < 5:
-            output_message+=f'Недостаточная выборка винрейтов у {radiant_team_name} между командой\n{radiant_heroes_and_positions}\n'
-        if len(radiant_wr_against) < 5:
-            output_message+=f'Недостаточная выборка винрейтов у команду между друг друга\n{radiant_heroes_and_positions}\n{dire_heroes_and_positions}\n'
+        output_message+='Непонятная ставка'
+        # if radiant_pos4_with_pos5 is None:
+        #     output_message += f'{radiant_heroes_and_positions["pos 4"]} with {radiant_heroes_and_positions["pos 5"]} Нету на dota2protracker\n'
+        # if dire_pos4_with_pos5 is None:
+        #     output_message += f'{dire_heroes_and_positions["pos 4"]} with {dire_heroes_and_positions["pos 5"]} Нету на dota2protracker\n'
+        # if len(radiant_pos3_vs_team) < 1:
+        #     output_message+= f'Недостаточно данных {radiant_heroes_and_positions["pos 3"]} vs {dire_heroes_and_positions}\n'
+        # if len(dire_pos3_vs_team) < 3:
+        #     output_message+= f'Недостаточно данных {dire_heroes_and_positions["pos 3"]} vs {radiant_heroes_and_positions}\n'
+        # if len(dire_pos2_vs_team) < 3:
+        #     output_message+= f'Недостаточно данных {dire_heroes_and_positions["pos 2"]} vs {radiant_heroes_and_positions}\n'
+        # if len(radiant_pos2_vs_team) < 3:
+        #     output_message+=f'Недостаточно данных {radiant_heroes_and_positions["pos 2"]} vs {dire_heroes_and_positions}\n'
+        # if len(radiant_pos1_vs_team) < 3:
+        #     output_message+=f'Недостаточно данных {radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions}\n'
+        # if len(dire_pos1_vs_team) < 3:
+        #     output_message+=f'Недостаточно данных {dire_heroes_and_positions["pos 1"]} vs {radiant_heroes_and_positions}\n'
+        # if core_matchup is None:
+        #     output_message+=f'{radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions["pos 1"]} нету на dota2protracker\n'
+        # if len(dire_wr_with) < 5:
+        #     output_message+=f'Недостаточная выборка винрейтов у {dire_team_name} между командой\n{dire_heroes_and_positions}\n'
+        # if len(radiant_wr_with) < 5:
+        #     output_message+=f'Недостаточная выборка винрейтов у {radiant_team_name} между командой\n{radiant_heroes_and_positions}\n'
+        # if len(radiant_wr_against) < 5:
+        #     output_message+=f'Недостаточная выборка винрейтов у команду между друг друга\n{radiant_heroes_and_positions}\n{dire_heroes_and_positions}\n'
     output_message += '\n'
     for hero in list(radiant_heroes_and_positions.values()):
         if hero in game_changer_list:
@@ -458,20 +521,33 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
 
 
 
-def get_map_id(data, radiant_team_name, dire_team_name):
+def get_map_id(data):
     for match in data['rows']:
-        if match['team_dire'] is not None and match['team_dire'] is not None:
-            radi_team = match['team_radiant']['name'].lower().replace(' ', '')
-            dire_team = match['team_dire']['name'].lower().replace(' ', '')
-            if (radi_team in radiant_team_name or radiant_team_name in radi_team) or \
-                    (dire_team in dire_team_name or dire_team_name in dire_team):
-                for karta in match['related_matches']:
-                    if karta['status'] == 'online':
-                        map_id = karta['id']
-                        url = f'https://cyberscore.live/en/matches/{map_id}/'
-                        result = if_unique(url)
-                        if result is not None:
-                            return url
+        if match['tournament']['tier'] in [1, 2] and 'name' in match['team_radiant'] and 'name' in match['team_radiant']:
+            radiant_team_name = match['team_radiant']['name']
+            dire_team_name = match['team_dire']['name']
+            score = match['best_of_score']
+            for karta in match['related_matches']:
+                if karta['status'] == 'online':
+                    map_id = karta['id']
+                    url = f'https://cyberscore.live/en/matches/{map_id}/'
+                    result = if_unique(url)
+                    if result is not None:
+                        return url, radiant_team_name, dire_team_name, score
+    for match in data['rows']:
+        if match['tournament']['tier'] in [1, 2] and 'name' in match['team_radiant'] and 'name' in match[
+            'team_radiant']:
+            radiant_team_name = match['team_radiant']['name']
+            dire_team_name = match['team_dire']['name']
+            time_until = datetime.datetime.fromisoformat(match['date_start']) + datetime.timedelta(hours=3)
+            now = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)
+            to_wait = time_until - now
+            if to_wait.seconds > 0:
+
+                print(f'{radiant_team_name} vs {dire_team_name}\nсплю {to_wait.seconds/60} минут')
+                time.sleep(to_wait.seconds)
+
+
 
 
 def if_unique(url):
@@ -522,6 +598,18 @@ def if_picks_are_done(soup):
         if len(items_dire) == 5 and len(items_radiant) == 5:
             return True
 
+
+def clean_up(inp):
+    copy = inp.copy()
+    for i in inp:
+        if i >45 and i <55:
+            copy.remove(i)
+    if len(copy) == 0:
+        return inp
+    else:
+        return copy
+
+
 def send_message(message):
     bot_token = f'{keys.Token}'
     chat_id = f'{keys.Chat_id}'
@@ -542,6 +630,6 @@ def send_message(message):
 #     print('сплю 2 минуты')
 #     time.sleep(120)
 # testing
-# radiant_heroes_and_positions={'pos 1': 'Troll Warlord', 'pos 2': 'Tiny', 'pos 3': 'Enigma', 'pos 4': 'Hoodwink', 'pos 5': 'Crystal Maiden'}
-# dire_heroes_and_positions={'pos 1': 'Lifestealer', 'pos 2': 'Leshrac', 'pos 3': 'Brewmaster', 'pos 4': 'Batrider', 'pos 5': 'Shadow Demon'}
-# dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_positions, dire_heroes_and_positions=dire_heroes_and_positions, radiant_team_name='Boom', dire_team_name='Talon', score=['0','0'])
+# radiant_heroes_and_positions={'pos 1': 'Troll Warlord', 'pos 2': 'Zeus', 'pos 3': 'Kunkka', 'pos 4': 'Techies', 'pos 5': "Elder Titan"}
+# dire_heroes_and_positions={'pos 1': 'Faceless Void', 'pos 2': 'Leshrac', 'pos 3': 'Dark Seer', 'pos 4': 'Clockwerk', 'pos 5': 'Gyrocopter'}
+# dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_positions, dire_heroes_and_positions=dire_heroes_and_positions, radiant_team_name='Tundra', dire_team_name='Heroic', score=['0','0'])

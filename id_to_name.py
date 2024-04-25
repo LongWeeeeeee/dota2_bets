@@ -129,6 +129,7 @@ translate = {
  105: "Techies",
  106: "Ember Spirit",
  107: "Earth Spirit",
+ 108: "Underlord",
  109: "Terrorblade",
  110: "Phoenix",
  111: "Oracle",

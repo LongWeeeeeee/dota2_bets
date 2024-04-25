@@ -461,6 +461,9 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             output_message+=f'{radiant_heroes_and_positions["pos 4"]} with {radiant_heroes_and_positions["pos 5"]} нету на proracker'
         if dire_pos4_with_pos5 is None:
             output_message+=f'{dire_heroes_and_positions["pos 4"]} with {dire_heroes_and_positions["pos 5"]} нету на proracker'
+    dire_wr_with = clean_up(dire_wr_with)
+    radiant_wr_with = clean_up(radiant_wr_with)
+    radiant_wr_against = clean_up(radiant_wr_against)
     radiant_pos1_vs_team = clean_up(radiant_pos1_vs_team)
     dire_pos1_vs_team = clean_up(dire_pos1_vs_team)
     radiant_pos2_vs_team = clean_up(radiant_pos2_vs_team)
@@ -534,18 +537,18 @@ def get_map_id(data):
                     result = if_unique(url)
                     if result is not None:
                         return url, radiant_team_name, dire_team_name, score
-    for match in data['rows']:
-        if match['tournament']['tier'] in [1, 2] and 'name' in match['team_radiant'] and 'name' in match[
-            'team_radiant']:
-            radiant_team_name = match['team_radiant']['name']
-            dire_team_name = match['team_dire']['name']
-            time_until = datetime.datetime.fromisoformat(match['date_start']) + datetime.timedelta(hours=3)
-            now = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)
-            to_wait = time_until - now
-            if to_wait.seconds > 0:
-
-                print(f'{radiant_team_name} vs {dire_team_name}\nсплю {to_wait.seconds/60} минут')
-                time.sleep(to_wait.seconds)
+    # for match in data['rows']:
+    #     if match['tournament']['tier'] in [1, 2] and 'name' in match['team_radiant'] and 'name' in match[
+    #         'team_radiant']:
+    #         radiant_team_name = match['team_radiant']['name']
+    #         dire_team_name = match['team_dire']['name']
+    #         time_until = datetime.datetime.fromisoformat(match['date_start']) + datetime.timedelta(hours=3)
+    #         now = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)
+    #         to_wait = time_until - now
+    #         if to_wait.seconds > 0:
+    #
+    #             print(f'{radiant_team_name} vs {dire_team_name}\nсплю {to_wait.seconds/60} минут')
+    #             time.sleep(to_wait.seconds)
 
 
 

@@ -149,7 +149,7 @@ def get_team_positions():
                 heroes = []
                 for hero_block in picks_item:
                     for hero in list(id_to_name.translate.values()):
-                        if hero in hero_block.text:
+                        if f'({hero})' in hero_block.text:
                             heroes.append(hero)
                 radiant_heroes_and_pos = {}
                 dire_heroes_and_pos = {}
@@ -457,10 +457,6 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         sups = radiant_pos4_with_pos5 - dire_pos4_with_pos5
     else:
         sups = None
-        if radiant_pos4_with_pos5 is None:
-            output_message+=f'{radiant_heroes_and_positions["pos 4"]} with {radiant_heroes_and_positions["pos 5"]} нету на proracker'
-        if dire_pos4_with_pos5 is None:
-            output_message+=f'{dire_heroes_and_positions["pos 4"]} with {dire_heroes_and_positions["pos 5"]} нету на proracker'
     dire_wr_with = clean_up(dire_wr_with)
     radiant_wr_with = clean_up(radiant_wr_with)
     radiant_wr_against = clean_up(radiant_wr_against)
@@ -488,6 +484,10 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             output_message+= f'{radiant_team_name} vs {dire_team_name}\nSinergy: {sinergy}\nCounterpick: {counterpick}\nPos1_vs_team: {pos1_vs_team}\nPos2vs_team: {pos2_vs_team}\nPos3vs_team: {pos3_vs_team}\nCore matchup: {core_matchup}\nSups: {sups}\nПлохая ставка!!!\n'
     else:
         output_message+=f'{radiant_team_name} vs {dire_team_name}\n'
+        if radiant_pos4_with_pos5 is None:
+            output_message += f'{radiant_heroes_and_positions["pos 4"]} with {radiant_heroes_and_positions["pos 5"]} нету на proracker\n'
+        if dire_pos4_with_pos5 is None:
+            output_message += f'{dire_heroes_and_positions["pos 4"]} with {dire_heroes_and_positions["pos 5"]} нету на proracker\n'
         # if radiant_pos4_with_pos5 is None:
         #     output_message += f'{radiant_heroes_and_positions["pos 4"]} with {radiant_heroes_and_positions["pos 5"]} Нету на dota2protracker\n'
         # if dire_pos4_with_pos5 is None:

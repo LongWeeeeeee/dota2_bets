@@ -466,15 +466,15 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     dire_pos2_vs_team = clean_up(dire_pos2_vs_team)
     radiant_pos3_vs_team = clean_up(radiant_pos3_vs_team)
     dire_pos3_vs_team = clean_up(dire_pos3_vs_team)
-    sinergy = (sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))
-    counterpick = sum(radiant_wr_against) / len(radiant_wr_against) - 50
-    pos1_vs_team = sum(radiant_pos1_vs_team) / len(radiant_pos1_vs_team) - sum(dire_pos1_vs_team) / len(
-        dire_pos1_vs_team)
-    pos3_vs_team = sum(radiant_pos3_vs_team) / len(radiant_pos3_vs_team) - sum(dire_pos3_vs_team) / len(
-        dire_pos3_vs_team)
-    pos2_vs_team = sum(radiant_pos2_vs_team) / len(radiant_pos2_vs_team) - sum(dire_pos2_vs_team) / len(
-        dire_pos2_vs_team)
     if core_matchup is not None and len(dire_wr_with) >= 1 and len(radiant_wr_with) >= 1 and len(radiant_wr_against) >= 1 and len(radiant_pos1_vs_team) >= 1 and len(dire_pos1_vs_team) >= 1 and len(radiant_pos2_vs_team) >= 1 and len(dire_pos2_vs_team) >= 1 and len(radiant_pos3_vs_team) >= 1 and len(dire_pos3_vs_team) >= 1 and sups is not None:
+        sinergy = (sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))
+        counterpick = sum(radiant_wr_against) / len(radiant_wr_against) - 50
+        pos1_vs_team = sum(radiant_pos1_vs_team) / len(radiant_pos1_vs_team) - sum(dire_pos1_vs_team) / len(
+            dire_pos1_vs_team)
+        pos3_vs_team = sum(radiant_pos3_vs_team) / len(radiant_pos3_vs_team) - sum(dire_pos3_vs_team) / len(
+            dire_pos3_vs_team)
+        pos2_vs_team = sum(radiant_pos2_vs_team) / len(radiant_pos2_vs_team) - sum(dire_pos2_vs_team) / len(
+            dire_pos2_vs_team)
         core_matchup -= 50
         if sinergy > 0 and counterpick > 0 and pos1_vs_team > 0 and core_matchup > 0 and pos2_vs_team > 0 and pos3_vs_team > 0 and sups > 0:
             output_message+= f'Синергия {radiant_team_name} сильнее на {sinergy}%\nCounterpick: {counterpick}\nPos1vs_team: {pos1_vs_team}\nPos2vs_team: {pos2_vs_team}\nPos3vs_team: {pos3_vs_team}\nSups: {sups}\nCore matchup: {core_matchup}\n'
@@ -488,30 +488,26 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             output_message += f'{radiant_heroes_and_positions["pos 4"]} with {radiant_heroes_and_positions["pos 5"]} нету на proracker\n'
         if dire_pos4_with_pos5 is None:
             output_message += f'{dire_heroes_and_positions["pos 4"]} with {dire_heroes_and_positions["pos 5"]} нету на proracker\n'
-        # if radiant_pos4_with_pos5 is None:
-        #     output_message += f'{radiant_heroes_and_positions["pos 4"]} with {radiant_heroes_and_positions["pos 5"]} Нету на dota2protracker\n'
-        # if dire_pos4_with_pos5 is None:
-        #     output_message += f'{dire_heroes_and_positions["pos 4"]} with {dire_heroes_and_positions["pos 5"]} Нету на dota2protracker\n'
-        # if len(radiant_pos3_vs_team) < 1:
-        #     output_message+= f'Недостаточно данных {radiant_heroes_and_positions["pos 3"]} vs {dire_heroes_and_positions}\n'
-        # if len(dire_pos3_vs_team) < 3:
-        #     output_message+= f'Недостаточно данных {dire_heroes_and_positions["pos 3"]} vs {radiant_heroes_and_positions}\n'
-        # if len(dire_pos2_vs_team) < 3:
-        #     output_message+= f'Недостаточно данных {dire_heroes_and_positions["pos 2"]} vs {radiant_heroes_and_positions}\n'
-        # if len(radiant_pos2_vs_team) < 3:
-        #     output_message+=f'Недостаточно данных {radiant_heroes_and_positions["pos 2"]} vs {dire_heroes_and_positions}\n'
-        # if len(radiant_pos1_vs_team) < 3:
-        #     output_message+=f'Недостаточно данных {radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions}\n'
-        # if len(dire_pos1_vs_team) < 3:
-        #     output_message+=f'Недостаточно данных {dire_heroes_and_positions["pos 1"]} vs {radiant_heroes_and_positions}\n'
+        if len(radiant_pos3_vs_team) < 1:
+            output_message+= f'Недостаточно данных {radiant_heroes_and_positions["pos 3"]} vs {dire_heroes_and_positions}\n'
+        if len(dire_pos3_vs_team) < 1:
+            output_message+= f'Недостаточно данных {dire_heroes_and_positions["pos 3"]} vs {radiant_heroes_and_positions}\n'
+        if len(dire_pos2_vs_team) < 1:
+            output_message+= f'Недостаточно данных {dire_heroes_and_positions["pos 2"]} vs {radiant_heroes_and_positions}\n'
+        if len(radiant_pos2_vs_team) <1:
+            output_message+=f'Недостаточно данных {radiant_heroes_and_positions["pos 2"]} vs {dire_heroes_and_positions}\n'
+        if len(radiant_pos1_vs_team) < 1:
+            output_message+=f'Недостаточно данных {radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions}\n'
+        if len(dire_pos1_vs_team) < 1:
+            output_message+=f'Недостаточно данных {dire_heroes_and_positions["pos 1"]} vs {radiant_heroes_and_positions}\n'
         if core_matchup is None:
             output_message+=f'{radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions["pos 1"]} нету на dota2protracker\n'
-        # if len(dire_wr_with) < 5:
-        #     output_message+=f'Недостаточная выборка винрейтов у {dire_team_name} между командой\n{dire_heroes_and_positions}\n'
-        # if len(radiant_wr_with) < 5:
-        #     output_message+=f'Недостаточная выборка винрейтов у {radiant_team_name} между командой\n{radiant_heroes_and_positions}\n'
-        # if len(radiant_wr_against) < 5:
-        #     output_message+=f'Недостаточная выборка винрейтов у команду между друг друга\n{radiant_heroes_and_positions}\n{dire_heroes_and_positions}\n'
+        if len(dire_wr_with) < 5:
+            output_message+=f'Недостаточная выборка винрейтов у {dire_team_name} между командой\n{dire_heroes_and_positions}\n'
+        if len(radiant_wr_with) < 5:
+            output_message+=f'Недостаточная выборка винрейтов у {radiant_team_name} между командой\n{radiant_heroes_and_positions}\n'
+        if len(radiant_wr_against) < 5:
+            output_message+=f'Недостаточная выборка винрейтов у команду между друг друга\n{radiant_heroes_and_positions}\n{dire_heroes_and_positions}\n'
     output_message += '\n'
     for hero in list(radiant_heroes_and_positions.values()):
         if hero in game_changer_list:

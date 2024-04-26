@@ -23,7 +23,7 @@ game_changer_list = [
     'Tinker',
     'Huskar']
 translate = {
- 1: "Antimage",
+ 1: "Anti-Mage",
  2: "Axe",
  3: "Bane",
  4: "Bloodseeker",
@@ -135,6 +135,7 @@ translate = {
  111: "Oracle",
  112: "Winter Wyvern",
  113: "Arc Warden",
+ 114: 'Monkey King',
  119: 'Dark Willow',
  120: "Pangolier",
  121: 'Grimstroke',

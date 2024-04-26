@@ -272,7 +272,7 @@ def are_similar(s1, s2, threshold=70):
     return similarity_percentage(s1, s2) >= threshold
 
 
-def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, score, antiplagiat_url=None, core_matchup=None, output_message=''):
+def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, score=[0,0], antiplagiat_url=None, core_matchup=None, output_message=''):
     print('dota2protracker')
     radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team, radiant_pos4_with_pos5, dire_pos4_with_pos5 = [], [], [], [] ,[], [], [], [], [], None, None
     for position in radiant_heroes_and_positions:
@@ -470,14 +470,16 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     dire_pos2_vs_team = clean_up(dire_pos2_vs_team)
     radiant_pos3_vs_team = clean_up(radiant_pos3_vs_team)
     dire_pos3_vs_team = clean_up(dire_pos3_vs_team)
+    sinergy = (sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))
+    counterpick = sum(radiant_wr_against) / len(radiant_wr_against) - 50
+    pos1_vs_team = sum(radiant_pos1_vs_team) / len(radiant_pos1_vs_team) - sum(dire_pos1_vs_team) / len(
+        dire_pos1_vs_team)
+    pos3_vs_team = sum(radiant_pos3_vs_team) / len(radiant_pos3_vs_team) - sum(dire_pos3_vs_team) / len(
+        dire_pos3_vs_team)
+    pos2_vs_team = sum(radiant_pos2_vs_team) / len(radiant_pos2_vs_team) - sum(dire_pos2_vs_team) / len(
+        dire_pos2_vs_team)
     if core_matchup is not None and len(dire_wr_with) >= 1 and len(radiant_wr_with) >= 1 and len(radiant_wr_against) >= 1 and len(radiant_pos1_vs_team) >= 1 and len(dire_pos1_vs_team) >= 1 and len(radiant_pos2_vs_team) >= 1 and len(dire_pos2_vs_team) >= 1 and len(radiant_pos3_vs_team) >= 1 and len(dire_pos3_vs_team) >= 1 and sups is not None:
         core_matchup -= 50
-        sinergy = (sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))
-        counterpick = sum(radiant_wr_against) / len(radiant_wr_against) - 50
-        pos1_vs_team = sum(radiant_pos1_vs_team) / len(radiant_pos1_vs_team) - sum(dire_pos1_vs_team) / len(
-            dire_pos1_vs_team)
-        pos2_vs_team = sum(radiant_pos2_vs_team) / len(radiant_pos2_vs_team) - sum(dire_pos2_vs_team) / len(dire_pos2_vs_team)
-        pos3_vs_team = sum(radiant_pos3_vs_team) / len(radiant_pos3_vs_team) - sum(dire_pos3_vs_team) / len(dire_pos3_vs_team)
         if sinergy > 0 and counterpick > 0 and pos1_vs_team > 0 and core_matchup > 0 and pos2_vs_team > 0 and pos3_vs_team > 0 and sups > 0:
             output_message+= f'Синергия {radiant_team_name} сильнее на {sinergy}%\nCounterpick: {counterpick}\nPos1vs_team: {pos1_vs_team}\nPos2vs_team: {pos2_vs_team}\nPos3vs_team: {pos3_vs_team}\nSups: {sups}\nCore matchup: {core_matchup}\n'
         elif sinergy < 0 and counterpick < 0 and pos1_vs_team < 0 and core_matchup < 0 and pos2_vs_team < 0 and pos3_vs_team < 0 and sups < 0:
@@ -486,7 +488,6 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             output_message+= f'{radiant_team_name} vs {dire_team_name}\nSinergy: {sinergy}\nCounterpick: {counterpick}\nPos1_vs_team: {pos1_vs_team}\nPos2vs_team: {pos2_vs_team}\nPos3vs_team: {pos3_vs_team}\nCore matchup: {core_matchup}\nSups: {sups}\nПлохая ставка!!!\n'
     else:
         output_message+=f'{radiant_team_name} vs {dire_team_name}\n'
-        output_message+='Непонятная ставка'
         # if radiant_pos4_with_pos5 is None:
         #     output_message += f'{radiant_heroes_and_positions["pos 4"]} with {radiant_heroes_and_positions["pos 5"]} Нету на dota2protracker\n'
         # if dire_pos4_with_pos5 is None:
@@ -503,8 +504,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         #     output_message+=f'Недостаточно данных {radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions}\n'
         # if len(dire_pos1_vs_team) < 3:
         #     output_message+=f'Недостаточно данных {dire_heroes_and_positions["pos 1"]} vs {radiant_heroes_and_positions}\n'
-        # if core_matchup is None:
-        #     output_message+=f'{radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions["pos 1"]} нету на dota2protracker\n'
+        if core_matchup is None:
+            output_message+=f'{radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions["pos 1"]} нету на dota2protracker\n'
         # if len(dire_wr_with) < 5:
         #     output_message+=f'Недостаточная выборка винрейтов у {dire_team_name} между командой\n{dire_heroes_and_positions}\n'
         # if len(radiant_wr_with) < 5:

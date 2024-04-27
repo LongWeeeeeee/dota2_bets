@@ -138,6 +138,7 @@ translate = {
  120: "Pangolier",
  121: 'Grimstroke',
  123: "Hoodwink",
+ 126: 'Void Spirit',
  128: 'Snapfire',
  129: 'Mars',
  135: 'Dawnbreaker',

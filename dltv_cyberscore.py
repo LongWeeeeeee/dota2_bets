@@ -472,13 +472,13 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         sinergy = (sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))
     if len(radiant_wr_against) > 0:
         counterpick = sum(radiant_wr_against) / len(radiant_wr_against) - 50
-    if radiant_pos1_vs_team is not None and dire_pos1_vs_team is not None:
+    if len(radiant_pos1_vs_team) > 0 and len(dire_pos1_vs_team) > 0:
         pos1_vs_team = sum(radiant_pos1_vs_team) / len(radiant_pos1_vs_team) - sum(dire_pos1_vs_team) / len(
             dire_pos1_vs_team)
-    if radiant_pos3_vs_team is not None and dire_pos3_vs_team is not None:
+    if len(radiant_pos3_vs_team) > 0 and len(dire_pos3_vs_team) > 0:
         pos3_vs_team = sum(radiant_pos3_vs_team) / len(radiant_pos3_vs_team) - sum(dire_pos3_vs_team) / len(
             dire_pos3_vs_team)
-    if radiant_pos2_vs_team is not None and dire_pos2_vs_team is not None:
+    if len(radiant_pos2_vs_team) > 0 and len(dire_pos2_vs_team) > 0:
         pos2_vs_team = sum(radiant_pos2_vs_team) / len(radiant_pos2_vs_team) - sum(dire_pos2_vs_team) / len(
             dire_pos2_vs_team)
     if core_matchup is not None:

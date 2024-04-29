@@ -19,7 +19,8 @@ game_changer_list = [
     'Axe',
     'Storm Spirit',
     'Tinker',
-    'Huskar']
+    'Huskar',
+    'Earthshaker']
 translate = {
  1: "Anti-Mage",
  2: "Axe",

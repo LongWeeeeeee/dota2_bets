@@ -182,5 +182,7 @@ egb = {
  'sneyking':10366616,
  'qojqva':86738694,
  'ceb':88271237,
+ 'shiishak':190100004,
+ 'nightfall':124801257,
 }
 blacklist = ['execration', 'team bright']

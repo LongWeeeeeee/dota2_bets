@@ -115,7 +115,7 @@ def get_picks_and_pos(exac_match,):
         for player in players:
             coordinates = player['playbackData']['positionEvents']
             for time in coordinates:
-                if time['time']/60 > 2 and time['time']/60 < 8:
+                if time['time']/60 > 2.5 and time['time']/60 < 8:
                     index = coordinates.index(time)
                     print(time['time']/60)
                     break
@@ -124,8 +124,8 @@ def get_picks_and_pos(exac_match,):
                 for player in players:
                     hero = translate[player['heroId']]
                     coordinates = player['playbackData']['positionEvents']
-                    if coordinates[index]['x'] > 85 and coordinates[index]['x'] < 150 and coordinates[index]['y'] > 110 and coordinates[index]['y'] < 150:
-                        if not player['isRadiant']:
+                    if coordinates[index]['x'] > 90 and coordinates[index]['x'] < 150 and coordinates[index]['y'] > 110 and coordinates[index]['y'] < 150:
+                        if player['isRadiant']:
                             radiant_mid.append(player)
                         else:
                             dire_mid.append(player)
@@ -144,6 +144,85 @@ def get_picks_and_pos(exac_match,):
                         heroes_left.append(player)
             except:
                 return None
+
+            for player in heroes_left:
+                if player['isRadiant']:
+                    if len(radiant_hard) != 2:
+                        radiant_hard.append(player)
+                    elif len(radiant_safe) != 2:
+                        radiant_safe.append(player)
+                    elif len(radiant_mid) == 0:
+                        radiant_mid.append(player)
+            for player in heroes_left:
+                if not player['isRadiant']:
+                    if len(dire_hard) != 2:
+                        dire_hard.append(player)
+                    elif len(dire_safe) != 2:
+                        dire_safe.append(player)
+                    elif len(dire_mid) == 0:
+                        dire_mid.append(player)
+            if len(radiant_safe) == 2:
+                if radiant_safe[0]['numLastHits'] > radiant_safe[1]['numLastHits']:
+                    radiant['pos 1'] = translate[radiant_safe[0]['heroId']]
+                    radiant['pos 5'] = translate[radiant_safe[1]['heroId']]
+                else:
+                    radiant['pos 1'] = translate[radiant_safe[1]['heroId']]
+                    radiant['pos 5'] = translate[radiant_safe[0]['heroId']]
+            if len(radiant_hard) == 2:
+                if radiant_hard[0]['numLastHits'] > radiant_hard[1]['numLastHits']:
+                    radiant['pos 3'] = translate[radiant_hard[0]['heroId']]
+                    radiant['pos 4'] = translate[radiant_hard[1]['heroId']]
+                else:
+                    radiant['pos 3'] = translate[radiant_hard[1]['heroId']]
+                    radiant['pos 4'] = translate[radiant_hard[0]['heroId']]
+            if len(dire_safe) == 2:
+                if dire_safe[0]['numLastHits'] > dire_safe[1]['numLastHits']:
+                    dire['pos 1'] = translate[dire_safe[0]['heroId']]
+                    dire['pos 5'] = translate[dire_safe[1]['heroId']]
+                else:
+                    dire['pos 1'] = translate[dire_safe[1]['heroId']]
+                    dire['pos 5'] = translate[dire_safe[0]['heroId']]
+            if len(dire_hard) == 2:
+                if dire_hard[0]['numLastHits'] > dire_hard[1]['numLastHits']:
+                    dire['pos 3'] = translate[dire_hard[0]['heroId']]
+                    dire['pos 4'] = translate[dire_hard[1]['heroId']]
+                else:
+                    dire['pos 3'] = translate[dire_hard[1]['heroId']]
+                    dire['pos 4'] = translate[dire_hard[0]['heroId']]
+            if len(radiant_mid) == 1:
+                radiant['pos 2'] = translate[radiant_mid[0]['heroId']]
+            else:
+                if radiant_mid[0]['numLastHits'] > radiant_mid[1]['numLastHits']:
+                    radiant['pos 2'] = translate[radiant_mid[0]['heroId']]
+                    heroes_left.append(radiant_mid[1])
+                else:
+                    radiant['pos 2'] = translate[radiant_mid[1]['heroId']]
+                    heroes_left.append(radiant_mid[0])
+            if len(dire_mid) == 1:
+                dire['pos 2'] = translate[dire_mid[0]['heroId']]
+            else:
+                if dire_mid[0]['numLastHits'] > dire_mid[1]['numLastHits']:
+                    dire['pos 2'] = translate[dire_mid[0]['heroId']]
+                    heroes_left.append(dire_mid[1])
+                else:
+                    dire['pos 2'] = translate[dire_mid[1]['heroId']]
+                    heroes_left.append(dire_mid[0])
+            for player in heroes_left:
+                if player['isRadiant']:
+                    if len(radiant_hard) != 2:
+                        radiant_hard.append(player)
+                    elif len(radiant_safe) != 2:
+                        radiant_safe.append(player)
+                    elif len(radiant_mid) == 0:
+                        radiant_mid.append(player)
+            for player in heroes_left:
+                if not player['isRadiant']:
+                    if len(dire_hard) != 2:
+                        dire_hard.append(player)
+                    elif len(dire_safe) != 2:
+                        dire_safe.append(player)
+                    elif len(dire_mid) == 0:
+                        dire_mid.append(player)
             if len(radiant_safe) == 2:
                 if radiant_safe[0]['numLastHits'] > radiant_safe[1]['numLastHits']:
                     radiant['pos 1'] = translate[radiant_safe[0]['heroId']]
@@ -191,6 +270,7 @@ def get_picks_and_pos(exac_match,):
                     dire['pos 2'] = translate[dire_mid[1]['heroId']]
                     heroes_left.append(dire_mid[0])
 
+
         else:
             print('игра только началась или stratz Залагал')
             return None
@@ -205,6 +285,7 @@ def get_picks_and_pos(exac_match,):
         for player in heroes_left:
             if player['isRadiant']:
                 radiant[positions_copy[0]] = translate[player['heroId']]
+
     if len(dire) == 4:
         positions_copy = positions.copy()
         for key in dire:

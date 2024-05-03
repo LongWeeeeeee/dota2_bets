@@ -184,5 +184,6 @@ egb = {
  'ceb':88271237,
  'shiishak':190100004,
  'nightfall':124801257,
+ 'limitlessqt':1675023758,
 }
 blacklist = ['execration', 'team bright']

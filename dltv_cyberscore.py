@@ -14,7 +14,7 @@ import datetime
 
 import id_to_name
 import keys
-from id_to_name import game_changer_list
+from id_to_name import game_changer_list, blacklist
 
 
 
@@ -24,8 +24,8 @@ def get_live_matches():
     if result is not None:
         radiant_heroes_and_pos, dire_heroes_and_pos, radiant_team_name, dire_team_name, url, score = result
         print(f'{radiant_team_name} VS {dire_team_name}')
-        dota2protracker(radiant_heroes_and_pos, dire_heroes_and_pos, radiant_team_name,
-                        dire_team_name, score, url)
+        dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos, dire_heroes_and_positions=dire_heroes_and_pos, radiant_team_name=radiant_team_name,
+                        dire_team_name=dire_team_name, score=score, antiplagiat_url=url)
     #         else:
     #             print(f'Пики еще не закончились')
     # else:
@@ -141,65 +141,66 @@ def get_team_positions():
         result = get_map_id(data)
         if result is not None:
             url, radiant_team_name, dire_team_name, score = result
-            response = requests.get(url)
-            if response.status_code == 200:
-                response_html = html.unescape(response.text)
-                soup = BeautifulSoup(response_html, 'lxml')
-                picks_item = soup.find_all('div', class_='picks-item with-match-players-tooltip')
-                heroes = []
-                for hero_block in picks_item:
-                    for hero in list(id_to_name.translate.values()):
-                        if f'({hero})' in hero_block.text:
-                            heroes.append(hero)
-                radiant_heroes_and_pos = {}
-                dire_heroes_and_pos = {}
-                for i in range(5):
-                    radiant_heroes_and_pos[f'pos {i+1}'] = heroes[i]
+            if radiant_team_name not in blacklist and dire_team_name not in blacklist:
+                response = requests.get(url)
+                if response.status_code == 200:
+                    response_html = html.unescape(response.text)
+                    soup = BeautifulSoup(response_html, 'lxml')
+                    picks_item = soup.find_all('div', class_='picks-item with-match-players-tooltip')
+                    heroes = []
+                    for hero_block in picks_item:
+                        for hero in list(id_to_name.translate.values()):
+                            if f'({hero})' in hero_block.text:
+                                heroes.append(hero)
+                    radiant_heroes_and_pos = {}
+                    dire_heroes_and_pos = {}
+                    for i in range(5):
+                        radiant_heroes_and_pos[f'pos {i+1}'] = heroes[i]
 
-                for i in range(5):
-                    dire_heroes_and_pos[f'pos {i+1}'] = heroes[i+5]
-                # players = soup.find_all('div', class_='team-item')
-                # for player in players:
-                #     nick_name = player.find('div', class_='player-name')
-                #     if nick_name is not None:
-                #         nick_name = nick_name.text.lower().replace('.', '')
-                #         nick_name = re.sub(r'[^\w\s\u4e00-\u9fff]+', '', nick_name)
-                #         position = player.find('span', class_='truncate').text.lower()
-                #         if nick_name in nick_fixes:
-                #             nick_name = nick_fixes[nick_name]
-                #         if position in lst:
-                #             result = find_in_radiant(radiant_players, nick_name, translate, position, radiant_pick, radiant_lst)
-                #             if result is not None:
-                #                 radiant_lst, radiant_pick = result
-                #             else:
-                #                 result = find_in_dire(dire_players, nick_name, translate, position, dire_pick, dire_lst)
-                #                 if result is not None:
-                #                     dire_lst, dire_pick = result
-                #
-                #
-                # if len(radiant_pick) == 4:
-                #     for player in radiant_players.values():
-                #         hero = player['hero']
-                #         p_list = list(radiant_pick.values())
-                #         if hero not in p_list:
-                #             radiant_pick[translate[radiant_lst[0]]] = hero
-                # if len(dire_pick) == 4:
-                #     for player in dire_players.values():
-                #         hero = player['hero']
-                #         p_list = list(dire_pick.values())
-                #         if hero not in p_list:
-                #             dire_pick[translate[dire_lst[0]]] = hero
-                # if len(radiant_pick) != 5:
-                #     print(f'{radiant_team_name}\nНе удалось выяснить позиции игроков {radiant_pick}')
-                #     # send_message(f'{radiant_team_name}\nНе удалось выяснить позиции игроков {radiant_pick}')
-                #     return None
-                # if len(dire_pick) != 5:
-                #     print((f'{dire_team_name}\nНе удалось выяснить позиции игроков {dire_pick}'))
-                #     # send_message(f'{dire_team_name}\nНе удалось выяснить позиции игроков {dire_pick}')
-                #     return None
+                    for i in range(5):
+                        dire_heroes_and_pos[f'pos {i+1}'] = heroes[i+5]
+                    # players = soup.find_all('div', class_='team-item')
+                    # for player in players:
+                    #     nick_name = player.find('div', class_='player-name')
+                    #     if nick_name is not None:
+                    #         nick_name = nick_name.text.lower().replace('.', '')
+                    #         nick_name = re.sub(r'[^\w\s\u4e00-\u9fff]+', '', nick_name)
+                    #         position = player.find('span', class_='truncate').text.lower()
+                    #         if nick_name in nick_fixes:
+                    #             nick_name = nick_fixes[nick_name]
+                    #         if position in lst:
+                    #             result = find_in_radiant(radiant_players, nick_name, translate, position, radiant_pick, radiant_lst)
+                    #             if result is not None:
+                    #                 radiant_lst, radiant_pick = result
+                    #             else:
+                    #                 result = find_in_dire(dire_players, nick_name, translate, position, dire_pick, dire_lst)
+                    #                 if result is not None:
+                    #                     dire_lst, dire_pick = result
+                    #
+                    #
+                    # if len(radiant_pick) == 4:
+                    #     for player in radiant_players.values():
+                    #         hero = player['hero']
+                    #         p_list = list(radiant_pick.values())
+                    #         if hero not in p_list:
+                    #             radiant_pick[translate[radiant_lst[0]]] = hero
+                    # if len(dire_pick) == 4:
+                    #     for player in dire_players.values():
+                    #         hero = player['hero']
+                    #         p_list = list(dire_pick.values())
+                    #         if hero not in p_list:
+                    #             dire_pick[translate[dire_lst[0]]] = hero
+                    # if len(radiant_pick) != 5:
+                    #     print(f'{radiant_team_name}\nНе удалось выяснить позиции игроков {radiant_pick}')
+                    #     # send_message(f'{radiant_team_name}\nНе удалось выяснить позиции игроков {radiant_pick}')
+                    #     return None
+                    # if len(dire_pick) != 5:
+                    #     print((f'{dire_team_name}\nНе удалось выяснить позиции игроков {dire_pick}'))
+                    #     # send_message(f'{dire_team_name}\nНе удалось выяснить позиции игроков {dire_pick}')
+                    #     return None
 
 
-                return radiant_heroes_and_pos, dire_heroes_and_pos, radiant_team_name, dire_team_name, url, score
+                    return radiant_heroes_and_pos, dire_heroes_and_pos, radiant_team_name, dire_team_name, url, score
         else:
             print('нету live матчей')
 
@@ -272,7 +273,7 @@ def are_similar(s1, s2, threshold=70):
     return similarity_percentage(s1, s2) >= threshold
 
 
-def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, score=[0,0], antiplagiat_url=None, core_matchup=None, output_message=''):
+def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, antiplagiat_url, score=[0,0], core_matchup=None, output_message=''):
     print('dota2protracker')
     radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team, radiant_pos4_with_pos5, dire_pos4_with_pos5 = [], [], [], [] ,[], [], [], [], [], None, None
     for position in radiant_heroes_and_positions:
@@ -536,8 +537,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
 def get_map_id(data):
     for match in data['rows']:
         if match['tournament']['tier'] in [1, 2, 3] and match['team_dire'] is not None and match['team_radiant'] is not None:
-            radiant_team_name = match['team_radiant']['name']
-            dire_team_name = match['team_dire']['name']
+            radiant_team_name = match['team_radiant']['name'].lower()
+            dire_team_name = match['team_dire']['name'].lower()
             score = match['best_of_score']
             for karta in match['related_matches']:
                 if karta['status'] == 'online':

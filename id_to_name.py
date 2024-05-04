@@ -195,5 +195,6 @@ egb = {
  'save':317880638,
  'torontotokyo':431770905,
  'dubu':145550466,
+"dubu's":145550466,
 }
 blacklist = ['execration', 'team bright']

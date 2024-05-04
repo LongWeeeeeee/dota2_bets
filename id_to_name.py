@@ -188,5 +188,6 @@ egb = {
  'dnm':361688848,
  'baxadoto':999961232,
  'raven':132309493,
+ 'y0nd':404150207,
 }
 blacklist = ['execration', 'team bright']

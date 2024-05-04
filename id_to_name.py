@@ -151,7 +151,7 @@ egb = {
  'quinn' : 221666230,
  'antoha' : 178692606,
  'resolut1on' : 86725175,
- 'sonneikO' : 117421467,
+ 'sonneiko' : 369342470,
  'monkeys-forever' : 86811043,
 'xcalibur':245373129,
 'gorgc' : 56939869,
@@ -165,7 +165,7 @@ egb = {
  'invokergirl':311219411,
  'ramzes':132851371,
  'abed':154715080,
- 'stariy_bog':70922174,
+ 'stariy_bog':393024955,
 'speedmanq':1060164724,
  'yapzor':89117038,
  'iltw':113995822,
@@ -185,5 +185,8 @@ egb = {
  'shiishak':190100004,
  'nightfall':124801257,
  'limitlessqt':1675023758,
+ 'dnm':361688848,
+ 'baxadoto':999961232,
+ 'raven':132309493,
 }
 blacklist = ['execration', 'team bright']

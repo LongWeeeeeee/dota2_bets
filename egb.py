@@ -124,30 +124,27 @@ def get_picks_and_pos(exac_match,):
         radiant, dire, heroes_left, index = {}, {}, [], None
         index = find_index(players)
         if index is not None:
-            try:
-                for player in players:
-                    hero = translate[player['heroId']]
-                    coordinates = player['playbackData']['positionEvents']
-                    if coordinates[index]['x'] > 90 and coordinates[index]['x'] < 150 and coordinates[index]['y'] > 110 and coordinates[index]['y'] < 150:
-                        if player['isRadiant']:
-                            radiant_mid.append(player)
-                        else:
-                            dire_mid.append(player)
-                    elif coordinates[index]['x'] > 70 and coordinates[index]['x'] < 110 and coordinates[index]['y'] > 130 and coordinates[index]['y'] < 170:
-                        if player['isRadiant']:
-                            radiant_hard.append(player)
-                        else:
-                            dire_safe.append(player)
-                    elif coordinates[index]['x'] > 120 and coordinates[index]['x'] < 180 and coordinates[index]['y'] > 70 and coordinates[index]['y'] < 120:
-                        if not player['isRadiant']:
-                            dire_hard.append(player)
-                        else:
-                            radiant_safe.append(player)
-
+            for player in players:
+                hero = translate[player['heroId']]
+                coordinates = player['playbackData']['positionEvents']
+                if coordinates[index]['x'] > 90 and coordinates[index]['x'] < 150 and coordinates[index]['y'] > 110 and coordinates[index]['y'] < 150:
+                    if player['isRadiant']:
+                        radiant_mid.append(player)
                     else:
-                        heroes_left.append(player)
-            except:
-                return None
+                        dire_mid.append(player)
+                elif coordinates[index]['x'] > 70 and coordinates[index]['x'] < 110 and coordinates[index]['y'] > 130 and coordinates[index]['y'] < 170:
+                    if player['isRadiant']:
+                        radiant_hard.append(player)
+                    else:
+                        dire_safe.append(player)
+                elif coordinates[index]['x'] > 120 and coordinates[index]['x'] < 180 and coordinates[index]['y'] > 70 and coordinates[index]['y'] < 120:
+                    if not player['isRadiant']:
+                        dire_hard.append(player)
+                    else:
+                        radiant_safe.append(player)
+
+                else:
+                    heroes_left.append(player)
 
             for player in heroes_left:
                 if player['isRadiant']:

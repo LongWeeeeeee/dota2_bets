@@ -3,7 +3,7 @@ from keys import api_token
 import json
 import requests
 import time
-from dltv_cyberscore import dota2protracker, if_unique, add_url
+from dltv_cyberscore import dota2protracker, if_unique, add_url, send_message
 import requests
 from id_to_name import egb
 
@@ -31,7 +31,12 @@ def get_players(bet):
     dire_and_radiant['radiant'] = players[0]
     dire_and_radiant['dire'] = players[1]
     print(bet['game_label'])
-    players_ids = [egb[player] for player in player_names]
+    players_ids = []
+    for player in player_names:
+        if player in egb:
+            players_ids.append(egb[player])
+        else:
+            send_message(f'{player} не найден')
     return players_ids, dire_and_radiant
 
 

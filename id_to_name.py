@@ -163,8 +163,11 @@ egb = {
 'taiga':401792574,
  'yapzOr':89117038,
  'invokergirl':311219411,
+ 'yuragi':167976729,
+ 'ghostik':92847434,
  'ramzes':132851371,
  'abed':154715080,
+ 'noticed':195108598,
  'stariy_bog':393024955,
 'speedmanq':1060164724,
  'yapzor':89117038,
@@ -189,5 +192,7 @@ egb = {
  'baxadoto':999961232,
  'raven':132309493,
  'y0nd':404150207,
+ 'save':317880638,
+ 'torontotokyo':431770905,
 }
 blacklist = ['execration', 'team bright']

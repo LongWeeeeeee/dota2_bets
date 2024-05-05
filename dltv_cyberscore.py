@@ -13,7 +13,7 @@ import datetime
 
 import id_to_name
 import keys
-from id_to_name import game_changer_list, blacklist
+from id_to_name import game_changer_list
 
 
 
@@ -515,7 +515,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
 
 def get_map_id(data):
     for match in data['rows']:
-        if match['tournament']['tier'] in [1, 2, 3] and match['team_dire'] is not None and match['team_radiant'] is not None and 'Kobold' not in match['tournament']['name']:
+        if match['tournament']['tier'] in [1] and match['team_dire'] is not None and match['team_radiant'] is not None and 'Kobold' not in match['tournament']['name']:
             radiant_team_name = match['team_radiant']['name'].lower()
             dire_team_name = match['team_dire']['name'].lower()
             score = match['best_of_score']

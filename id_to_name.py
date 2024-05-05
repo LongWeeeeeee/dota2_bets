@@ -204,4 +204,7 @@ egb = {
 'reira':208407289,
 'gpk':480412663,
 }
-blacklist = ['execration', 'team bright']
+blacklist_players = {
+ 'vikared'
+}
+blacklist_teams = ['execration', 'team bright']

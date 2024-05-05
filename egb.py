@@ -130,153 +130,158 @@ def get_picks_and_pos(exac_match,):
         radiant_hard, radiant_safe, dire_hard, dire_safe, radiant_mid, dire_mid = [],[],[],[],[],[]
         radiant, dire, heroes_left, index = {}, {}, [], None
         index = find_index(players)
+        # try:
         if index is not None:
-            for player in players:
-                hero = translate[player['heroId']]
-                coordinates = player['playbackData']['positionEvents']
-                if coordinates[index]['x'] > 90 and coordinates[index]['x'] < 150 and coordinates[index]['y'] > 110 and coordinates[index]['y'] < 150:
-                    if player['isRadiant']:
-                        radiant_mid.append(player)
+            try:
+                for player in players:
+                    hero = translate[player['heroId']]
+                    coordinates = player['playbackData']['positionEvents']
+                    if coordinates[index]['x'] > 90 and coordinates[index]['x'] < 150 and coordinates[index]['y'] > 110 and coordinates[index]['y'] < 150:
+                        if player['isRadiant']:
+                            radiant_mid.append(player)
+                        else:
+                            dire_mid.append(player)
+                    elif coordinates[index]['x'] > 70 and coordinates[index]['x'] < 110 and coordinates[index]['y'] > 130 and coordinates[index]['y'] < 170:
+                        if player['isRadiant']:
+                            radiant_hard.append(player)
+                        else:
+                            dire_safe.append(player)
+                    elif coordinates[index]['x'] > 120 and coordinates[index]['x'] < 180 and coordinates[index]['y'] > 70 and coordinates[index]['y'] < 120:
+                        if not player['isRadiant']:
+                            dire_hard.append(player)
+                        else:
+                            radiant_safe.append(player)
+
                     else:
-                        dire_mid.append(player)
-                elif coordinates[index]['x'] > 70 and coordinates[index]['x'] < 110 and coordinates[index]['y'] > 130 and coordinates[index]['y'] < 170:
+                        heroes_left.append(player)
+
+                for player in heroes_left:
                     if player['isRadiant']:
-                        radiant_hard.append(player)
-                    else:
-                        dire_safe.append(player)
-                elif coordinates[index]['x'] > 120 and coordinates[index]['x'] < 180 and coordinates[index]['y'] > 70 and coordinates[index]['y'] < 120:
+                        if len(radiant_hard) != 2:
+                            radiant_hard.append(player)
+                        elif len(radiant_safe) != 2:
+                            radiant_safe.append(player)
+                        elif len(radiant_mid) == 0:
+                            radiant_mid.append(player)
+                for player in heroes_left:
                     if not player['isRadiant']:
-                        dire_hard.append(player)
+                        if len(dire_hard) != 2:
+                            dire_hard.append(player)
+                        elif len(dire_safe) != 2:
+                            dire_safe.append(player)
+                        elif len(dire_mid) == 0:
+                            dire_mid.append(player)
+                if len(radiant_safe) == 2:
+                    if radiant_safe[0]['numLastHits'] > radiant_safe[1]['numLastHits']:
+                        radiant['pos 1'] = translate[radiant_safe[0]['heroId']]
+                        radiant['pos 5'] = translate[radiant_safe[1]['heroId']]
                     else:
-                        radiant_safe.append(player)
-
-                else:
-                    heroes_left.append(player)
-
-            for player in heroes_left:
-                if player['isRadiant']:
-                    if len(radiant_hard) != 2:
-                        radiant_hard.append(player)
-                    elif len(radiant_safe) != 2:
-                        radiant_safe.append(player)
-                    elif len(radiant_mid) == 0:
-                        radiant_mid.append(player)
-            for player in heroes_left:
-                if not player['isRadiant']:
-                    if len(dire_hard) != 2:
-                        dire_hard.append(player)
-                    elif len(dire_safe) != 2:
-                        dire_safe.append(player)
-                    elif len(dire_mid) == 0:
-                        dire_mid.append(player)
-            if len(radiant_safe) == 2:
-                if radiant_safe[0]['numLastHits'] > radiant_safe[1]['numLastHits']:
-                    radiant['pos 1'] = translate[radiant_safe[0]['heroId']]
-                    radiant['pos 5'] = translate[radiant_safe[1]['heroId']]
-                else:
-                    radiant['pos 1'] = translate[radiant_safe[1]['heroId']]
-                    radiant['pos 5'] = translate[radiant_safe[0]['heroId']]
-            if len(radiant_hard) == 2:
-                if radiant_hard[0]['numLastHits'] > radiant_hard[1]['numLastHits']:
-                    radiant['pos 3'] = translate[radiant_hard[0]['heroId']]
-                    radiant['pos 4'] = translate[radiant_hard[1]['heroId']]
-                else:
-                    radiant['pos 3'] = translate[radiant_hard[1]['heroId']]
-                    radiant['pos 4'] = translate[radiant_hard[0]['heroId']]
-            if len(dire_safe) == 2:
-                if dire_safe[0]['numLastHits'] > dire_safe[1]['numLastHits']:
-                    dire['pos 1'] = translate[dire_safe[0]['heroId']]
-                    dire['pos 5'] = translate[dire_safe[1]['heroId']]
-                else:
-                    dire['pos 1'] = translate[dire_safe[1]['heroId']]
-                    dire['pos 5'] = translate[dire_safe[0]['heroId']]
-            if len(dire_hard) == 2:
-                if dire_hard[0]['numLastHits'] > dire_hard[1]['numLastHits']:
-                    dire['pos 3'] = translate[dire_hard[0]['heroId']]
-                    dire['pos 4'] = translate[dire_hard[1]['heroId']]
-                else:
-                    dire['pos 3'] = translate[dire_hard[1]['heroId']]
-                    dire['pos 4'] = translate[dire_hard[0]['heroId']]
-            if len(radiant_mid) == 1:
-                radiant['pos 2'] = translate[radiant_mid[0]['heroId']]
-            else:
-                if radiant_mid[0]['numLastHits'] > radiant_mid[1]['numLastHits']:
+                        radiant['pos 1'] = translate[radiant_safe[1]['heroId']]
+                        radiant['pos 5'] = translate[radiant_safe[0]['heroId']]
+                if len(radiant_hard) == 2:
+                    if radiant_hard[0]['numLastHits'] > radiant_hard[1]['numLastHits']:
+                        radiant['pos 3'] = translate[radiant_hard[0]['heroId']]
+                        radiant['pos 4'] = translate[radiant_hard[1]['heroId']]
+                    else:
+                        radiant['pos 3'] = translate[radiant_hard[1]['heroId']]
+                        radiant['pos 4'] = translate[radiant_hard[0]['heroId']]
+                if len(dire_safe) == 2:
+                    if dire_safe[0]['numLastHits'] > dire_safe[1]['numLastHits']:
+                        dire['pos 1'] = translate[dire_safe[0]['heroId']]
+                        dire['pos 5'] = translate[dire_safe[1]['heroId']]
+                    else:
+                        dire['pos 1'] = translate[dire_safe[1]['heroId']]
+                        dire['pos 5'] = translate[dire_safe[0]['heroId']]
+                if len(dire_hard) == 2:
+                    if dire_hard[0]['numLastHits'] > dire_hard[1]['numLastHits']:
+                        dire['pos 3'] = translate[dire_hard[0]['heroId']]
+                        dire['pos 4'] = translate[dire_hard[1]['heroId']]
+                    else:
+                        dire['pos 3'] = translate[dire_hard[1]['heroId']]
+                        dire['pos 4'] = translate[dire_hard[0]['heroId']]
+                if len(radiant_mid) == 1:
                     radiant['pos 2'] = translate[radiant_mid[0]['heroId']]
-                    heroes_left.append(radiant_mid[1])
                 else:
-                    radiant['pos 2'] = translate[radiant_mid[1]['heroId']]
-                    heroes_left.append(radiant_mid[0])
-            if len(dire_mid) == 1:
-                dire['pos 2'] = translate[dire_mid[0]['heroId']]
-            else:
-                if dire_mid[0]['numLastHits'] > dire_mid[1]['numLastHits']:
+                    if radiant_mid[0]['numLastHits'] > radiant_mid[1]['numLastHits']:
+                        radiant['pos 2'] = translate[radiant_mid[0]['heroId']]
+                        heroes_left.append(radiant_mid[1])
+                    else:
+                        radiant['pos 2'] = translate[radiant_mid[1]['heroId']]
+                        heroes_left.append(radiant_mid[0])
+                if len(dire_mid) == 1:
                     dire['pos 2'] = translate[dire_mid[0]['heroId']]
-                    heroes_left.append(dire_mid[1])
                 else:
-                    dire['pos 2'] = translate[dire_mid[1]['heroId']]
-                    heroes_left.append(dire_mid[0])
-            for player in heroes_left:
-                if player['isRadiant']:
-                    if len(radiant_hard) != 2:
-                        radiant_hard.append(player)
-                    elif len(radiant_safe) != 2:
-                        radiant_safe.append(player)
-                    elif len(radiant_mid) == 0:
-                        radiant_mid.append(player)
-            for player in heroes_left:
-                if not player['isRadiant']:
-                    if len(dire_hard) != 2:
-                        dire_hard.append(player)
-                    elif len(dire_safe) != 2:
-                        dire_safe.append(player)
-                    elif len(dire_mid) == 0:
-                        dire_mid.append(player)
-            if len(radiant_safe) == 2:
-                if radiant_safe[0]['numLastHits'] > radiant_safe[1]['numLastHits']:
-                    radiant['pos 1'] = translate[radiant_safe[0]['heroId']]
-                    radiant['pos 5'] = translate[radiant_safe[1]['heroId']]
-                else:
-                    radiant['pos 1'] = translate[radiant_safe[1]['heroId']]
-                    radiant['pos 5'] = translate[radiant_safe[0]['heroId']]
-            if len(radiant_hard) == 2:
-                if radiant_hard[0]['numLastHits'] > radiant_hard[1]['numLastHits']:
-                    radiant['pos 3'] = translate[radiant_hard[0]['heroId']]
-                    radiant['pos 4'] = translate[radiant_hard[1]['heroId']]
-                else:
-                    radiant['pos 3'] = translate[radiant_hard[1]['heroId']]
-                    radiant['pos 4'] = translate[radiant_hard[0]['heroId']]
-            if len(dire_safe) == 2:
-                if dire_safe[0]['numLastHits'] > dire_safe[1]['numLastHits']:
-                    dire['pos 1'] = translate[dire_safe[0]['heroId']]
-                    dire['pos 5'] = translate[dire_safe[1]['heroId']]
-                else:
-                    dire['pos 1'] = translate[dire_safe[1]['heroId']]
-                    dire['pos 5'] = translate[dire_safe[0]['heroId']]
-            if len(dire_hard) == 2:
-                if dire_hard[0]['numLastHits'] > dire_hard[1]['numLastHits']:
-                    dire['pos 3'] = translate[dire_hard[0]['heroId']]
-                    dire['pos 4'] = translate[dire_hard[1]['heroId']]
-                else:
-                    dire['pos 3'] = translate[dire_hard[1]['heroId']]
-                    dire['pos 4'] = translate[dire_hard[0]['heroId']]
-            if len(radiant_mid) == 1:
-                radiant['pos 2'] = translate[radiant_mid[0]['heroId']]
-            else:
-                if radiant_mid[0]['numLastHits'] > radiant_mid[1]['numLastHits']:
+                    if dire_mid[0]['numLastHits'] > dire_mid[1]['numLastHits']:
+                        dire['pos 2'] = translate[dire_mid[0]['heroId']]
+                        heroes_left.append(dire_mid[1])
+                    else:
+                        dire['pos 2'] = translate[dire_mid[1]['heroId']]
+                        heroes_left.append(dire_mid[0])
+                for player in heroes_left:
+                    if player['isRadiant']:
+                        if len(radiant_hard) != 2:
+                            radiant_hard.append(player)
+                        elif len(radiant_safe) != 2:
+                            radiant_safe.append(player)
+                        elif len(radiant_mid) == 0:
+                            radiant_mid.append(player)
+                for player in heroes_left:
+                    if not player['isRadiant']:
+                        if len(dire_hard) != 2:
+                            dire_hard.append(player)
+                        elif len(dire_safe) != 2:
+                            dire_safe.append(player)
+                        elif len(dire_mid) == 0:
+                            dire_mid.append(player)
+                if len(radiant_safe) == 2:
+                    if radiant_safe[0]['numLastHits'] > radiant_safe[1]['numLastHits']:
+                        radiant['pos 1'] = translate[radiant_safe[0]['heroId']]
+                        radiant['pos 5'] = translate[radiant_safe[1]['heroId']]
+                    else:
+                        radiant['pos 1'] = translate[radiant_safe[1]['heroId']]
+                        radiant['pos 5'] = translate[radiant_safe[0]['heroId']]
+                if len(radiant_hard) == 2:
+                    if radiant_hard[0]['numLastHits'] > radiant_hard[1]['numLastHits']:
+                        radiant['pos 3'] = translate[radiant_hard[0]['heroId']]
+                        radiant['pos 4'] = translate[radiant_hard[1]['heroId']]
+                    else:
+                        radiant['pos 3'] = translate[radiant_hard[1]['heroId']]
+                        radiant['pos 4'] = translate[radiant_hard[0]['heroId']]
+                if len(dire_safe) == 2:
+                    if dire_safe[0]['numLastHits'] > dire_safe[1]['numLastHits']:
+                        dire['pos 1'] = translate[dire_safe[0]['heroId']]
+                        dire['pos 5'] = translate[dire_safe[1]['heroId']]
+                    else:
+                        dire['pos 1'] = translate[dire_safe[1]['heroId']]
+                        dire['pos 5'] = translate[dire_safe[0]['heroId']]
+                if len(dire_hard) == 2:
+                    if dire_hard[0]['numLastHits'] > dire_hard[1]['numLastHits']:
+                        dire['pos 3'] = translate[dire_hard[0]['heroId']]
+                        dire['pos 4'] = translate[dire_hard[1]['heroId']]
+                    else:
+                        dire['pos 3'] = translate[dire_hard[1]['heroId']]
+                        dire['pos 4'] = translate[dire_hard[0]['heroId']]
+                if len(radiant_mid) == 1:
                     radiant['pos 2'] = translate[radiant_mid[0]['heroId']]
-                    heroes_left.append(radiant_mid[1])
                 else:
-                    radiant['pos 2'] = translate[radiant_mid[1]['heroId']]
-                    heroes_left.append(radiant_mid[0])
-            if len(dire_mid) == 1:
-                dire['pos 2'] = translate[dire_mid[0]['heroId']]
-            else:
-                if dire_mid[0]['numLastHits'] > dire_mid[1]['numLastHits']:
+                    if radiant_mid[0]['numLastHits'] > radiant_mid[1]['numLastHits']:
+                        radiant['pos 2'] = translate[radiant_mid[0]['heroId']]
+                        heroes_left.append(radiant_mid[1])
+                    else:
+                        radiant['pos 2'] = translate[radiant_mid[1]['heroId']]
+                        heroes_left.append(radiant_mid[0])
+                if len(dire_mid) == 1:
                     dire['pos 2'] = translate[dire_mid[0]['heroId']]
-                    heroes_left.append(dire_mid[1])
                 else:
-                    dire['pos 2'] = translate[dire_mid[1]['heroId']]
-                    heroes_left.append(dire_mid[0])
+                    if dire_mid[0]['numLastHits'] > dire_mid[1]['numLastHits']:
+                        dire['pos 2'] = translate[dire_mid[0]['heroId']]
+                        heroes_left.append(dire_mid[1])
+                    else:
+                        dire['pos 2'] = translate[dire_mid[1]['heroId']]
+                        heroes_left.append(dire_mid[0])
+            except:
+                print('игра только началась или stratz Залагал')
+                return None
 
 
         else:

@@ -4,6 +4,7 @@ game_changer_list = [
     'Phoenix',
     'Disruptor',
     'Bane',
+    'Alchemist'
     'Tinker',
     'Doom',
     'Ancient Apparation',
@@ -196,6 +197,11 @@ egb = {
  'torontotokyo':431770905,
  'dubu':145550466,
 "dubu's":145550466,
- 'jubei':104275965,
+ 'jubei':106159118,
+ 'febby':112377459,
+ 'squad1x':123023873,
+ 'layme':368917218,
+'reira':208407289,
+'gpk':480412663,
 }
 blacklist = ['execration', 'team bright']

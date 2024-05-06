@@ -204,6 +204,7 @@ egb = {
 'gpk':480412663,
  'hellscream':241884166,
 'saksa':103735745,
+ 're1bl':439345730,
  'reibl':439345730,
 }
 blacklist_players = {

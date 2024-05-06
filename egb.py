@@ -309,7 +309,7 @@ def get_picks_and_pos(exac_match,):
                 radiant[positions_copy[0]] = translate[player['heroId']]
 
     if len(radiant) == 5 and len(dire) == 5:
-        print(f"https://stratz.com/matches/{match_id}/live\n{radiant}\n{dire}")
+        (f"https://stratz.com/matches/{match_id}/live\n{radiant}\n{dire}")
         return radiant, dire, match_id
     else:
         print(f'пики не полные\n{radiant}\n{dire}')
@@ -333,6 +333,7 @@ while True:
                     answer = get_picks_and_pos(exac_match)
                     if answer is not None:
                         radiant, dire, match_id = answer
+                        send_message(f"{radiant}\n{dire}")
                         dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id)
                 else:
                     print('карта не найдена, вероятно, матч только начался')

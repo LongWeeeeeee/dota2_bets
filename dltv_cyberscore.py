@@ -508,6 +508,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     for hero in list(dire_heroes_and_positions.values()):
         if hero in game_changer_list:
             output_message+=f'Аккуратно! У {dire_team_name} есть {hero}, который может изменить исход боя\n'
+    output_message+=f'https://stratz.com/matches/{antiplagiat_url}/live'
     send_message(output_message)
     add_url(antiplagiat_url)
 

@@ -158,7 +158,6 @@ egb = {
 'gorgc' : 56939869,
 'krylat' : 150748346,
 'desire':115464954,
- 'rostislav_999':165571447,
  'sclkoma':165671428,
  'leBron': 35504297,
 'taiga':401792574,
@@ -203,8 +202,11 @@ egb = {
  'layme':368917218,
 'reira':208407289,
 'gpk':480412663,
+ 'hellscream':241884166,
+'saksa':103735745,
 }
 blacklist_players = {
- 'vikared'
+ 'vikared',
+ 'rostislav_999',
 }
 blacklist_teams = ['execration', 'team bright']

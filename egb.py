@@ -34,11 +34,12 @@ def get_players(bet):
     print(bet['game_label'])
     players_ids = []
     for player in player_names:
-        if player in egb and player:
-            if player not in blacklist_players:
-                players_ids.append(egb[player])
-        else:
-            send_message(f'{player} не найден')
+        if player not in blacklist_players:
+            if player in egb and player:
+
+                    players_ids.append(egb[player])
+            else:
+                send_message(f'{player} не найден')
     return players_ids, dire_and_radiant
 
 

@@ -22,5 +22,3 @@ while True:
     if response.status_code == 200:
         answer = json.loads(response.text)
         print(answer)
-    print('сплю пол часа')
-    time.sleep(1800)

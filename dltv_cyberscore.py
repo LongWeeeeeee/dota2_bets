@@ -25,16 +25,6 @@ def get_live_matches():
         print(f'{radiant_team_name} VS {dire_team_name}')
         dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos, dire_heroes_and_positions=dire_heroes_and_pos, radiant_team_name=radiant_team_name,
                         dire_team_name=dire_team_name, score=score, antiplagiat_url=url)
-    #         else:
-    #             print(f'Пики еще не закончились')
-    # else:
-    #     now = datetime.datetime.now()
-    #     if sleep_time != 0:
-    #         if sleep_time > now:
-    #             wait_seconds = (sleep_time - now).total_seconds()
-    #             print(f'Live матчей нет, сплю {wait_seconds/60} минут')
-    #             time.sleep(wait_seconds)
-
 
 
 def get_urls(url, target_datetime = 0):
@@ -138,46 +128,6 @@ def get_team_positions():
 
                 for i in range(5):
                     dire_heroes_and_pos[f'pos {i+1}'] = heroes[i+5]
-                # players = soup.find_all('div', class_='team-item')
-                # for player in players:
-                #     nick_name = player.find('div', class_='player-name')
-                #     if nick_name is not None:
-                #         nick_name = nick_name.text.lower().replace('.', '')
-                #         nick_name = re.sub(r'[^\w\s\u4e00-\u9fff]+', '', nick_name)
-                #         position = player.find('span', class_='truncate').text.lower()
-                #         if nick_name in nick_fixes:
-                #             nick_name = nick_fixes[nick_name]
-                #         if position in lst:
-                #             result = find_in_radiant(radiant_players, nick_name, translate, position, radiant_pick, radiant_lst)
-                #             if result is not None:
-                #                 radiant_lst, radiant_pick = result
-                #             else:
-                #                 result = find_in_dire(dire_players, nick_name, translate, position, dire_pick, dire_lst)
-                #                 if result is not None:
-                #                     dire_lst, dire_pick = result
-                #
-                #
-                # if len(radiant_pick) == 4:
-                #     for player in radiant_players.values():
-                #         hero = player['hero']
-                #         p_list = list(radiant_pick.values())
-                #         if hero not in p_list:
-                #             radiant_pick[translate[radiant_lst[0]]] = hero
-                # if len(dire_pick) == 4:
-                #     for player in dire_players.values():
-                #         hero = player['hero']
-                #         p_list = list(dire_pick.values())
-                #         if hero not in p_list:
-                #             dire_pick[translate[dire_lst[0]]] = hero
-                # if len(radiant_pick) != 5:
-                #     print(f'{radiant_team_name}\nНе удалось выяснить позиции игроков {radiant_pick}')
-                #     # send_message(f'{radiant_team_name}\nНе удалось выяснить позиции игроков {radiant_pick}')
-                #     return None
-                # if len(dire_pick) != 5:
-                #     print((f'{dire_team_name}\nНе удалось выяснить позиции игроков {dire_pick}'))
-                #     # send_message(f'{dire_team_name}\nНе удалось выяснить позиции игроков {dire_pick}')
-                #     return None
-
 
                 return radiant_heroes_and_pos, dire_heroes_and_pos, radiant_team_name, dire_team_name, url, score
         else:
@@ -508,7 +458,6 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     for hero in list(dire_heroes_and_positions.values()):
         if hero in game_changer_list:
             output_message+=f'Аккуратно! У {dire_team_name} есть {hero}, который может изменить исход боя\n'
-    output_message+=f'https://stratz.com/matches/{antiplagiat_url}/live'
     send_message(output_message)
     add_url(antiplagiat_url)
 
@@ -612,16 +561,7 @@ def send_message(message):
         'text': message
     }
     requests.post(url, json=payload)
-# while True:
-#     try:
-#         get_live_matches()
-#     except Exception as e:
-#         print(e)
-#         with open('errors.txt', 'r+' ) as f:
-#             f.write(str(e))
-#     # get_live_matches()
-#     print('сплю 2 минуты')
-#     time.sleep(120)
+
 # testing
 # radiant_heroes_and_positions={'pos 1': 'Troll Warlord', 'pos 2': 'Zeus', 'pos 3': 'Kunkka', 'pos 4': 'Techies', 'pos 5': "Elder Titan"}
 # dire_heroes_and_positions={'pos 1': 'Faceless Void', 'pos 2': 'Leshrac', 'pos 3': 'Dark Seer', 'pos 4': 'Clockwerk', 'pos 5': 'Gyrocopter'}

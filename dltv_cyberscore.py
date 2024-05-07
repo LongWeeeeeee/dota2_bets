@@ -202,6 +202,96 @@ def are_similar(s1, s2, threshold=70):
     return similarity_percentage(s1, s2) >= threshold
 
 
+
+
+
+
+def get_map_id(data):
+    for match in data['rows']:
+        if match['tournament']['tier'] in [1    ] and match['team_dire'] is not None and match['team_radiant'] is not None and 'Kobold' not in match['tournament']['name']:
+            radiant_team_name = match['team_radiant']['name'].lower()
+            dire_team_name = match['team_dire']['name'].lower()
+            score = match['best_of_score']
+            for karta in match['related_matches']:
+                if karta['status'] == 'online':
+                    map_id = karta['id']
+                    url = f'https://cyberscore.live/en/matches/{map_id}/'
+                    result = if_unique(url)
+                    if result is not None:
+                        return url, radiant_team_name, dire_team_name, score
+
+
+def if_unique(url):
+    with open('map_id_check.txt', 'r+') as f:
+        data = json.load(f)
+        if url not in data:
+            # data.append(url)
+            # f.truncate()
+            # f.seek(0)
+            # json.dump(data, f)
+            return True
+
+
+def add_url(url):
+    with open('map_id_check.txt', 'r+') as f:
+        data = json.load(f)
+        if url not in data:
+            data.append(url)
+            f.truncate()
+            f.seek(0)
+            json.dump(data, f)
+
+
+def find_in_radiant(radiant_players, nick_name, translate, position, radiant_pick, radiant_lst):
+    for radiant_player_name in radiant_players:
+        if are_similar(radiant_player_name, nick_name, threshold=70):
+            radiant_pick[translate[position]] = radiant_players[radiant_player_name]['hero']
+            if position in radiant_lst:
+                radiant_lst.remove(position)
+                return radiant_lst, radiant_pick
+
+
+def find_in_dire(dire_players, nick_name, translate, position, dire_pick, dire_lst):
+    for dire_player_name in dire_players:
+        if are_similar(dire_player_name, nick_name, threshold=70):
+            dire_pick[translate[position]] = dire_players[dire_player_name]['hero']
+            if position in dire_lst:
+                dire_lst.remove(position)
+                return dire_lst, dire_pick
+
+
+def if_picks_are_done(soup):
+    dire_block = soup.find('div', class_='picks__new-picks__picks dire')
+    radiant_block = soup.find('div', class_='picks__new-picks__picks radiant')
+    if radiant_block is not None and dire_block is not None:
+        items_radiant = radiant_block.find('div', class_='items').find_all('div', class_='pick')
+        items_dire = dire_block.find('div', class_='items').find_all('div', class_='pick')
+        if len(items_dire) == 5 and len(items_radiant) == 5:
+            return True
+
+
+def clean_up(inp):
+    copy = inp.copy()
+    for i in inp:
+        if i >45 and i <55:
+            copy.remove(i)
+    if len(copy) == 0:
+        return inp
+    else:
+        return copy
+
+
+def send_message(message):
+    bot_token = f'{keys.Token}'
+    chat_id = f'{keys.Chat_id}'
+    url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
+    payload = {
+        'chat_id': chat_id,
+        'text': message
+    }
+    requests.post(url, json=payload)
+
+
 def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, antiplagiat_url, score=[0,0], core_matchup=None, output_message='', only_good_bets=None):
     print('dota2protracker')
     radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team, radiant_pos4_with_pos5, dire_pos4_with_pos5 = [], [], [], [] ,[], [], [], [], [], None, None
@@ -413,9 +503,13 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             dire_pos2_vs_team)
     if core_matchup is not None:
         core_matchup -= 50
-    if None not in [sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team, sups]:
-        if ((sinergy > 0 and counterpick > 0 and pos1_vs_team > 0 and core_matchup > 0 and pos2_vs_team > 0 and pos3_vs_team > 0 and sups > 0) or \
-                (sinergy < 0 and counterpick < 0 and pos1_vs_team < 0 and core_matchup < 0 and pos2_vs_team < 0 and pos3_vs_team < 0 and sups < 0)):
+    values = [sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team, sups]
+    if None not in values:
+        all_positive = all(value > 0 for value in values)
+        all_negative = all(value < 0 for value in values)
+        one_negative = sum(1 for value in values if value < 0) == 1
+        one_positive = sum(1 for value in values if value > 0) == 1
+        if all_positive or all_negative or one_negative or one_positive:
             output_message += f'ХОРОШАЯ СТАВКА\n'
         else:
             output_message += f'ПЛОХАЯ СТАВКА!!!\n'
@@ -463,96 +557,11 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     if only_good_bets == True:
         if 'ПЛОХАЯ СТАВКА!!!' not in output_message:
             send_message(output_message)
+        else:
+            print(output_message)
     else:
         send_message(output_message)
     add_url(antiplagiat_url)
-
-
-
-def get_map_id(data):
-    for match in data['rows']:
-        if match['tournament']['tier'] in [1    ] and match['team_dire'] is not None and match['team_radiant'] is not None and 'Kobold' not in match['tournament']['name']:
-            radiant_team_name = match['team_radiant']['name'].lower()
-            dire_team_name = match['team_dire']['name'].lower()
-            score = match['best_of_score']
-            for karta in match['related_matches']:
-                if karta['status'] == 'online':
-                    map_id = karta['id']
-                    url = f'https://cyberscore.live/en/matches/{map_id}/'
-                    result = if_unique(url)
-                    if result is not None:
-                        return url, radiant_team_name, dire_team_name, score
-
-
-def if_unique(url):
-    with open('map_id_check.txt', 'r+') as f:
-        data = json.load(f)
-        if url not in data:
-            # data.append(url)
-            # f.truncate()
-            # f.seek(0)
-            # json.dump(data, f)
-            return True
-
-
-def add_url(url):
-    with open('map_id_check.txt', 'r+') as f:
-        data = json.load(f)
-        if url not in data:
-            data.append(url)
-            f.truncate()
-            f.seek(0)
-            json.dump(data, f)
-
-
-def find_in_radiant(radiant_players, nick_name, translate, position, radiant_pick, radiant_lst):
-    for radiant_player_name in radiant_players:
-        if are_similar(radiant_player_name, nick_name, threshold=70):
-            radiant_pick[translate[position]] = radiant_players[radiant_player_name]['hero']
-            if position in radiant_lst:
-                radiant_lst.remove(position)
-                return radiant_lst, radiant_pick
-
-
-def find_in_dire(dire_players, nick_name, translate, position, dire_pick, dire_lst):
-    for dire_player_name in dire_players:
-        if are_similar(dire_player_name, nick_name, threshold=70):
-            dire_pick[translate[position]] = dire_players[dire_player_name]['hero']
-            if position in dire_lst:
-                dire_lst.remove(position)
-                return dire_lst, dire_pick
-
-
-def if_picks_are_done(soup):
-    dire_block = soup.find('div', class_='picks__new-picks__picks dire')
-    radiant_block = soup.find('div', class_='picks__new-picks__picks radiant')
-    if radiant_block is not None and dire_block is not None:
-        items_radiant = radiant_block.find('div', class_='items').find_all('div', class_='pick')
-        items_dire = dire_block.find('div', class_='items').find_all('div', class_='pick')
-        if len(items_dire) == 5 and len(items_radiant) == 5:
-            return True
-
-
-def clean_up(inp):
-    copy = inp.copy()
-    for i in inp:
-        if i >45 and i <55:
-            copy.remove(i)
-    if len(copy) == 0:
-        return inp
-    else:
-        return copy
-
-
-def send_message(message):
-    bot_token = f'{keys.Token}'
-    chat_id = f'{keys.Chat_id}'
-    url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
-    payload = {
-        'chat_id': chat_id,
-        'text': message
-    }
-    requests.post(url, json=payload)
 
 # testing
 # radiant_heroes_and_positions={'pos 1': 'Troll Warlord', 'pos 2': 'Zeus', 'pos 3': 'Kunkka', 'pos 4': 'Techies', 'pos 5': "Elder Titan"}

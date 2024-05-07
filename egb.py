@@ -333,5 +333,5 @@ while True:
                         dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id, only_good_bets=True)
                 else:
                     print('карта не найдена, вероятно, матч только начался')
-    print('сплю 2 минуты')
-    time.sleep(120)
+    print('сплю 3 минуты')
+    time.sleep(160)

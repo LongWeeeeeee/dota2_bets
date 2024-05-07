@@ -503,6 +503,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             dire_pos2_vs_team)
     if core_matchup is not None:
         core_matchup -= 50
+    check = False
     values = [sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team, sups]
     if None not in values or sum(1 for value in values if value is None) == 1:
         for value in values:
@@ -512,7 +513,14 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         one_negative = sum(1 for value in values if value < 0) == 1
         one_positive = sum(1 for value in values if value > 0) == 1
         if all_positive or all_negative or one_negative or one_positive:
-            output_message += f'ХОРОШАЯ СТАВКА\n'
+            for hero in list(dire_heroes_and_positions.values()):
+                if hero in game_changer_list:
+                    output_message += f'Аккуратно! У {dire_team_name} есть {hero}, который может изменить исход боя\n'
+                    check = True
+            if check:
+                output_message += f'ХОРОШАЯ СТАВКА на 1 ФЛЕТ\n'
+            else:
+                output_message += f'ОТЛИЧНАЯ СТАВКА ALL IN\n'
         else:
             output_message += f'ПЛОХАЯ СТАВКА!!!\n'
     else:
@@ -553,9 +561,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         if hero in game_changer_list:
             output_message+=f'Аккуратно! У {radiant_team_name} есть {hero}, который может изменить исход боя\n'
     output_message += '\n'
-    for hero in list(dire_heroes_and_positions.values()):
-        if hero in game_changer_list:
-            output_message+=f'Аккуратно! У {dire_team_name} есть {hero}, который может изменить исход боя\n'
+
     if only_good_bets == True:
         if 'ПЛОХАЯ СТАВКА!!!' not in output_message:
             send_message(output_message)

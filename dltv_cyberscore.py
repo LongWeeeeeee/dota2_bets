@@ -202,7 +202,7 @@ def are_similar(s1, s2, threshold=70):
     return similarity_percentage(s1, s2) >= threshold
 
 
-def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, antiplagiat_url, score=[0,0], core_matchup=None, output_message=''):
+def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, antiplagiat_url, score=[0,0], core_matchup=None, output_message='', only_good_bets=None):
     print('dota2protracker')
     radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team, radiant_pos4_with_pos5, dire_pos4_with_pos5 = [], [], [], [] ,[], [], [], [], [], None, None
     for position in radiant_heroes_and_positions:
@@ -417,6 +417,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         if ((sinergy > 0 and counterpick > 0 and pos1_vs_team > 0 and core_matchup > 0 and pos2_vs_team > 0 and pos3_vs_team > 0 and sups > 0) or \
                 (sinergy < 0 and counterpick < 0 and pos1_vs_team < 0 and core_matchup < 0 and pos2_vs_team < 0 and pos3_vs_team < 0 and sups < 0)):
             output_message += f'ХОРОШАЯ СТАВКА\n'
+        else:
+            output_message += f'ПЛОХАЯ СТАВКА!!!\n'
     else:
         output_message += f'ПЛОХАЯ СТАВКА!!!\n'
 
@@ -458,7 +460,11 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     for hero in list(dire_heroes_and_positions.values()):
         if hero in game_changer_list:
             output_message+=f'Аккуратно! У {dire_team_name} есть {hero}, который может изменить исход боя\n'
-    send_message(output_message)
+    if only_good_bets == True:
+        if 'ПЛОХАЯ СТАВКА!!!' not in output_message:
+            send_message(output_message)
+    else:
+        send_message(output_message)
     add_url(antiplagiat_url)
 
 
@@ -476,20 +482,6 @@ def get_map_id(data):
                     result = if_unique(url)
                     if result is not None:
                         return url, radiant_team_name, dire_team_name, score
-    # for match in data['rows']:
-    #     if match['tournament']['tier'] in [1, 2] and 'name' in match['team_radiant'] and 'name' in match[
-    #         'team_radiant']:
-    #         radiant_team_name = match['team_radiant']['name']
-    #         dire_team_name = match['team_dire']['name']
-    #         time_until = datetime.datetime.fromisoformat(match['date_start']) + datetime.timedelta(hours=3)
-    #         now = datetime.datetime.now().replace(tzinfo=datetime.timezone.utc)
-    #         to_wait = time_until - now
-    #         if to_wait.seconds > 0:
-    #
-    #             print(f'{radiant_team_name} vs {dire_team_name}\nсплю {to_wait.seconds/60} минут')
-    #             time.sleep(to_wait.seconds)
-
-
 
 
 def if_unique(url):

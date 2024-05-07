@@ -330,7 +330,7 @@ while True:
                     answer = get_picks_and_pos(exac_match)
                     if answer is not None:
                         radiant, dire, match_id = answer
-                        dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id)
+                        dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id, only_good_bets=True)
                 else:
                     print('карта не найдена, вероятно, матч только начался')
     print('сплю 2 минуты')

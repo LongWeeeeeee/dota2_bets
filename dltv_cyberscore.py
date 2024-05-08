@@ -292,7 +292,7 @@ def send_message(message):
     requests.post(url, json=payload)
 
 
-def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, antiplagiat_url, score=[0,0], core_matchup=None, output_message='', only_good_bets=None):
+def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, antiplagiat_url=None, score=[0,0], core_matchup=None, output_message='', only_good_bets=None):
     print('dota2protracker')
     radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team, radiant_pos4_with_pos5, dire_pos4_with_pos5 = [], [], [], [] ,[], [], [], [], [], None, None
     for position in radiant_heroes_and_positions:
@@ -572,9 +572,10 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             print(output_message)
     else:
         send_message(output_message)
-    add_url(antiplagiat_url)
+    if antiplagiat_url is not None:
+        add_url(antiplagiat_url)
 
 # testing
 # radiant_heroes_and_positions={'pos 1': 'Troll Warlord', 'pos 2': 'Zeus', 'pos 3': 'Kunkka', 'pos 4': 'Techies', 'pos 5': "Elder Titan"}
-# dire_heroes_and_positions={'pos 1': 'Faceless Void', 'pos 2': 'Leshrac', 'pos 3': 'Dark Seer', 'pos 4': 'Clockwerk', 'pos 5': 'Gyrocopter'}
+# dire_heroes_and_positions={'pos 1': 'Lifestealer', 'pos 2': 'Leshrac', 'pos 3': 'Dark Seer', 'pos 4': 'Disruptor', 'pos 5': 'Io'}
 # dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_positions, dire_heroes_and_positions=dire_heroes_and_positions, radiant_team_name='Tundra', dire_team_name='Heroic', score=['0','0'])

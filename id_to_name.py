@@ -209,9 +209,14 @@ egb = {
  "illidan's":26316691,
  'bsj':105178768,
  'zitraks':133558180,
+ 'moo':84429681,
+ 'malr1ne':898455820,
+ 'shergarat':372801387,
+ 'timado':97658618,
+
 }
 blacklist_players = {
-'gusar',
+ 'gusar',
  'vikared',
  'rostislav_999',
 }

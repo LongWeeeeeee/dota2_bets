@@ -208,8 +208,10 @@ egb = {
  'reibl':439345730,
  "illidan's":26316691,
  'bsj':105178768,
+ 'zitraks':133558180,
 }
 blacklist_players = {
+'gusar',
  'vikared',
  'rostislav_999',
 }

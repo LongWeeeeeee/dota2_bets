@@ -506,6 +506,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     check = False
     values = [sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team, sups]
     values_others = [pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team, sups]
+
     if None not in values or sum(1 for value in values if value is None) == 1:
         for value in values:
             if value is None: values.remove(value)
@@ -515,9 +516,9 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         all_negative = all(value < 0 for value in values)
         one_negative = sum(1 for value in values_others if value <= 0) == 1
         one_positive = sum(1 for value in values_others if value >= 0) == 1
-        main_positive = all(value > 0 for value in values_others)
-        main_negative = all(value < 0 for value in values_others)
-        if all_positive or all_negative or (one_negative and main_negative) or (one_positive and main_positive):
+        main_positive = all(value > 0 for value in [sinergy, counterpick])
+        main_negative = all(value < 0 for value in [sinergy, counterpick])
+        if all_positive or all_negative or (one_negative and main_positive) or (one_positive and main_negative):
             for hero in list(dire_heroes_and_positions.values()):
                 if hero in game_changer_list:
                     output_message += f'Аккуратно! У {dire_team_name} есть {hero}, который может изменить исход боя\n'

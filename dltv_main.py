@@ -1,9 +1,15 @@
 import time
 import traceback
-import dltv_cyberscore
+from dltv_cyberscore import get_team_positions, dota2protracker
 while True:
     try:
-        dltv_cyberscore.get_live_matches()
+        result = get_team_positions()
+        if result is not None:
+            radiant_heroes_and_pos, dire_heroes_and_pos, radiant_team_name, dire_team_name, url, score = result
+            print(f'{radiant_team_name} VS {dire_team_name}')
+            dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos,
+                            dire_heroes_and_positions=dire_heroes_and_pos, radiant_team_name=radiant_team_name,
+                            dire_team_name=dire_team_name, score=score, antiplagiat_url=url, only_good_bets=True)
     except Exception as e:
         error_message = str(e)
         # Получаем последний объект трассировки и извлекаем номер строки

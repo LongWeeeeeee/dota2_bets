@@ -18,13 +18,7 @@ from id_to_name import game_changer_list
 
 
 
-def get_live_matches():
-    result = get_team_positions()
-    if result is not None:
-        radiant_heroes_and_pos, dire_heroes_and_pos, radiant_team_name, dire_team_name, url, score = result
-        print(f'{radiant_team_name} VS {dire_team_name}')
-        dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos, dire_heroes_and_positions=dire_heroes_and_pos, radiant_team_name=radiant_team_name,
-                        dire_team_name=dire_team_name, score=score, antiplagiat_url=url)
+
 
 
 def get_urls(url, target_datetime = 0):
@@ -208,7 +202,7 @@ def are_similar(s1, s2, threshold=70):
 
 def get_map_id(data):
     for match in data['rows']:
-        if match['tournament']['tier'] in [1    ] and match['team_dire'] is not None and match['team_radiant'] is not None and 'Kobold' not in match['tournament']['name']:
+        if match['tournament']['tier'] in [1, 2] and match['team_dire'] is not None and match['team_radiant'] is not None and 'Kobold' not in match['tournament']['name']:
             radiant_team_name = match['team_radiant']['name'].lower()
             dire_team_name = match['team_dire']['name'].lower()
             score = match['best_of_score']

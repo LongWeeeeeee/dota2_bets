@@ -512,15 +512,20 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         one_positive = sum(1 for value in values_others if value >= 0) == 1
         main_positive = all(value > 0 for value in [sinergy, counterpick])
         main_negative = all(value < 0 for value in [sinergy, counterpick])
-        if all_positive or all_negative or (one_negative and main_positive) or (one_positive and main_negative):
-            for hero in list(dire_heroes_and_positions.values()):
-                if hero in game_changer_list:
-                    output_message += f'Аккуратно! У {dire_team_name} есть {hero}, который может изменить исход боя\n'
-                    check = True
-            if check:
-                output_message += f'ХОРОШАЯ СТАВКА на 1 ФЛЕТ\n'
+        for hero in list(dire_heroes_and_positions.values()):
+            if hero in game_changer_list:
+                output_message += f'Аккуратно! У {dire_team_name} есть {hero}, который может изменить исход боя\n'
+                check = True
+        if all_positive or all_negative:
+            if not check:
+                output_message += f'ОТЛИЧНАЯ СТАВКА\n'
             else:
-                output_message += f'ОТЛИЧНАЯ СТАВКА ALL IN\n'
+                output_message += f'ХОРОШАЯ СТАВКА на 1 ФЛЕТ\n'
+        elif (one_negative and main_positive) or (one_positive and main_negative):
+            if not check:
+                output_message += f'ХОРОШАЯ СТАВКА\n'
+            else:
+                output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
         else:
             output_message += f'ПЛОХАЯ СТАВКА!!!\n'
     else:

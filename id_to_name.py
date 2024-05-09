@@ -213,6 +213,7 @@ egb = {
  'malr1ne':898455820,
  'shergarat':372801387,
  'timado':97658618,
+ 'ar1se':96169991,
 
 }
 blacklist_players = {

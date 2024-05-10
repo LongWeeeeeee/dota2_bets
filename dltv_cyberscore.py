@@ -564,7 +564,10 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
 
     if only_good_bets == True:
         if 'ПЛОХАЯ СТАВКА!!!' not in output_message:
-            send_message(output_message)
+            if len(set(dire_heroes_and_positions.values())) == 5 and len(set(radiant_heroes_and_positions.values())) == 5:
+                send_message(output_message)
+            else:
+                send_message(f'Ошибка пиков https://stratz.com/matches/{antiplagiat_url} ')
         else:
             print(output_message)
     else:

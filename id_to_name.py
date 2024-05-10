@@ -215,6 +215,7 @@ egb = {
  'timado':97658618,
  'ar1se':96169991,
  'dinozavrik':165390194,
+ 'sketcher_8':173480718,
 
 }
 blacklist_players = {

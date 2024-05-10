@@ -117,7 +117,7 @@ def find_index(players):
     for player in players:
         coordinates = player['playbackData']['positionEvents']
         for time in coordinates:
-            if time['time'] / 60 > 2.5 and time['time'] / 60 < 8:
+            if time['time'] / 60 > 2 and time['time'] / 60 < 8:
                 index = coordinates.index(time)
                 print(time['time'] / 60)
                 return index

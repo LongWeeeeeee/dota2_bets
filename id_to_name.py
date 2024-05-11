@@ -216,6 +216,9 @@ egb = {
  'ar1se':96169991,
  'dinozavrik':165390194,
  'sketcher_8':173480718,
+ 'yatoro':321580662,
+ # 'vovapain'
+ # '420jenkins'
 
 }
 blacklist_players = {

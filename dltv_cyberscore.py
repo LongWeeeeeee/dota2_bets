@@ -102,23 +102,24 @@ def get_team_positions():
     response = requests.get(url)
     if response.status_code == 200:
         data = json.loads(response.text)
-        result = get_map_id(data)
-        if result is not None:
-            url, radiant_team_name, dire_team_name, score = result
-            response = requests.get(url)
-            if response.status_code == 200:
-                response_html = html.unescape(response.text)
-                soup = BeautifulSoup(response_html, 'lxml')
-                picks_item = soup.find_all('div', class_='picks-item with-match-players-tooltip')
-                heroes = []
-                for hero_block in picks_item:
-                    for hero in list(id_to_name.translate.values()):
-                        if f'({hero})' in hero_block.text:
-                            heroes.append(hero)
-                radiant_heroes_and_pos = {}
-                dire_heroes_and_pos = {}
-                for i in range(5):
-                    radiant_heroes_and_pos[f'pos {i+1}'] = heroes[i]
+        for match in data['rows']:
+            result = get_map_id(match)
+            if result is not None:
+                url, radiant_team_name, dire_team_name, score = result
+                response = requests.get(url)
+                if response.status_code == 200:
+                    response_html = html.unescape(response.text)
+                    soup = BeautifulSoup(response_html, 'lxml')
+                    picks_item = soup.find_all('div', class_='picks-item with-match-players-tooltip')
+                    heroes = []
+                    for hero_block in picks_item:
+                        for hero in list(id_to_name.translate.values()):
+                            if f'({hero})' in hero_block.text:
+                                heroes.append(hero)
+                    radiant_heroes_and_pos = {}
+                    dire_heroes_and_pos = {}
+                    for i in range(5):
+                        radiant_heroes_and_pos[f'pos {i+1}'] = heroes[i]
 
                 for i in range(5):
                     dire_heroes_and_pos[f'pos {i+1}'] = heroes[i+5]
@@ -200,19 +201,18 @@ def are_similar(s1, s2, threshold=70):
 
 
 
-def get_map_id(data):
-    for match in data['rows']:
-        if match['tournament']['tier'] in [1, 2] and match['team_dire'] is not None and match['team_radiant'] is not None and 'Kobold' not in match['tournament']['name']:
-            radiant_team_name = match['team_radiant']['name'].lower()
-            dire_team_name = match['team_dire']['name'].lower()
-            score = match['best_of_score']
-            for karta in match['related_matches']:
-                if karta['status'] == 'online':
-                    map_id = karta['id']
-                    url = f'https://cyberscore.live/en/matches/{map_id}/'
-                    result = if_unique(url)
-                    if result is not None:
-                        return url, radiant_team_name, dire_team_name, score
+def get_map_id(match):
+    if match['tournament']['tier'] in [1, 2] and match['team_dire'] is not None and match['team_radiant'] is not None and 'Kobold' not in match['tournament']['name']:
+        radiant_team_name = match['team_radiant']['name'].lower()
+        dire_team_name = match['team_dire']['name'].lower()
+        score = match['best_of_score']
+        for karta in match['related_matches']:
+            if karta['status'] == 'online':
+                map_id = karta['id']
+                url = f'https://cyberscore.live/en/matches/{map_id}/'
+                result = if_unique(url)
+                if result is not None:
+                    return url, radiant_team_name, dire_team_name, score
 
 
 def if_unique(url):
@@ -505,8 +505,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             if value is None: values.remove(value)
         all_positive = all(value > 0 for value in values)
         all_negative = all(value < 0 for value in values)
-        one_negative = sum(1 for value in values if value <= 0) == 1
-        one_positive = sum(1 for value in values if value >= 0) == 1
+        one_negative = sum(1 for value in values if value < 0) == 1
+        one_positive = sum(1 for value in values if value > 0) == 1
         for hero in list(dire_heroes_and_positions.values()):
             if hero in game_changer_list:
                 output_message += f'Аккуратно! У {dire_team_name} есть {hero}, который может изменить исход боя\n'

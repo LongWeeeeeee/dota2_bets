@@ -222,8 +222,8 @@ egb = {
 
 }
 blacklist_players = {
- 'vovapain'
- 'lenagol0vach'
+ 'vovapain',
+ 'lenagol0vach',
  'gusar',
  'vikared',
  'rostislav_999',

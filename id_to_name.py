@@ -217,11 +217,13 @@ egb = {
  'dinozavrik':165390194,
  'sketcher_8':173480718,
  'yatoro':321580662,
- # 'vovapain'
+ 'w33haa':86700461,
  # '420jenkins'
 
 }
 blacklist_players = {
+ 'vovapain'
+ 'lenagol0vach'
  'gusar',
  'vikared',
  'rostislav_999',

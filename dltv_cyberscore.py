@@ -97,36 +97,28 @@ def get_player_names_and_heroes(soup):
 
 
 
-def get_team_positions():
-    url = 'https://api.cyberscore.live/api/v1/matches/?limit=20&type=liveOrUpcoming&locale=en'
+def get_team_positions(url):
     response = requests.get(url)
     if response.status_code == 200:
-        data = json.loads(response.text)
-        for match in data['rows']:
-            result = get_map_id(match)
-            if result is not None:
-                url, radiant_team_name, dire_team_name, score = result
-                response = requests.get(url)
-                if response.status_code == 200:
-                    response_html = html.unescape(response.text)
-                    soup = BeautifulSoup(response_html, 'lxml')
-                    picks_item = soup.find_all('div', class_='picks-item with-match-players-tooltip')
-                    heroes = []
-                    for hero_block in picks_item:
-                        for hero in list(id_to_name.translate.values()):
-                            if f'({hero})' in hero_block.text:
-                                heroes.append(hero)
-                    radiant_heroes_and_pos = {}
-                    dire_heroes_and_pos = {}
-                    for i in range(5):
-                        radiant_heroes_and_pos[f'pos {i+1}'] = heroes[i]
+        response_html = html.unescape(response.text)
+        soup = BeautifulSoup(response_html, 'lxml')
+        picks_item = soup.find_all('div', class_='picks-item with-match-players-tooltip')
+        heroes = []
+        for hero_block in picks_item:
+            for hero in list(id_to_name.translate.values()):
+                if f'({hero})' in hero_block.text:
+                    heroes.append(hero)
+        radiant_heroes_and_pos = {}
+        dire_heroes_and_pos = {}
+        for i in range(5):
+            radiant_heroes_and_pos[f'pos {i+1}'] = heroes[i]
 
-                for i in range(5):
-                    dire_heroes_and_pos[f'pos {i+1}'] = heroes[i+5]
+        for i in range(5):
+            dire_heroes_and_pos[f'pos {i+1}'] = heroes[i+5]
 
-                return radiant_heroes_and_pos, dire_heroes_and_pos, radiant_team_name, dire_team_name, url, score
-        else:
-            print('нету live матчей')
+        return radiant_heroes_and_pos, dire_heroes_and_pos
+    else:
+        print('нету live матчей')
 
 
 
@@ -508,6 +500,10 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         all_negative = all(value < 0 for value in values)
         one_negative = sum(1 for value in values if value < 0) == 1
         one_positive = sum(1 for value in values if value > 0) == 1
+        for hero in list(radiant_heroes_and_positions.values()):
+            if hero in game_changer_list:
+                output_message += f'Аккуратно! У {radiant_team_name} есть {hero}, который может изменить исход боя\n'
+                check = True
         for hero in list(dire_heroes_and_positions.values()):
             if hero in game_changer_list:
                 output_message += f'Аккуратно! У {dire_team_name} есть {hero}, который может изменить исход боя\n'
@@ -558,10 +554,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             output_message += f'{radiant_heroes_and_positions["pos 4"]} pos 4 with {radiant_heroes_and_positions["pos 5"]} pos 5 Нету на dota2protracker\n'
         if dire_pos4_with_pos5 is None:
             output_message += f'{dire_heroes_and_positions["pos 4"]} pos 4 with {dire_heroes_and_positions["pos 5"]} pos 5 Нету на dota2protracker\n'
-    for hero in list(radiant_heroes_and_positions.values()):
-        if hero in game_changer_list:
-            output_message+=f'Аккуратно! У {radiant_team_name} есть {hero}, который может изменить исход боя\n'
-    output_message += '\n'
+
 
     if only_good_bets == True:
         if 'ПЛОХАЯ СТАВКА!!!' not in output_message:

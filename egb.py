@@ -42,7 +42,7 @@ def get_players(bet):
                 print(f'{player} не найден')
                 send_message(f'{player} не найден')
         else:
-            print(f'{player} is blacklisted')
+            print(f'{player} is blacklisted ')
     return players_ids, dire_and_radiant
 
 

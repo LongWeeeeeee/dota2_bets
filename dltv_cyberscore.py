@@ -286,7 +286,7 @@ def send_message(message):
     requests.post(url, json=payload)
 
 
-def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, antiplagiat_url=None, score=[0,0], core_matchup=None, output_message='', only_good_bets=None):
+def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, antiplagiat_url=None, score=[0,0], core_matchup=None, output_message='', only_good_bets=None, only_best_bets=None):
     print('dota2protracker')
     radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team, radiant_pos4_with_pos5, dire_pos4_with_pos5 = [], [], [], [] ,[], [], [], [], [], None, None
     for position in radiant_heroes_and_positions:
@@ -493,7 +493,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     check = False
     values = [sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team, sups]
 
-    if None not in values or sum(1 for value in values if value is None) == 1:
+    if sum(1 for value in values if value is None) < 2:
         for value in values:
             if value is None: values.remove(value)
         all_positive = all(value > 0 for value in values)
@@ -556,7 +556,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             output_message += f'{dire_heroes_and_positions["pos 4"]} pos 4 with {dire_heroes_and_positions["pos 5"]} pos 5 Нету на dota2protracker\n'
 
 
-    if only_good_bets == True:
+    if only_good_bets:
         if 'ОТЛИЧНАЯ СТАВКА' in output_message:
             if len(set(dire_heroes_and_positions.values())) == 5 and len(set(radiant_heroes_and_positions.values())) == 5:
                 send_message(output_message)
@@ -565,7 +565,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         else:
             print(output_message)
     else:
-        send_message(output_message)
+        if not 'ПЛОХАЯ СТАВКА!!!' in output_message:
+            send_message(output_message)
     if antiplagiat_url is not None:
         add_url(antiplagiat_url)
 

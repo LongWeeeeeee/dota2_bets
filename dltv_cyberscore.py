@@ -567,6 +567,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     else:
         if not 'ПЛОХАЯ СТАВКА!!!' in output_message:
             send_message(output_message)
+        else:
+            print(output_message)
     if antiplagiat_url is not None:
         add_url(antiplagiat_url)
 

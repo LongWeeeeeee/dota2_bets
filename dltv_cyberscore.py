@@ -440,20 +440,26 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             positions = ['pos 1', 'pos 2', 'pos 3', 'pos 4', 'pos 5']
             if matchup['num_matches'] > 5 and data_pos in positions:
                 # проверить
-                for pos in positions:
-                    if pos in data_pos and data_hero == dire_heroes_and_positions[pos]:
-                        if tracker_position == 'pos 1' and pos == 'pos 1':
-                            core_matchup = data_wr
-                        radiant_wr_against.append(data_wr)
+                if tracker_position == 'pos 1' and position == 'pos 1' and data_pos == 'pos 1' and data_hero == dire_heroes_and_positions[
+                    position]:
+                    core_matchup = data_wr
                 if position == 'pos 1' and tracker_position == 'pos 1' and data_hero == dire_heroes_and_positions[data_pos]:
                     radiant_pos1_vs_team.append(data_wr)
+                    radiant_wr_against.append(data_wr)
                 if position == 'pos 2' and tracker_position == 'pos 2' and data_hero == dire_heroes_and_positions[data_pos]:
                     radiant_pos2_vs_team.append(data_wr)
+                    radiant_wr_against.append(data_wr)
                 if position == 'pos 3' and tracker_position == 'pos 3' and data_hero == dire_heroes_and_positions[data_pos]:
                     radiant_pos3_vs_team.append(data_wr)
+                    radiant_wr_against.append(data_wr)
+                if position == 'pos 4' and tracker_position == 'pos 4' and data_hero == dire_heroes_and_positions[data_pos]:
+                    radiant_wr_against.append(data_wr)
+                if position == 'pos 5' and tracker_position == 'pos 5' and data_hero == dire_heroes_and_positions[data_pos]:
+                    radiant_wr_against.append(data_wr)
 
                 if 'pos 1' in data_pos and data_hero == dire_heroes_and_positions['pos 1'] and tracker_position == position:
                     dire_pos1_vs_team.append(100-data_wr)
+
                 if 'pos 2' in data_pos and data_hero == dire_heroes_and_positions['pos 2'] and tracker_position == position:
                     dire_pos2_vs_team.append(100-data_wr)
                 if 'pos 3' in data_pos and data_hero == dire_heroes_and_positions['pos 3'] and tracker_position == position:

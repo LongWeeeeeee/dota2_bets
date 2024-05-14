@@ -218,7 +218,10 @@ egb = {
  'sketcher_8':173480718,
  'yatoro':321580662,
  'w33haa':86700461,
+ 'satanic':1044002267,
  'dendi':70388657,
+ 'depressed__kid':858106446,
+ 'iceberg':250114507,
  # '420jenkins'
 
 }

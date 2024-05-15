@@ -498,8 +498,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         core_matchup -= 50
     check = False
     values = [sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team, sups]
-
-    if sum(1 for value in values if value is None) < 2:
+    nones = sum(1 for value in values if value is None)
+    if nones < 2:
         for value in values:
             if value is None: values.remove(value)
         all_positive = all(value > 0 for value in values)
@@ -516,12 +516,18 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                 check = True
         if all_positive or all_negative:
             if not check:
-                output_message += f'ОТЛИЧНАЯ СТАВКА\n'
+                if nones == 0:
+                    output_message += f'ОТЛИЧНАЯ СТАВКА\n'
+                else:
+                    output_message += f'ХОРОШАЯ СТАВКА на 1 ФЛЕТ\n'
             else:
                 output_message += f'ХОРОШАЯ СТАВКА на 1 ФЛЕТ\n'
         elif one_negative or one_positive:
             if not check:
-                output_message += f'ХОРОШАЯ СТАВКА\n'
+                if nones == 0:
+                    output_message += f'ХОРОШАЯ СТАВКА\n'
+                else:
+                    output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
             else:
                 output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
         else:

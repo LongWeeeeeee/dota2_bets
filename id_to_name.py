@@ -222,6 +222,7 @@ egb = {
  'dendi':70388657,
  'depressed__kid':858106446,
  'iceberg':250114507,
+ 'kiyotaka':858106446,
  # '420jenkins'
 
 }

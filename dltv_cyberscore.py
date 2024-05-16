@@ -268,10 +268,17 @@ def clean_up(inp):
 
 
 def str_to_json(input_data):
-    text = input_data.replace(':', '":').replace('#', '').replace('.', '').replace('{', '{"')
+    text = input_data.replace(':', '":').replace('#', '').replace('{', '{"')
     data = re.sub(r",(?=[a-zA-Z])", ',"', text)
+    data = re.sub(r'\.(\d{2})(\d{2})', r'\1.\2', data, flags=re.MULTILINE)
+    data = re.sub(r'\.(\d{2})(\d{1})', r'\1.\2', data, flags=re.MULTILINE)
     data = re.sub(r':0(?=[0-9])', ':', data)
     data = re.sub(r'[\x00-\x1F]+', '', data)
+    def multiply_by_10(match):
+        number = int(match.group(1))
+        output = ':' + str(number * 10) + ','
+        return output
+    data = re.sub(r':\.(\d{1}),', multiply_by_10, data).replace(':.', ':')
     return data
 
 
@@ -307,13 +314,6 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                 data_pos = synergy['other_pos']
                 data_hero = synergy['other_hero']
                 data_wr = synergy['win_rate']
-                if data_wr > 999:
-                    data_wr = data_wr/100
-                elif data_wr > 99 and data_wr < 1000:
-                    data_wr = data_wr/10
-                elif data_wr < 10:
-                    data_wr = data_wr*10
-
                 if synergy['num_matches'] > 5:
                     # Extract the values of 'data-hero', 'data-wr', and 'data-pos' attributes
                     if position == 'pos 1':
@@ -371,12 +371,6 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                 data_pos = synergy['other_pos']
                 data_hero = synergy['other_hero']
                 data_wr = synergy['win_rate']
-                if data_wr > 999:
-                    data_wr = data_wr/100
-                elif data_wr > 99 and data_wr < 1000:
-                    data_wr = data_wr/10
-                elif data_wr < 10:
-                    data_wr = data_wr*10
                 if synergy['num_matches'] > 5:
                     if position == 'pos 1':
                         if 'pos 2' in data_pos and data_hero == dire_heroes_and_positions['pos 2'] and tracker_position == position:
@@ -431,12 +425,6 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             data_pos = matchup['other_pos']
             data_hero = matchup['other_hero']
             data_wr = matchup['win_rate']
-            if data_wr > 999:
-                data_wr = data_wr / 100
-            elif data_wr > 99 and data_wr < 1000:
-                data_wr = data_wr / 10
-            elif data_wr < 10:
-                data_wr = data_wr*10
             positions = ['pos 1', 'pos 2', 'pos 3', 'pos 4', 'pos 5']
             if matchup['num_matches'] > 5 and data_pos in positions:
                 # проверить

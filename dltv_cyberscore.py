@@ -487,7 +487,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     check = False
     values = [sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team, sups]
     nones = sum(1 for value in values if value is None)
-    if nones < 2:
+    if nones <= 2:
         for value in values:
             if value is None: values.remove(value)
         all_positive = all(value > 0 for value in values)
@@ -557,7 +557,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
 
 
     if only_good_bets:
-        if 'ОТЛИЧНАЯ СТАВКА' in output_message:
+        if 'ОТЛИЧНАЯ СТАВКА' in output_message or 'ХОРОШАЯ СТАВКА' in output_message:
             if len(set(dire_heroes_and_positions.values())) == 5 and len(set(radiant_heroes_and_positions.values())) == 5:
                 send_message(output_message)
             else:

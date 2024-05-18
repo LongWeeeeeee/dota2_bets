@@ -23,3 +23,10 @@ while True:
     except: pass
     print('Сплю 2 минуты')
     time.sleep(120)
+# url = 'https://cyberscore.live/en/matches/95956/'
+# result = get_team_positions(url)
+# if result is not None:
+#     radiant_heroes_and_pos, dire_heroes_and_pos = result
+#     dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos,
+#                                         dire_heroes_and_positions=dire_heroes_and_pos, radiant_team_name='Aurora',
+#                                         dire_team_name='Shopify', antiplagiat_url=url)

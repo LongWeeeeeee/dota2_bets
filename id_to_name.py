@@ -231,6 +231,7 @@ egb = {
  'rodjer':159020918,
  'poshliy_vladik':148612029,
  'jabz':100471531,
+ 'lelis':87063175,
  # '420jenkins'
 
 }

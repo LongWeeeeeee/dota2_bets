@@ -279,6 +279,7 @@ def str_to_json(input_data):
         output = ':' + str(number * 10) + ','
         return output
     data = re.sub(r':\.(\d{1}),', multiply_by_10, data).replace(':.', ':')
+    data = re.sub(r':(0)([0-9])', r':\2', data, flags=re.MULTILINE)
     return data
 
 

@@ -198,13 +198,14 @@ def get_map_id(match):
         radiant_team_name = match['team_radiant']['name'].lower()
         dire_team_name = match['team_dire']['name'].lower()
         score = match['best_of_score']
+        tier = match['tournament']['tier']
         for karta in match['related_matches']:
             if karta['status'] == 'online':
                 map_id = karta['id']
                 url = f'https://cyberscore.live/en/matches/{map_id}/'
                 result = if_unique(url)
                 if result is not None:
-                    return url, radiant_team_name, dire_team_name, score
+                    return url, radiant_team_name, dire_team_name, score, tier
 
 
 def if_unique(url):
@@ -294,7 +295,7 @@ def send_message(message):
     requests.post(url, json=payload)
 
 
-def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, antiplagiat_url=None, score=[0,0], core_matchup=None, output_message='', only_good_bets=None, only_best_bets=None):
+def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, tier, antiplagiat_url=None, score=[0,0], core_matchup=None, output_message='', only_good_bets=None, only_best_bets=None):
     print('dota2protracker')
     radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team, radiant_pos4_with_pos5, dire_pos4_with_pos5 = [], [], [], [] ,[], [], [], [], [], None, None
     for position in radiant_heroes_and_positions:
@@ -567,7 +568,11 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             print(output_message)
     else:
         if not 'ПЛОХАЯ СТАВКА!!!' in output_message:
-            send_message(output_message)
+            if 2 not in tier:
+                send_message(output_message)
+            else:
+                if not 'НОРМ СТАВКА на 1 ФЛЕТ' in output_message:
+                    send_message(output_message)
         else:
             print(output_message)
     if antiplagiat_url is not None:

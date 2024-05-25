@@ -1,6 +1,7 @@
 game_changer_list = [
     'Faceless Void',
     'Enigma',
+    'Elder Titan',
     'Phoenix',
     'Disruptor',
     'Bane',

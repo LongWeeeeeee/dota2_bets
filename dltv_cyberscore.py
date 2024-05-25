@@ -568,7 +568,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             print(output_message)
     else:
         if not 'ПЛОХАЯ СТАВКА!!!' in output_message:
-            if 2 not in tier:
+            if tier != 2:
                 send_message(output_message)
             else:
                 if not 'НОРМ СТАВКА на 1 ФЛЕТ' in output_message:

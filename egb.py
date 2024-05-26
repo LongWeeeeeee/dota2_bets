@@ -33,16 +33,23 @@ def get_players(bet):
     dire_and_radiant['dire'] = players[1]
     print(bet['game_label'])
     players_ids = []
-    for player in player_names:
-        if player not in id_to_name.blacklist_players:
-            if player in id_to_name.egb and player:
-
-                    players_ids.append(id_to_name.egb[player])
+    if len(player_names) == 2:
+        if player_names[0] not in id_to_name.blacklist_players and player_names[1] not in id_to_name.blacklist_players:
+            if player_names[0] in id_to_name.egb or player_names[1] in id_to_name.egb:
+                if player_names[0] in id_to_name.egb:
+                    players_ids.append(id_to_name.egb[player_names[0]])
+                elif player_names[1] in id_to_name.egb:
+                    players_ids.append(id_to_name.egb[player_names[1]])
             else:
-                print(f'{player} не найден')
-                send_message(f'{player} не найден')
-        else:
-            print(f'{player} is blacklisted ')
+                print(f'{player_names[0]} и {player_names[1]} не найдны')
+                send_message(f'{player_names[0]} и {player_names[1]} не найдны')
+    elif len(player_names) == 1:
+        if player_names[0] not in id_to_name.blacklist_players:
+            if player_names[0] in id_to_name.egb:
+                players_ids.append(id_to_name.egb[player_names[0]])
+            else:
+                print(f'{player_names[0]} не найден')
+                send_message(f'{player_names[0]} не найден')
     return players_ids, dire_and_radiant
 
 

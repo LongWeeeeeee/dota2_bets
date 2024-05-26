@@ -257,15 +257,18 @@ def if_picks_are_done(soup):
             return True
 
 
-def clean_up(inp):
-    copy = inp.copy()
-    for i in inp:
-        if i >45 and i <55:
-            copy.remove(i)
-    if len(copy) == 0:
-        return inp
+def clean_up(inp, lenght=0):
+    if len(inp) >= lenght:
+        copy = inp.copy()
+        for i in inp:
+            if i >45 and i <55:
+                copy.remove(i)
+        if len(copy) == 0:
+            return inp
+        else:
+            return copy
     else:
-        return copy
+        return []
 
 
 def str_to_json(input_data):
@@ -460,9 +463,9 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         sups = radiant_pos4_with_pos5 - dire_pos4_with_pos5
     else:
         sups = None
-    dire_wr_with = clean_up(dire_wr_with)
-    radiant_wr_with = clean_up(radiant_wr_with)
-    radiant_wr_against = clean_up(radiant_wr_against)
+    dire_wr_with = clean_up(dire_wr_with, 5)
+    radiant_wr_with = clean_up(radiant_wr_with, 5)
+    radiant_wr_against = clean_up(radiant_wr_against, 6)
     radiant_pos1_vs_team = clean_up(radiant_pos1_vs_team)
     dire_pos1_vs_team = clean_up(dire_pos1_vs_team)
     radiant_pos2_vs_team = clean_up(radiant_pos2_vs_team)

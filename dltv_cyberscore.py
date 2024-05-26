@@ -493,8 +493,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     values = [sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team, sups]
     nones = sum(1 for value in values if value is None)
     if nones <= 2:
-        for value in values:
-            if value is None: values.remove(value)
+        for i in range(nones):
+            values.remove(None)
         all_positive = all(value > 0 for value in values)
         all_negative = all(value < 0 for value in values)
         one_negative = sum(1 for value in values if value < 0) == 1

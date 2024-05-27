@@ -512,9 +512,12 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                 if nones == 0:
                     output_message += f'ОТЛИЧНАЯ СТАВКА\n'
                 else:
-                    output_message += f'ХОРОШАЯ СТАВКА на 1 ФЛЕТ\n'
+                    output_message += f'ХОРОШАЯ СТАВКА\n'
             else:
-                output_message += f'ХОРОШАЯ СТАВКА на 1 ФЛЕТ\n'
+                if nones == 0:
+                    output_message += f'ХОРОШАЯ СТАВКА\n'
+                else:
+                    output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
         elif one_negative or one_positive:
             if not check:
                 if nones == 0:
@@ -576,6 +579,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             else:
                 if not 'НОРМ СТАВКА на 1 ФЛЕТ' in output_message:
                     send_message(output_message)
+                else:
+                    print(output_message)
         else:
             print(output_message)
     if antiplagiat_url is not None:

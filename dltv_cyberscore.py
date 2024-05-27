@@ -198,7 +198,10 @@ def get_map_id(match):
         radiant_team_name = match['team_radiant']['name'].lower()
         dire_team_name = match['team_dire']['name'].lower()
         score = match['best_of_score']
-        tier = match['tournament']['tier']
+        if 'FISSURE' in match['tournament']['name']:
+            tier = 1
+        else:
+            tier = match['tournament']['tier']
         for karta in match['related_matches']:
             if karta['status'] == 'online':
                 map_id = karta['id']

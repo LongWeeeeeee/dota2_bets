@@ -28,7 +28,7 @@ headers = {
 def get_players(bet):
     dire_and_radiant = {}
     players = [player for player in bet['game_label'].lower().replace(' team', '').split(' vs ')]
-    player_names = [player for player in players if 'enemy' not in player]
+    player_names = [player.replace("'s", '') for player in players if 'enemy' not in player]
     dire_and_radiant['radiant'] = players[0]
     dire_and_radiant['dire'] = players[1]
     print(bet['game_label'])

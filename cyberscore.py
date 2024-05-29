@@ -19,12 +19,14 @@ while True:
                     dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos,
                                     dire_heroes_and_positions=dire_heroes_and_pos, radiant_team_name=radiant_team_name,
                                     dire_team_name=dire_team_name, score=score, antiplagiat_url=url, tier=tier)
+    else:
+        print(response.status_code)
     print('Сплю 2 минуты')
     time.sleep(120)
-# url = 'https://cyberscore.live/en/matches/96458/'
+# url = 'https://cyberscore.live/en/matches/96808/'
 # result = get_team_positions(url)
 # if result is not None:
 #     radiant_heroes_and_pos, dire_heroes_and_pos = result
 #     dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos,
 #                                         dire_heroes_and_positions=dire_heroes_and_pos, radiant_team_name='Aurora',
-#                                         dire_team_name='Shopify', antiplagiat_url=url)
+#                                         dire_team_name='Shopify', antiplagiat_url=url, tier=1)

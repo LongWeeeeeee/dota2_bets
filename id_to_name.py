@@ -235,6 +235,9 @@ egb = {
  'topson':94054712,
  'azimovdota':1159912962,
  '420jenkins':95145869,
+ 'smilling knight':155162307,
+ 'boxi':77490514,
+ 'mira':256156323,
 
 }
 blacklist_players = {

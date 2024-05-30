@@ -194,11 +194,11 @@ def are_similar(s1, s2, threshold=70):
 
 
 def get_map_id(match):
-    if match['tournament']['tier'] in [1, 2] and match['team_dire'] is not None and match['team_radiant'] is not None and 'Kobold' not in match['tournament']['name']:
+    if match['tournament']['tier'] in [1, 2, 3] and match['team_dire'] is not None and match['team_radiant'] is not None and 'Kobold' not in match['tournament']['name']:
         radiant_team_name = match['team_radiant']['name'].lower()
         dire_team_name = match['team_dire']['name'].lower()
         score = match['best_of_score']
-        if 'FISSURE' in match['tournament']['name']:
+        if 'FISSURE' in match['tournament']['name'] or 'Riyadh' in match['tournament']['name']:
             tier = 1
         else:
             tier = match['tournament']['tier']

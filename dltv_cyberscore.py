@@ -194,7 +194,7 @@ def are_similar(s1, s2, threshold=70):
 
 
 def get_map_id(match):
-    if match['tournament']['tier'] in [1, 2, 3] and match['team_dire'] is not None and match['team_radiant'] is not None and 'Kobold' not in match['tournament']['name']:
+    if match['team_dire'] is not None and match['team_radiant'] is not None and 'Kobold' not in match['tournament']['name']:
         radiant_team_name = match['team_radiant']['name'].lower()
         dire_team_name = match['team_dire']['name'].lower()
         score = match['best_of_score']
@@ -202,13 +202,14 @@ def get_map_id(match):
             tier = 1
         else:
             tier = match['tournament']['tier']
-        for karta in match['related_matches']:
-            if karta['status'] == 'online':
-                map_id = karta['id']
-                url = f'https://cyberscore.live/en/matches/{map_id}/'
-                result = if_unique(url)
-                if result is not None:
-                    return url, radiant_team_name, dire_team_name, score, tier
+        if tier in [1, 2]:
+            for karta in match['related_matches']:
+                if karta['status'] == 'online':
+                    map_id = karta['id']
+                    url = f'https://cyberscore.live/en/matches/{map_id}/'
+                    result = if_unique(url)
+                    if result is not None:
+                        return url, radiant_team_name, dire_team_name, score, tier
 
 
 def if_unique(url):

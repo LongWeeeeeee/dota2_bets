@@ -495,6 +495,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         core_matchup -= 50
     check = False
     values = [sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team, sups]
+    other_values = [sinergy, counterpick, core_matchup, sups]
     nones = sum(1 for value in values if value is None)
     if nones <= 2:
         for i in range(nones):
@@ -503,6 +504,9 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         all_negative = all(value < 0 for value in values)
         one_negative = sum(1 for value in values if value < 0) == 1
         one_positive = sum(1 for value in values if value > 0) == 1
+        other_values_check = None
+        if None not in other_values:
+            other_values_check = sum(1 for value in values if value > 0) - sum(1 for value in values if value < 0)
         if counterpick is not None and sinergy is not None:
             singery_or_counterpick = sum(1 for value in [counterpick, sinergy] if value < 0) + sum(-1 for value in [counterpick, sinergy] if value > 0)
             over10=(sum(1 for value in [counterpick, sinergy] if value < -10) + sum(
@@ -528,7 +532,6 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                     output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
         elif counterpick is not None and sinergy is not None and singery_or_counterpick in [2, -2] and over10 > 0:
             output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
-
         elif one_negative or one_positive:
             if not check:
                 if nones == 0:
@@ -537,6 +540,10 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                     output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
             else:
                 output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
+        elif other_values_check is not None:
+            if other_values_check in [4, -4]:
+                output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
+
         else:
             output_message += f'ПЛОХАЯ СТАВКА!!!\n'
     else:

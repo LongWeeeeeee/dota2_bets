@@ -540,9 +540,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                     output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
             else:
                 output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
-        elif other_values_check is not None:
-            if other_values_check in [4, -4]:
-                output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
+        elif other_values_check is not None and other_values_check in [4, -4]:
+            output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
 
         else:
             output_message += f'ПЛОХАЯ СТАВКА!!!\n'

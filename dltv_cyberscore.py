@@ -500,13 +500,13 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     if nones <= 2:
         for i in range(nones):
             values.remove(None)
-        all_positive = all(value > 0 for value in values)
-        all_negative = all(value < 0 for value in values)
-        one_negative = sum(1 for value in values if value < 0) == 1
-        one_positive = sum(1 for value in values if value > 0) == 1
+        all_positive = all(value >= 0 for value in values)
+        all_negative = all(value <= 0 for value in values)
+        one_negative = sum(1 for value in values if value <= 0) == 1
+        one_positive = sum(1 for value in values if value >= 0) == 1
         other_values_check = None
         if None not in other_values:
-            other_values_check = sum(1 for value in values if value > 0) - sum(1 for value in values if value < 0)
+            other_values_check = sum(1 for value in values if value >= 0) - sum(1 for value in values if value <= 0)
         if counterpick is not None and sinergy is not None:
             singery_or_counterpick = sum(1 for value in [counterpick, sinergy] if value < 0) + sum(-1 for value in [counterpick, sinergy] if value > 0)
             over10=(sum(1 for value in [counterpick, sinergy] if value < -10) + sum(
@@ -530,19 +530,25 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                     output_message += f'ХОРОШАЯ СТАВКА\n'
                 else:
                     output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
-        elif counterpick is not None and sinergy is not None and singery_or_counterpick in [2, -2] and over10 > 0:
-            output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
-        elif one_negative or one_positive:
-            if not check:
-                if nones == 0:
-                    output_message += f'ХОРОШАЯ СТАВКА\n'
-                else:
-                    output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
+
+        # elif one_negative or one_positive:
+        #     if not check:
+        #         if nones == 0:
+        #             output_message += f'ХОРОШАЯ СТАВКА\n'
+        #         else:
+        #             output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
+        #     else:
+        #         output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
+        elif other_values_check is not None and other_values_check in [4, -4]:
+            if nones == 0:
+                output_message += f'ХОРОШАЯ СТАВКА\n'
             else:
                 output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
-        elif other_values_check is not None and other_values_check in [4, -4]:
-            output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
-
+        elif counterpick is not None and sinergy is not None and singery_or_counterpick in [2, -2]:
+            if over10 > 0:
+                output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
+            else:
+                output_message += f'СОМНИТЕЛЬНАЯ СТАВКА, ТОЛЬКО НА ФАВОРИТА'
         else:
             output_message += f'ПЛОХАЯ СТАВКА!!!\n'
     else:

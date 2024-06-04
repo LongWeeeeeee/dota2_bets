@@ -523,6 +523,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             if not check:
                 if nones == 0:
                     output_message += f'ОТЛИЧНАЯ СТАВКА\n'
+                    output_message += f'МОЖНО ПОСТАВИТЬ НА ТМ ИЛИ ВМ'
                 else:
                     output_message += f'ХОРОШАЯ СТАВКА\n'
             else:
@@ -544,12 +545,18 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                 output_message += f'ХОРОШАЯ СТАВКА\n'
             else:
                 output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
+            if not check:
+                output_message += f'МОЖНО ПОСТАВИТЬ НА ТМ ИЛИ ВМ'
         elif counterpick is not None and sinergy is not None and singery_or_counterpick in [2, -2]:
             if over10 > 0:
                 output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
             else:
-                output_message += f'СОМНИТЕЛЬНАЯ СТАВКА, ТОЛЬКО НА ФАВОРИТА'
+                output_message += f'СОМНИТЕЛЬНАЯ СТАВКА, ТОЛЬКО НА ФАВОРИТА\n'
+            if not check:
+                output_message += f'МОЖНО ПОСТАВИТЬ НА ТМ ИЛИ ВМ'
         else:
+            if not check:
+                output_message += f'МОЖНО ПОСТАВИТЬ НА ТМ ИЛИ ВМ'
             output_message += f'ПЛОХАЯ СТАВКА!!!\n'
     else:
         output_message += f'ПЛОХАЯ СТАВКА!!!\n'

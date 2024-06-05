@@ -557,6 +557,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         else:
             if not check:
                 output_message += f'МОЖНО ПОСТАВИТЬ НА ТМ ИЛИ ВМ'
+            else:
+                output_message += f'МОЖНО ПОСТАВИТЬ НА ТБ'
             output_message += f'ПЛОХАЯ СТАВКА!!!\n'
     else:
         output_message += f'ПЛОХАЯ СТАВКА!!!\n'

@@ -1,28 +1,22 @@
 game_changer_list = [
-    'Leshrack'
+    'Leshrac'
     'Faceless Void',
     'Enigma',
     'Elder Titan',
     'Phoenix',
     'Disruptor',
     'Bane',
-    'Alchemist'
-    'Tinker',
     'Doom',
-    'Ancient Apparation',
     'Magnus',
     'Bristleback',
     'Winter Wyvern'
     'Doom',
-    'Lone Druid',
+    'Tidehunter'
     'Tusk',
-    'Arc Warden',
     'Ancient Apparition'
     'Phantom Lancer',
     'Axe',
     'Storm Spirit',
-    'Tinker',
-    'Huskar',
     'Earthshaker']
 translate = {
  1: "Anti-Mage",
@@ -325,6 +319,7 @@ egb = {
  'layme':368917218,
 'reira':208407289,
 'gpk':480412663,
+ 'illidan':26316691,
  'hellscream':241884166,
 'saksa':103735745,
  're1bl':439345730,

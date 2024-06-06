@@ -377,25 +377,29 @@ def get_picks_and_pos(match_id):
             return radiant, dire, match_id
         else:
             print(f'пики не полные\n{radiant}\n{dire}')
+    else:
+        print('карта уже расчитана')
 
 
 while True:
-    importlib.reload(id_to_name)
-    response = requests.get(url, params=params, headers=headers)
-    if response.status_code == 200:
-        data = json.loads(response.text)
-        for bet in data['bets']:
-            if bet['esports'] and bet['streams_enabled'] and bet['game'] == 'Dota 2' and bet['tourn'] in ['Incubator','Ladder Games']:
-                players_ids, dire_and_radiant = get_players(bet)
-                response = get_strats_graph_match()
-                exac_match = get_exac_match(response, players_ids)
-                if exac_match is not None:
-                    answer = get_picks_and_pos(match_id=exac_match['matchId'])
-                    if answer is not None:
-                        radiant, dire, match_id = answer
-                        dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id, tier=2)
-                else:
-                    print('карта не найдена, вероятно, матч только начался')
+    try:
+        importlib.reload(id_to_name)
+        response = requests.get(url, params=params, headers=headers)
+        if response.status_code == 200:
+            data = json.loads(response.text)
+            for bet in data['bets']:
+                if bet['esports'] and bet['streams_enabled'] and bet['game'] == 'Dota 2' and bet['tourn'] in ['Incubator','Ladder Games']:
+                    players_ids, dire_and_radiant = get_players(bet)
+                    response = get_strats_graph_match()
+                    exac_match = get_exac_match(response, players_ids)
+                    if exac_match is not None:
+                        answer = get_picks_and_pos(match_id=exac_match['matchId'])
+                        if answer is not None:
+                            radiant, dire, match_id = answer
+                            dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id, tier=2)
+                    else:
+                        print('карта не найдена, вероятно, матч только начался')
+    except: pass
     print('сплю 3 минуты')
     time.sleep(160)
 # answer = get_picks_and_pos(match_id=exac_match['matchId'])

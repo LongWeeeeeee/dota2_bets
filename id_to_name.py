@@ -269,6 +269,8 @@ pro_players = {
 egb = {
  'quinn' : 221666230,
  'antoha' : 178692606,
+    'cooman':175463659,
+    
  'resolut1on' : 86725175,
  'sonneiko' : 369342470,
  'monkeys-forever' : 86811043,

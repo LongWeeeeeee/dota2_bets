@@ -531,15 +531,6 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                     output_message += f'ХОРОШАЯ СТАВКА\n'
                 else:
                     output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
-
-        # elif one_negative or one_positive:
-        #     if not check:
-        #         if nones == 0:
-        #             output_message += f'ХОРОШАЯ СТАВКА\n'
-        #         else:
-        #             output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
-        #     else:
-        #         output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
         elif other_values_check is not None and other_values_check in [4, -4]:
             if nones == 0:
                 output_message += f'ХОРОШАЯ СТАВКА\n'
@@ -596,24 +587,14 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             output_message += f'{dire_heroes_and_positions["pos 4"]} pos 4 with {dire_heroes_and_positions["pos 5"]} pos 5 Нету на dota2protracker\n'
 
 
-    if only_good_bets:
-        if 'ОТЛИЧНАЯ СТАВКА' in output_message or 'ХОРОШАЯ СТАВКА' in output_message:
-            if len(set(dire_heroes_and_positions.values())) == 5 and len(set(radiant_heroes_and_positions.values())) == 5:
-                send_message(output_message)
-            else:
-                send_message(f'Ошибка пиков https://stratz.com/matches/{antiplagiat_url} ')
+    if tier != 1:
+        if 'ОТЛИЧНАЯ СТАВКА' in output_message or 'ХОРОШАЯ СТАВКА' in output_message or 'НОРМ СТАВКА на 1 ФЛЕТ' in output_message:
+            send_message(output_message)
         else:
             print(output_message)
     else:
         if not 'ПЛОХАЯ СТАВКА!!!' in output_message:
-            if tier != 2:
-                send_message(output_message)
-            else:
-                if not 'НОРМ СТАВКА на 1 ФЛЕТ' in output_message:
-                    send_message(output_message)
-                else:
-                    print(output_message)
-        else:
+            send_message(output_message)
             print(output_message)
     if antiplagiat_url is not None:
         add_url(antiplagiat_url)

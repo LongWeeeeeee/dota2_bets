@@ -187,7 +187,7 @@ def get_picks_and_pos(match_id):
                     dire_mid.append(player)
         if len(radiant_safe) == 2:
             for i in range(len(radiant_safe[0]['playbackData']['goldEvents'])):
-                if radiant_safe[0]['playbackData']['goldEvents'][i]['time'] >= 140 and radiant_safe[0]['playbackData']['goldEvents'][i]['time'] <= 220:
+                if radiant_safe[0]['playbackData']['goldEvents'][i]['time'] >= 60 and radiant_safe[0]['playbackData']['goldEvents'][i]['time'] <= 220:
                     index = i
                     break
             if radiant_safe[0]['playbackData']['goldEvents'][index]['networth'] > radiant_safe[1]['playbackData']['goldEvents'][index]['networth']:
@@ -198,7 +198,7 @@ def get_picks_and_pos(match_id):
                 radiant['pos 5'] = id_to_name.translate[radiant_safe[0]['heroId']]
         if len(radiant_hard) == 2:
             for i in range(len(radiant_hard[0]['playbackData']['goldEvents'])):
-                if radiant_hard[0]['playbackData']['goldEvents'][i]['time'] >= 140 and radiant_hard[0]['playbackData']['goldEvents'][i]['time'] <= 220:
+                if radiant_hard[0]['playbackData']['goldEvents'][i]['time'] >= 60 and radiant_hard[0]['playbackData']['goldEvents'][i]['time'] <= 220:
                     index = i
                     break
             if radiant_hard[0]['playbackData']['goldEvents'][index]['networth'] > radiant_hard[1]['playbackData']['goldEvents'][index]['networth']:
@@ -209,7 +209,7 @@ def get_picks_and_pos(match_id):
                 radiant['pos 4'] = id_to_name.translate[radiant_hard[0]['heroId']]
         if len(dire_safe) == 2:
             for i in range(len(dire_safe[0]['playbackData']['goldEvents'])):
-                if dire_safe[0]['playbackData']['goldEvents'][i]['time'] >= 140 and dire_safe[0]['playbackData']['goldEvents'][i]['time'] <= 220:
+                if dire_safe[0]['playbackData']['goldEvents'][i]['time'] >= 60 and dire_safe[0]['playbackData']['goldEvents'][i]['time'] <= 220:
                     index = i
                     break
             if dire_safe[0]['playbackData']['goldEvents'][index]['networth'] > dire_safe[1]['playbackData']['goldEvents'][index]['networth']:
@@ -220,7 +220,7 @@ def get_picks_and_pos(match_id):
                 dire['pos 5'] = id_to_name.translate[dire_safe[0]['heroId']]
         if len(dire_hard) == 2:
             for i in range(len(dire_hard[0]['playbackData']['goldEvents'])):
-                if dire_hard[0]['playbackData']['goldEvents'][i]['time'] >= 140 and dire_hard[0]['playbackData']['goldEvents'][i]['time'] <= 220:
+                if dire_hard[0]['playbackData']['goldEvents'][i]['time'] >= 60 and dire_hard[0]['playbackData']['goldEvents'][i]['time'] <= 220:
                     index = i
                     break
             if dire_hard[0]['playbackData']['goldEvents'][index]['networth'] > dire_hard[1]['playbackData']['goldEvents'][index]['networth']:
@@ -231,9 +231,9 @@ def get_picks_and_pos(match_id):
                 dire['pos 4'] = id_to_name.translate[dire_hard[0]['heroId']]
         if len(radiant_mid) == 1:
             radiant['pos 2'] = id_to_name.translate[radiant_mid[0]['heroId']]
-        else:
+        elif len(radiant_mid) == 2:
             for i in range(len(radiant_mid[0]['playbackData']['goldEvents'])):
-                if radiant_mid[0]['playbackData']['goldEvents'][i]['time'] >= 140 and radiant_mid[0]['playbackData']['goldEvents'][i]['time'] <= 220:
+                if radiant_mid[0]['playbackData']['goldEvents'][i]['time'] >= 60 and radiant_mid[0]['playbackData']['goldEvents'][i]['time'] <= 220:
                     index = i
                     break
             if radiant_mid[0]['playbackData']['goldEvents'][index]['networth'] > radiant_mid[1]['playbackData']['goldEvents'][index]['networth']:
@@ -244,9 +244,9 @@ def get_picks_and_pos(match_id):
                 heroes_left.append(radiant_mid[0])
         if len(dire_mid) == 1:
             dire['pos 2'] = id_to_name.translate[dire_mid[0]['heroId']]
-        else:
+        elif len(dire_mid) == 2:
             for i in range(len(dire_mid[0]['playbackData']['goldEvents'])):
-                if dire_mid[0]['playbackData']['goldEvents'][i]['time'] >= 140 and dire_mid[0]['playbackData']['goldEvents'][i]['time'] <= 220:
+                if dire_mid[0]['playbackData']['goldEvents'][i]['time'] >= 60 and dire_mid[0]['playbackData']['goldEvents'][i]['time'] <= 220:
                     index = i
                     break
             if dire_mid[0]['playbackData']['goldEvents'][index]['networth'] > dire_mid[1]['playbackData']['goldEvents'][index]['networth']:
@@ -273,7 +273,7 @@ def get_picks_and_pos(match_id):
                     dire_mid.append(player)
         if len(radiant_safe) == 2:
             for i in range(len(radiant_safe[0]['playbackData']['goldEvents'])):
-                if radiant_safe[0]['playbackData']['goldEvents'][i]['time'] >= 140 and \
+                if radiant_safe[0]['playbackData']['goldEvents'][i]['time'] >= 60 and \
                         radiant_safe[0]['playbackData']['goldEvents'][i]['time'] <= 220:
                     index = i
                     break
@@ -286,7 +286,7 @@ def get_picks_and_pos(match_id):
                 radiant['pos 5'] = id_to_name.translate[radiant_safe[0]['heroId']]
         if len(radiant_hard) == 2:
             for i in range(len(radiant_hard[0]['playbackData']['goldEvents'])):
-                if radiant_hard[0]['playbackData']['goldEvents'][i]['time'] >= 140 and \
+                if radiant_hard[0]['playbackData']['goldEvents'][i]['time'] >= 60 and \
                         radiant_hard[0]['playbackData']['goldEvents'][i]['time'] <= 220:
                     index = i
                     break
@@ -299,7 +299,7 @@ def get_picks_and_pos(match_id):
                 radiant['pos 4'] = id_to_name.translate[radiant_hard[0]['heroId']]
         if len(dire_safe) == 2:
             for i in range(len(dire_safe[0]['playbackData']['goldEvents'])):
-                if dire_safe[0]['playbackData']['goldEvents'][i]['time'] >= 140 and \
+                if dire_safe[0]['playbackData']['goldEvents'][i]['time'] >= 60 and \
                         dire_safe[0]['playbackData']['goldEvents'][i]['time'] <= 220:
                     index = i
                     break
@@ -312,7 +312,7 @@ def get_picks_and_pos(match_id):
                 dire['pos 5'] = id_to_name.translate[dire_safe[0]['heroId']]
         if len(dire_hard) == 2:
             for i in range(len(dire_hard[0]['playbackData']['goldEvents'])):
-                if dire_hard[0]['playbackData']['goldEvents'][i]['time'] >= 140 and \
+                if dire_hard[0]['playbackData']['goldEvents'][i]['time'] >= 60 and \
                         dire_hard[0]['playbackData']['goldEvents'][i]['time'] <= 220:
                     index = i
                     break
@@ -327,7 +327,7 @@ def get_picks_and_pos(match_id):
             radiant['pos 2'] = id_to_name.translate[radiant_mid[0]['heroId']]
         else:
             for i in range(len(radiant_mid[0]['playbackData']['goldEvents'])):
-                if radiant_mid[0]['playbackData']['goldEvents'][i]['time'] >= 140 and \
+                if radiant_mid[0]['playbackData']['goldEvents'][i]['time'] >= 60 and \
                         radiant_mid[0]['playbackData']['goldEvents'][i]['time'] <= 220:
                     index = i
                     break
@@ -342,7 +342,7 @@ def get_picks_and_pos(match_id):
             dire['pos 2'] = id_to_name.translate[dire_mid[0]['heroId']]
         else:
             for i in range(len(dire_mid[0]['playbackData']['goldEvents'])):
-                if dire_mid[0]['playbackData']['goldEvents'][i]['time'] >= 140 and \
+                if dire_mid[0]['playbackData']['goldEvents'][i]['time'] >= 60 and \
                         dire_mid[0]['playbackData']['goldEvents'][i]['time'] <= 220:
                     index = i
                     break
@@ -380,24 +380,23 @@ def get_picks_and_pos(match_id):
 
 
 while True:
-    try:
-        importlib.reload(id_to_name)
-        response = requests.get(url, params=params, headers=headers)
-        if response.status_code == 200:
-            data = json.loads(response.text)
-            for bet in data['bets']:
-                if bet['esports'] and bet['streams_enabled'] and bet['game'] == 'Dota 2' and bet['tourn'] in ['Incubator','Ladder Games']:
-                    players_ids, dire_and_radiant = get_players(bet)
-                    response = get_strats_graph_match()
-                    exac_match = get_exac_match(response, players_ids)
-                    if exac_match is not None:
-                        answer = get_picks_and_pos(match_id=exac_match['matchId'])
-                        if answer is not None:
-                            radiant, dire, match_id = answer
-                            dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id, tier=2)
-                    else:
-                        print('карта не найдена, вероятно, матч только начался')
-    except: pass
+    importlib.reload(id_to_name)
+    response = requests.get(url, params=params, headers=headers)
+    if response.status_code == 200:
+        data = json.loads(response.text)
+        for bet in data['bets']:
+            if bet['esports'] and bet['streams_enabled'] and bet['game'] == 'Dota 2' and bet['tourn'] in ['Incubator','Ladder Games']:
+                players_ids, dire_and_radiant = get_players(bet)
+                response = get_strats_graph_match()
+                exac_match = get_exac_match(response, players_ids)
+                if exac_match is not None:
+                    answer = get_picks_and_pos(match_id=exac_match['matchId'])
+                    if answer is not None:
+                        radiant, dire, match_id = answer
+                        print(f'Radint pick: {radiant}\nDire pick: {dire}')
+                        dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id, tier=2)
+                else:
+                    print('карта не найдена, вероятно, матч только начался')
     print('сплю 3 минуты')
     time.sleep(160)
 # answer = get_picks_and_pos(match_id=exac_match['matchId'])

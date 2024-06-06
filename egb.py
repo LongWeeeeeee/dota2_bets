@@ -129,7 +129,7 @@ def find_index(players):
     for player in players:
         coordinates = player['playbackData']['positionEvents']
         for time in coordinates:
-            if time['time'] / 60 > 2 and time['time'] / 60 < 8:
+            if time['time'] / 60 > 0.30 and time['time'] / 60 < 2:
                 index = coordinates.index(time)
                 print(time['time'] / 60)
                 return index
@@ -142,10 +142,9 @@ def get_picks_and_pos(match_id):
         radiant_hard, radiant_safe, dire_hard, dire_safe, radiant_mid, dire_mid = [],[],[],[],[],[]
         radiant, dire, heroes_left, index = {}, {}, [], None
         for player in players:
-            hero = id_to_name.translate[player['heroId']]
             coordinates = player['playbackData']['positionEvents']
             for time in coordinates:
-                if time['time'] / 60 > 2 and time['time'] / 60 < 8:
+                if time['time'] / 60 > 1 and time['time'] / 60 < 2:
                     if time['x'] > 90 and time['x'] < 150 and time['y'] > 110 and time['y'] < 150:
                         if player['isRadiant']:
                             radiant_mid.append(player)
@@ -167,7 +166,6 @@ def get_picks_and_pos(match_id):
                         else:
                             radiant_safe.append(player)
                             break
-
                     else:
                         heroes_left.append(player)
                         break

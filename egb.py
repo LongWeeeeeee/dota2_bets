@@ -76,39 +76,38 @@ def get_strats_graph_match(map_id=None):
                                   name
                                 }
                               }
-    
+
                             }
-    
-    
+
+
                           }
                         }
-    
+
                         '''
     else:
         query = '''{
           live{
             match(id:%s){
               players{
-                networth
-                heroId
-                isRadiant
-                playbackData{
-                  goldEvents{
-                    time
-                    networth
-                  }
-                  positionEvents{
-                    time
-                    x
-                    y
-                  }
-                }
-              }
-            }
-        
-        
+        heroId
+        isRadiant
+        networth
+        playbackData{
+          csEvents{
+            time
+          }
+          positionEvents{
+            time
+            x
+            y
           }
         }
+      }
+    }
+
+
+  }
+}
         '''%map_id
     headers = {"Authorization": f"Bearer {api_token}"}
     response = requests.post('https://api.stratz.com/graphql', json={"query": query}, headers=headers)
@@ -125,283 +124,324 @@ def get_exac_match(response, players_ids, exac_match=None):
                     return exac_match
 
 
-def find_index(players):
-    for player in players:
-        coordinates = player['playbackData']['positionEvents']
-        for time in coordinates:
-            if time['time'] / 60 > 0.30 and time['time'] / 60 < 2:
-                index = coordinates.index(time)
-                print(time['time'] / 60)
-                return index
-
-
 def get_picks_and_pos(match_id):
     if if_unique(match_id) is not None:
         response = get_strats_graph_match(match_id)
         players = json.loads(response.text)['data']['live']['match']['players']
-        radiant_hard, radiant_safe, dire_hard, dire_safe, radiant_mid, dire_mid = [],[],[],[],[],[]
-        radiant, dire, heroes_left, index = {}, {}, [], None
-        for player in players:
-            coordinates = player['playbackData']['positionEvents']
-            for time in coordinates:
-                if time['time'] > 90 and time['time'] / 60 < 2:
-                    if time['x'] > 90 and time['x'] < 150 and time['y'] > 110 and time['y'] < 150:
-                        if player['isRadiant']:
-                            radiant_mid.append(player)
-                            break
+
+
+        def get_picks(check_time=60):
+            radiant, dire, heroes_left, index = {}, {}, [], None
+            radiant_hard, radiant_safe, dire_hard, dire_safe, radiant_mid, dire_mid = [], [], [], [], [], []
+            for player in players:
+                coordinates = player['playbackData']['positionEvents']
+                for time in coordinates:
+                    if time['time'] >= check_time:
+                        if time['x'] > 90 and time['x'] < 150 and time['y'] > 110 and time['y'] < 150:
+                            if player['isRadiant']:
+                                radiant_mid.append(player)
+                                break
+                            else:
+                                dire_mid.append(player)
+                                break
+                        elif time['x'] > 70 and time['x'] < 110 and time['y'] > 130 and time['y'] < 170:
+                            if player['isRadiant']:
+                                radiant_hard.append(player)
+                                break
+                            else:
+                                dire_safe.append(player)
+                                break
+                        elif time['x'] > 120 and time['x'] < 180 and time['y'] > 70 and time['y'] < 120:
+                            if not player['isRadiant']:
+                                dire_hard.append(player)
+                                break
+                            else:
+                                radiant_safe.append(player)
+                                break
                         else:
-                            dire_mid.append(player)
+                            heroes_left.append(player)
                             break
-                    elif time['x'] > 70 and time['x'] < 110 and time['y'] > 130 and time['y'] < 170:
-                        if player['isRadiant']:
-                            radiant_hard.append(player)
-                            break
-                        else:
-                            dire_safe.append(player)
-                            break
-                    elif time['x'] > 120 and time['x'] < 180 and time['y'] > 70 and time['y'] < 120:
-                        if not player['isRadiant']:
-                            dire_hard.append(player)
-                            break
-                        else:
-                            radiant_safe.append(player)
-                            break
-                    else:
-                        heroes_left.append(player)
-                        break
-        for player in heroes_left:
-            if player['isRadiant']:
-                if len(radiant_hard) != 2:
-                    radiant_hard.append(player)
-                elif len(radiant_safe) != 2:
-                    radiant_safe.append(player)
-                elif len(radiant_mid) == 0:
-                    radiant_mid.append(player)
-        for player in heroes_left:
-            if not player['isRadiant']:
-                if len(dire_hard) != 2:
-                    dire_hard.append(player)
-                elif len(dire_safe) != 2:
-                    dire_safe.append(player)
-                elif len(dire_mid) == 0:
-                    dire_mid.append(player)
-        if len(radiant_safe) == 2:
-            for i in range(len(radiant_safe[0]['playbackData']['goldEvents'])):
-                if radiant_safe[0]['playbackData']['goldEvents'][i]['time'] >= 90 and radiant_safe[0]['playbackData']['goldEvents'][i]['time'] <= 220:
-                    index = i
-                    break
-            if radiant_safe[0]['playbackData']['goldEvents'][index]['networth'] > radiant_safe[1]['playbackData']['goldEvents'][index]['networth']:
-                radiant['pos 1'] = id_to_name.translate[radiant_safe[0]['heroId']]
-                radiant['pos 5'] = id_to_name.translate[radiant_safe[1]['heroId']]
-            else:
-                radiant['pos 1'] = id_to_name.translate[radiant_safe[1]['heroId']]
-                radiant['pos 5'] = id_to_name.translate[radiant_safe[0]['heroId']]
-        if len(radiant_hard) == 2:
-            for i in range(len(radiant_hard[0]['playbackData']['goldEvents'])):
-                if radiant_hard[0]['playbackData']['goldEvents'][i]['time'] >= 90 and radiant_hard[0]['playbackData']['goldEvents'][i]['time'] <= 220:
-                    index = i
-                    break
-            if radiant_hard[0]['playbackData']['goldEvents'][index]['networth'] > radiant_hard[1]['playbackData']['goldEvents'][index]['networth']:
-                radiant['pos 3'] = id_to_name.translate[radiant_hard[0]['heroId']]
-                radiant['pos 4'] = id_to_name.translate[radiant_hard[1]['heroId']]
-            else:
-                radiant['pos 3'] = id_to_name.translate[radiant_hard[1]['heroId']]
-                radiant['pos 4'] = id_to_name.translate[radiant_hard[0]['heroId']]
-        if len(dire_safe) == 2:
-            for i in range(len(dire_safe[0]['playbackData']['goldEvents'])):
-                if dire_safe[0]['playbackData']['goldEvents'][i]['time'] >= 90 and dire_safe[0]['playbackData']['goldEvents'][i]['time'] <= 220:
-                    index = i
-                    break
-            if dire_safe[0]['playbackData']['goldEvents'][index]['networth'] > dire_safe[1]['playbackData']['goldEvents'][index]['networth']:
-                dire['pos 1'] = id_to_name.translate[dire_safe[0]['heroId']]
-                dire['pos 5'] = id_to_name.translate[dire_safe[1]['heroId']]
-            else:
-                dire['pos 1'] = id_to_name.translate[dire_safe[1]['heroId']]
-                dire['pos 5'] = id_to_name.translate[dire_safe[0]['heroId']]
-        if len(dire_hard) == 2:
-            for i in range(len(dire_hard[0]['playbackData']['goldEvents'])):
-                if dire_hard[0]['playbackData']['goldEvents'][i]['time'] >= 90 and dire_hard[0]['playbackData']['goldEvents'][i]['time'] <= 220:
-                    index = i
-                    break
-            if dire_hard[0]['playbackData']['goldEvents'][index]['networth'] > dire_hard[1]['playbackData']['goldEvents'][index]['networth']:
-                dire['pos 3'] = id_to_name.translate[dire_hard[0]['heroId']]
-                dire['pos 4'] = id_to_name.translate[dire_hard[1]['heroId']]
-            else:
-                dire['pos 3'] = id_to_name.translate[dire_hard[1]['heroId']]
-                dire['pos 4'] = id_to_name.translate[dire_hard[0]['heroId']]
-        if len(radiant_mid) == 1:
-            radiant['pos 2'] = id_to_name.translate[radiant_mid[0]['heroId']]
-        elif len(radiant_mid) == 2:
-            for i in range(len(radiant_mid[0]['playbackData']['goldEvents'])):
-                if radiant_mid[0]['playbackData']['goldEvents'][i]['time'] >= 90 and radiant_mid[0]['playbackData']['goldEvents'][i]['time'] <= 220:
-                    index = i
-                    break
-            if radiant_mid[0]['playbackData']['goldEvents'][index]['networth'] > radiant_mid[1]['playbackData']['goldEvents'][index]['networth']:
-                radiant['pos 2'] = id_to_name.translate[radiant_mid[0]['heroId']]
-                heroes_left.append(radiant_mid[1])
-            else:
-                radiant['pos 2'] = id_to_name.translate[radiant_mid[1]['heroId']]
-                heroes_left.append(radiant_mid[0])
-        if len(dire_mid) == 1:
-            dire['pos 2'] = id_to_name.translate[dire_mid[0]['heroId']]
-        elif len(dire_mid) == 2:
-            for i in range(len(dire_mid[0]['playbackData']['goldEvents'])):
-                if dire_mid[0]['playbackData']['goldEvents'][i]['time'] >= 90 and dire_mid[0]['playbackData']['goldEvents'][i]['time'] <= 220:
-                    index = i
-                    break
-            if dire_mid[0]['playbackData']['goldEvents'][index]['networth'] > dire_mid[1]['playbackData']['goldEvents'][index]['networth']:
-                dire['pos 2'] = id_to_name.translate[dire_mid[0]['heroId']]
-                heroes_left.append(dire_mid[1])
-            else:
-                dire['pos 2'] = id_to_name.translate[dire_mid[1]['heroId']]
-                heroes_left.append(dire_mid[0])
-        for player in heroes_left:
-            if player['isRadiant']:
-                if len(radiant_hard) != 2:
-                    radiant_hard.append(player)
-                elif len(radiant_safe) != 2:
-                    radiant_safe.append(player)
-                elif len(radiant_mid) == 0:
-                    radiant_mid.append(player)
-        for player in heroes_left:
-            if not player['isRadiant']:
-                if len(dire_hard) != 2:
-                    dire_hard.append(player)
-                elif len(dire_safe) != 2:
-                    dire_safe.append(player)
-                elif len(dire_mid) == 0:
-                    dire_mid.append(player)
-        if len(radiant_safe) == 2:
-            for i in range(len(radiant_safe[0]['playbackData']['goldEvents'])):
-                if radiant_safe[0]['playbackData']['goldEvents'][i]['time'] >= 90 and \
-                        radiant_safe[0]['playbackData']['goldEvents'][i]['time'] <= 220:
-                    index = i
-                    break
-            if radiant_safe[0]['playbackData']['goldEvents'][index]['networth'] > \
-                    radiant_safe[1]['playbackData']['goldEvents'][index]['networth']:
-                radiant['pos 1'] = id_to_name.translate[radiant_safe[0]['heroId']]
-                radiant['pos 5'] = id_to_name.translate[radiant_safe[1]['heroId']]
-            else:
-                radiant['pos 1'] = id_to_name.translate[radiant_safe[1]['heroId']]
-                radiant['pos 5'] = id_to_name.translate[radiant_safe[0]['heroId']]
-        if len(radiant_hard) == 2:
-            for i in range(len(radiant_hard[0]['playbackData']['goldEvents'])):
-                if radiant_hard[0]['playbackData']['goldEvents'][i]['time'] >= 90 and \
-                        radiant_hard[0]['playbackData']['goldEvents'][i]['time'] <= 220:
-                    index = i
-                    break
-            if radiant_hard[0]['playbackData']['goldEvents'][index]['networth'] > \
-                    radiant_hard[1]['playbackData']['goldEvents'][index]['networth']:
-                radiant['pos 3'] = id_to_name.translate[radiant_hard[0]['heroId']]
-                radiant['pos 4'] = id_to_name.translate[radiant_hard[1]['heroId']]
-            else:
-                radiant['pos 3'] = id_to_name.translate[radiant_hard[1]['heroId']]
-                radiant['pos 4'] = id_to_name.translate[radiant_hard[0]['heroId']]
-        if len(dire_safe) == 2:
-            for i in range(len(dire_safe[0]['playbackData']['goldEvents'])):
-                if dire_safe[0]['playbackData']['goldEvents'][i]['time'] >= 90 and \
-                        dire_safe[0]['playbackData']['goldEvents'][i]['time'] <= 220:
-                    index = i
-                    break
-            if dire_safe[0]['playbackData']['goldEvents'][index]['networth'] > \
-                    dire_safe[1]['playbackData']['goldEvents'][index]['networth']:
-                dire['pos 1'] = id_to_name.translate[dire_safe[0]['heroId']]
-                dire['pos 5'] = id_to_name.translate[dire_safe[1]['heroId']]
-            else:
-                dire['pos 1'] = id_to_name.translate[dire_safe[1]['heroId']]
-                dire['pos 5'] = id_to_name.translate[dire_safe[0]['heroId']]
-        if len(dire_hard) == 2:
-            for i in range(len(dire_hard[0]['playbackData']['goldEvents'])):
-                if dire_hard[0]['playbackData']['goldEvents'][i]['time'] >= 90 and \
-                        dire_hard[0]['playbackData']['goldEvents'][i]['time'] <= 220:
-                    index = i
-                    break
-            if dire_hard[0]['playbackData']['goldEvents'][index]['networth'] > \
-                    dire_hard[1]['playbackData']['goldEvents'][index]['networth']:
-                dire['pos 3'] = id_to_name.translate[dire_hard[0]['heroId']]
-                dire['pos 4'] = id_to_name.translate[dire_hard[1]['heroId']]
-            else:
-                dire['pos 3'] = id_to_name.translate[dire_hard[1]['heroId']]
-                dire['pos 4'] = id_to_name.translate[dire_hard[0]['heroId']]
-        if len(radiant_mid) == 1:
-            radiant['pos 2'] = id_to_name.translate[radiant_mid[0]['heroId']]
-        else:
-            for i in range(len(radiant_mid[0]['playbackData']['goldEvents'])):
-                if radiant_mid[0]['playbackData']['goldEvents'][i]['time'] >= 90 and \
-                        radiant_mid[0]['playbackData']['goldEvents'][i]['time'] <= 220:
-                    index = i
-                    break
-            if radiant_mid[0]['playbackData']['goldEvents'][index]['networth'] > \
-                    radiant_mid[1]['playbackData']['goldEvents'][index]['networth']:
-                radiant['pos 2'] = id_to_name.translate[radiant_mid[0]['heroId']]
-                heroes_left.append(radiant_mid[1])
-            else:
-                radiant['pos 2'] = id_to_name.translate[radiant_mid[1]['heroId']]
-                heroes_left.append(radiant_mid[0])
-        if len(dire_mid) == 1:
-            dire['pos 2'] = id_to_name.translate[dire_mid[0]['heroId']]
-        else:
-            for i in range(len(dire_mid[0]['playbackData']['goldEvents'])):
-                if dire_mid[0]['playbackData']['goldEvents'][i]['time'] >= 90 and \
-                        dire_mid[0]['playbackData']['goldEvents'][i]['time'] <= 220:
-                    index = i
-                    break
-            if dire_mid[0]['playbackData']['goldEvents'][index]['networth'] > \
-                    dire_mid[1]['playbackData']['goldEvents'][index]['networth']:
-                dire['pos 2'] = id_to_name.translate[dire_mid[0]['heroId']]
-                heroes_left.append(dire_mid[1])
-            else:
-                dire['pos 2'] = id_to_name.translate[dire_mid[1]['heroId']]
-                heroes_left.append(dire_mid[0])
-        positions = ['pos 1', 'pos 2', 'pos 3', 'pos 4', 'pos 5']
-        if len(radiant) == 4:
-            positions_copy = positions.copy()
-            for key in radiant:
-                positions_copy.remove(key)
             for player in heroes_left:
                 if player['isRadiant']:
-                    radiant[positions_copy[0]] = id_to_name.translate[player['heroId']]
-
-        if len(dire) == 4:
-            positions_copy = positions.copy()
-            for key in dire:
-                positions_copy.remove(key)
+                    if len(radiant_hard) == 1:
+                        radiant_hard.append(player)
+                    elif len(radiant_safe) == 1:
+                        radiant_safe.append(player)
+                    elif len(radiant_mid) == 0:
+                        radiant_mid.append(player)
             for player in heroes_left:
                 if not player['isRadiant']:
-                    radiant[positions_copy[0]] = id_to_name.translate[player['heroId']]
+                    if len(dire_hard) == 1:
+                        dire_hard.append(player)
+                    elif len(dire_safe) == 1:
+                        dire_safe.append(player)
+                    elif len(dire_mid) == 0:
+                        dire_mid.append(player)
+            if len(radiant_safe) == 2:
+                zero_cs, first_cs = 0, 0
+                for event in radiant_safe[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs +=1
+                for event in radiant_safe[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs +=1
+                if zero_cs > first_cs:
+                    radiant['pos 1'] = id_to_name.translate[radiant_safe[0]['heroId']]
+                    radiant['pos 5'] = id_to_name.translate[radiant_safe[1]['heroId']]
+                else:
+                    radiant['pos 1'] = id_to_name.translate[radiant_safe[1]['heroId']]
+                    radiant['pos 5'] = id_to_name.translate[radiant_safe[0]['heroId']]
+            if len(radiant_hard) == 2:
+                zero_cs, first_cs = 0, 0
+                for event in radiant_hard[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs += 1
+                for event in radiant_hard[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs += 1
+                if zero_cs > first_cs:
+                    radiant['pos 3'] = id_to_name.translate[radiant_hard[0]['heroId']]
+                    radiant['pos 4'] = id_to_name.translate[radiant_hard[1]['heroId']]
+                else:
+                    radiant['pos 3'] = id_to_name.translate[radiant_hard[1]['heroId']]
+                    radiant['pos 4'] = id_to_name.translate[radiant_hard[0]['heroId']]
+            if len(dire_safe) == 2:
+                zero_cs, first_cs = 0, 0
+                for event in dire_safe[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs += 1
+                for event in dire_safe[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs += 1
+                if zero_cs > first_cs:
+                    dire['pos 1'] = id_to_name.translate[dire_safe[0]['heroId']]
+                    dire['pos 5'] = id_to_name.translate[dire_safe[1]['heroId']]
+                else:
+                    dire['pos 1'] = id_to_name.translate[dire_safe[1]['heroId']]
+                    dire['pos 5'] = id_to_name.translate[dire_safe[0]['heroId']]
+            if len(dire_hard) == 2:
+                zero_cs, first_cs = 0, 0
+                for event in dire_hard[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs += 1
+                for event in dire_hard[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs += 1
+                if zero_cs > first_cs:
+                    dire['pos 3'] = id_to_name.translate[dire_hard[0]['heroId']]
+                    dire['pos 4'] = id_to_name.translate[dire_hard[1]['heroId']]
+                else:
+                    dire['pos 3'] = id_to_name.translate[dire_hard[1]['heroId']]
+                    dire['pos 4'] = id_to_name.translate[dire_hard[0]['heroId']]
+            if len(radiant_mid) == 1:
+                radiant['pos 2'] = id_to_name.translate[radiant_mid[0]['heroId']]
+            elif len(radiant_mid) == 2:
+                zero_cs, first_cs = 0, 0
+                for event in radiant_mid[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs += 1
+                for event in radiant_mid[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs += 1
+                if zero_cs > first_cs:
+                    radiant['pos 2'] = id_to_name.translate[radiant_mid[0]['heroId']]
+                    heroes_left.append(radiant_mid[1])
+                else:
+                    radiant['pos 2'] = id_to_name.translate[radiant_mid[1]['heroId']]
+                    heroes_left.append(radiant_mid[0])
+            if len(dire_mid) == 1:
+                dire['pos 2'] = id_to_name.translate[dire_mid[0]['heroId']]
+            elif len(dire_mid) == 2:
+                zero_cs, first_cs = 0, 0
+                for event in dire_mid[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs += 1
+                for event in dire_mid[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs += 1
+                if zero_cs > first_cs:
+                    dire['pos 2'] = id_to_name.translate[dire_mid[0]['heroId']]
+                    heroes_left.append(dire_mid[1])
+                else:
+                    dire['pos 2'] = id_to_name.translate[dire_mid[1]['heroId']]
+                    heroes_left.append(dire_mid[0])
+            for player in heroes_left:
+                if player['isRadiant']:
+                    if len(radiant_hard) == 1:
+                        radiant_hard.append(player)
+                    elif len(radiant_safe) == 1:
+                        radiant_safe.append(player)
+                    elif len(radiant_mid) == 0:
+                        radiant_mid.append(player)
+            for player in heroes_left:
+                if not player['isRadiant']:
+                    if len(dire_hard) == 1:
+                        dire_hard.append(player)
+                    elif len(dire_safe) == 1:
+                        dire_safe.append(player)
+                    elif len(dire_mid) == 0:
+                        dire_mid.append(player)
+            for player in heroes_left:
+                if player['isRadiant']:
+                    if len(radiant_hard) == 1:
+                        radiant_hard.append(player)
+                    elif len(radiant_safe) == 1:
+                        radiant_safe.append(player)
+                    elif len(radiant_mid) == 0:
+                        radiant_mid.append(player)
+            for player in heroes_left:
+                if not player['isRadiant']:
+                    if len(dire_hard) == 1:
+                        dire_hard.append(player)
+                    elif len(dire_safe) == 1:
+                        dire_safe.append(player)
+                    elif len(dire_mid) == 0:
+                        dire_mid.append(player)
+            if len(radiant_safe) == 2:
+                zero_cs, first_cs = 0, 0
+                for event in radiant_safe[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs += 1
+                for event in radiant_safe[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs += 1
+                if zero_cs > first_cs:
+                    radiant['pos 1'] = id_to_name.translate[radiant_safe[0]['heroId']]
+                    radiant['pos 5'] = id_to_name.translate[radiant_safe[1]['heroId']]
+                else:
+                    radiant['pos 1'] = id_to_name.translate[radiant_safe[1]['heroId']]
+                    radiant['pos 5'] = id_to_name.translate[radiant_safe[0]['heroId']]
+            if len(radiant_hard) == 2:
+                zero_cs, first_cs = 0, 0
+                for event in radiant_hard[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs += 1
+                for event in radiant_hard[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs += 1
+                if zero_cs > first_cs:
+                    radiant['pos 3'] = id_to_name.translate[radiant_hard[0]['heroId']]
+                    radiant['pos 4'] = id_to_name.translate[radiant_hard[1]['heroId']]
+                else:
+                    radiant['pos 3'] = id_to_name.translate[radiant_hard[1]['heroId']]
+                    radiant['pos 4'] = id_to_name.translate[radiant_hard[0]['heroId']]
+            if len(dire_safe) == 2:
+                zero_cs, first_cs = 0, 0
+                for event in dire_safe[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs += 1
+                for event in dire_safe[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs += 1
+                if zero_cs > first_cs:
+                    dire['pos 1'] = id_to_name.translate[dire_safe[0]['heroId']]
+                    dire['pos 5'] = id_to_name.translate[dire_safe[1]['heroId']]
+                else:
+                    dire['pos 1'] = id_to_name.translate[dire_safe[1]['heroId']]
+                    dire['pos 5'] = id_to_name.translate[dire_safe[0]['heroId']]
+            if len(dire_hard) == 2:
+                zero_cs, first_cs = 0, 0
+                for event in dire_hard[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs += 1
+                for event in dire_hard[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs += 1
+                if zero_cs > first_cs:
+                    dire['pos 3'] = id_to_name.translate[dire_hard[0]['heroId']]
+                    dire['pos 4'] = id_to_name.translate[dire_hard[1]['heroId']]
+                else:
+                    dire['pos 3'] = id_to_name.translate[dire_hard[1]['heroId']]
+                    dire['pos 4'] = id_to_name.translate[dire_hard[0]['heroId']]
+            if len(radiant_mid) == 1:
+                radiant['pos 2'] = id_to_name.translate[radiant_mid[0]['heroId']]
+            elif len(radiant_mid) == 2:
+                zero_cs, first_cs = 0, 0
+                for event in radiant_mid[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs += 1
+                for event in radiant_mid[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs += 1
+                if zero_cs > first_cs:
+                    radiant['pos 2'] = id_to_name.translate[radiant_mid[0]['heroId']]
+                    heroes_left.append(radiant_mid[1])
+                else:
+                    radiant['pos 2'] = id_to_name.translate[radiant_mid[1]['heroId']]
+                    heroes_left.append(radiant_mid[0])
+            if len(dire_mid) == 1:
+                dire['pos 2'] = id_to_name.translate[dire_mid[0]['heroId']]
+            elif len(dire_mid) == 2:
+                zero_cs, first_cs = 0, 0
+                for event in dire_mid[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs += 1
+                for event in dire_mid[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs += 1
+                if zero_cs > first_cs:
+                    dire['pos 2'] = id_to_name.translate[dire_mid[0]['heroId']]
+                    heroes_left.append(dire_mid[1])
+                else:
+                    dire['pos 2'] = id_to_name.translate[dire_mid[1]['heroId']]
+                    heroes_left.append(dire_mid[0])
+            positions = ['pos 1', 'pos 2', 'pos 3', 'pos 4', 'pos 5']
+            if len(radiant) == 4:
+                positions_copy = positions.copy()
+                for key in radiant:
+                    positions_copy.remove(key)
+                for player in heroes_left:
+                    if player['isRadiant']:
+                        radiant[positions_copy[0]] = id_to_name.translate[player['heroId']]
 
-        if len(radiant) == 5 and len(dire) == 5:
-            (f"https://stratz.com/matches/{match_id}/live\n{radiant}\n{dire}")
-            return radiant, dire, match_id
-        else:
-            print(f'пики не полные\n{radiant}\n{dire}')
+            if len(dire) == 4:
+                positions_copy = positions.copy()
+                for key in dire:
+                    positions_copy.remove(key)
+                for player in heroes_left:
+                    if not player['isRadiant']:
+                        radiant[positions_copy[0]] = id_to_name.translate[player['heroId']]
+            return radiant, dire
+
+        check_time = 60
+        while check_time < 256:
+            if check_time > 240:
+                pass
+            radiant, dire = get_picks(check_time)
+            if len(radiant) == 5 and len(dire) == 5:
+                print(f"https://stratz.com/matches/{match_id}/live\n{radiant}\n{dire}")
+                return radiant, dire, match_id
+            else:
+                check_time += 15
+                print(url)
+                print(f'пики не полные\n{radiant}\n{dire}')
     else:
         print('карта уже расчитана')
 
 
-while True:
-    try:
-        importlib.reload(id_to_name)
-        response = requests.get(url, params=params, headers=headers)
-        if response.status_code == 200:
-            data = json.loads(response.text)
-            for bet in data['bets']:
-                if bet['esports'] and bet['streams_enabled'] and bet['game'] == 'Dota 2' and bet['tourn'] in ['Incubator','Ladder Games']:
-                    players_ids, dire_and_radiant = get_players(bet)
-                    response = get_strats_graph_match()
-                    exac_match = get_exac_match(response, players_ids)
-                    if exac_match is not None:
-                        answer = get_picks_and_pos(match_id=exac_match['matchId'])
-                        if answer is not None:
-                            radiant, dire, match_id = answer
-                            print(f'Radint pick: {radiant}\nDire pick: {dire}')
-                            dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id, tier=2)
-                    else:
-                        print('карта не найдена, вероятно, матч только начался')
-    except: pass
-    print('сплю 3 минуты')
-    time.sleep(160)
-# answer = get_picks_and_pos(match_id=exac_match['matchId'])
-# if answer is not None:
-#     radiant, dire, match_id = answer
-#     dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id, tier=2)
+# while True:
+#     try:
+#         importlib.reload(id_to_name)
+#         response = requests.get(url, params=params, headers=headers)
+#         if response.status_code == 200:
+#             data = json.loads(response.text)
+#             for bet in data['bets']:
+#                 if bet['esports'] and bet['streams_enabled'] and bet['game'] == 'Dota 2' and bet['tourn'] in ['Incubator','Ladder Games']:
+#                     players_ids, dire_and_radiant = get_players(bet)
+#                     response = get_strats_graph_match()
+#                     exac_match = get_exac_match(response, players_ids)
+#                     if exac_match is not None:
+#                         answer = get_picks_and_pos(match_id=exac_match['matchId'])
+#                         if answer is not None:
+#                             radiant, dire, match_id = answer
+#                             print(f'Radint pick: {radiant}\nDire pick: {dire}')
+#                             dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id, tier=2)
+#                     else:
+#                         print('карта не найдена, вероятно, матч только начался')
+#     except: pass
+#     print('сплю 3 минуты')
+#     time.sleep(160)
+answer = get_picks_and_pos(match_id=7781964303)
+if answer is not None:
+    radiant, dire, match_id = answer
+    dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name='radiant', dire_team_name='dire', antiplagiat_url=match_id, tier=2)

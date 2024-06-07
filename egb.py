@@ -144,7 +144,7 @@ def get_picks_and_pos(match_id):
         for player in players:
             coordinates = player['playbackData']['positionEvents']
             for time in coordinates:
-                if time['time'] / 60 > 1 and time['time'] / 60 < 2:
+                if time['time'] > 90 and time['time'] / 60 < 2:
                     if time['x'] > 90 and time['x'] < 150 and time['y'] > 110 and time['y'] < 150:
                         if player['isRadiant']:
                             radiant_mid.append(player)

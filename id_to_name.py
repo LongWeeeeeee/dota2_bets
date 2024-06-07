@@ -359,6 +359,7 @@ egb = {
  'smilling knight':155162307,
  'boxi':77490514,
  'mira':256156323,
+'afganistan_doto':858200619,
 
 }
 blacklist_players = {

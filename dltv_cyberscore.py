@@ -202,7 +202,7 @@ def get_map_id(match):
             tier = 1
         else:
             tier = match['tournament']['tier']
-        if tier in [1, 2]:
+        if tier in [1, 2, 3]:
             for karta in match['related_matches']:
                 if karta['status'] == 'online':
                     map_id = karta['id']
@@ -509,8 +509,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             other_values_check = sum(1 for value in values if value >= 0) - sum(1 for value in values if value <= 0)
         if counterpick is not None and sinergy is not None:
             singery_or_counterpick = sum(1 for value in [counterpick, sinergy] if value < 0) + sum(-1 for value in [counterpick, sinergy] if value > 0)
-            over10=(sum(1 for value in [counterpick, sinergy] if value < -10) + sum(
-                1 for value in [counterpick, sinergy] if value > 10))
+            over5=(sum(1 for value in [counterpick, sinergy] if value < -5) + sum(
+                1 for value in [counterpick, sinergy] if value > 5))
         for hero in list(radiant_heroes_and_positions.values()):
             if hero in game_changer_list:
                 output_message += f'Аккуратно! У {radiant_team_name} есть {hero}, который может изменить исход боя\n'
@@ -539,7 +539,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             if not check:
                 output_message += f'МОЖНО ПОСТАВИТЬ НА ТМ ИЛИ ВМ\n'
         elif counterpick is not None and sinergy is not None and singery_or_counterpick in [2, -2]:
-            if over10 > 0:
+            if over5 > 0:
                 output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
             else:
                 output_message += f'СОМНИТЕЛЬНАЯ СТАВКА, ТОЛЬКО НА ФАВОРИТА\n'

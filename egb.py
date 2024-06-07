@@ -188,7 +188,7 @@ def get_picks_and_pos(match_id):
                 if zero_cs > first_cs:
                     radiant['pos 1'] = id_to_name.translate[radiant_safe[0]['heroId']]
                     radiant['pos 5'] = id_to_name.translate[radiant_safe[1]['heroId']]
-                else:
+                elif zero_cs < first_cs:
                     radiant['pos 1'] = id_to_name.translate[radiant_safe[1]['heroId']]
                     radiant['pos 5'] = id_to_name.translate[radiant_safe[0]['heroId']]
             if len(radiant_hard) == 2:
@@ -202,7 +202,7 @@ def get_picks_and_pos(match_id):
                 if zero_cs > first_cs:
                     radiant['pos 3'] = id_to_name.translate[radiant_hard[0]['heroId']]
                     radiant['pos 4'] = id_to_name.translate[radiant_hard[1]['heroId']]
-                else:
+                elif zero_cs < first_cs:
                     radiant['pos 3'] = id_to_name.translate[radiant_hard[1]['heroId']]
                     radiant['pos 4'] = id_to_name.translate[radiant_hard[0]['heroId']]
             if len(dire_safe) == 2:
@@ -216,7 +216,7 @@ def get_picks_and_pos(match_id):
                 if zero_cs > first_cs:
                     dire['pos 1'] = id_to_name.translate[dire_safe[0]['heroId']]
                     dire['pos 5'] = id_to_name.translate[dire_safe[1]['heroId']]
-                else:
+                elif zero_cs < first_cs:
                     dire['pos 1'] = id_to_name.translate[dire_safe[1]['heroId']]
                     dire['pos 5'] = id_to_name.translate[dire_safe[0]['heroId']]
             if len(dire_hard) == 2:
@@ -230,7 +230,7 @@ def get_picks_and_pos(match_id):
                 if zero_cs > first_cs:
                     dire['pos 3'] = id_to_name.translate[dire_hard[0]['heroId']]
                     dire['pos 4'] = id_to_name.translate[dire_hard[1]['heroId']]
-                else:
+                elif zero_cs < first_cs:
                     dire['pos 3'] = id_to_name.translate[dire_hard[1]['heroId']]
                     dire['pos 4'] = id_to_name.translate[dire_hard[0]['heroId']]
             if len(radiant_mid) == 1:
@@ -246,7 +246,7 @@ def get_picks_and_pos(match_id):
                 if zero_cs > first_cs:
                     radiant['pos 2'] = id_to_name.translate[radiant_mid[0]['heroId']]
                     heroes_left.append(radiant_mid[1])
-                else:
+                elif zero_cs < first_cs:
                     radiant['pos 2'] = id_to_name.translate[radiant_mid[1]['heroId']]
                     heroes_left.append(radiant_mid[0])
             if len(dire_mid) == 1:
@@ -262,7 +262,7 @@ def get_picks_and_pos(match_id):
                 if zero_cs > first_cs:
                     dire['pos 2'] = id_to_name.translate[dire_mid[0]['heroId']]
                     heroes_left.append(dire_mid[1])
-                else:
+                elif zero_cs < first_cs:
                     dire['pos 2'] = id_to_name.translate[dire_mid[1]['heroId']]
                     heroes_left.append(dire_mid[0])
             for player in heroes_left:
@@ -308,7 +308,7 @@ def get_picks_and_pos(match_id):
                 if zero_cs > first_cs:
                     radiant['pos 1'] = id_to_name.translate[radiant_safe[0]['heroId']]
                     radiant['pos 5'] = id_to_name.translate[radiant_safe[1]['heroId']]
-                else:
+                elif zero_cs < first_cs:
                     radiant['pos 1'] = id_to_name.translate[radiant_safe[1]['heroId']]
                     radiant['pos 5'] = id_to_name.translate[radiant_safe[0]['heroId']]
             if len(radiant_hard) == 2:
@@ -322,7 +322,7 @@ def get_picks_and_pos(match_id):
                 if zero_cs > first_cs:
                     radiant['pos 3'] = id_to_name.translate[radiant_hard[0]['heroId']]
                     radiant['pos 4'] = id_to_name.translate[radiant_hard[1]['heroId']]
-                else:
+                elif zero_cs < first_cs:
                     radiant['pos 3'] = id_to_name.translate[radiant_hard[1]['heroId']]
                     radiant['pos 4'] = id_to_name.translate[radiant_hard[0]['heroId']]
             if len(dire_safe) == 2:
@@ -336,7 +336,7 @@ def get_picks_and_pos(match_id):
                 if zero_cs > first_cs:
                     dire['pos 1'] = id_to_name.translate[dire_safe[0]['heroId']]
                     dire['pos 5'] = id_to_name.translate[dire_safe[1]['heroId']]
-                else:
+                elif zero_cs < first_cs:
                     dire['pos 1'] = id_to_name.translate[dire_safe[1]['heroId']]
                     dire['pos 5'] = id_to_name.translate[dire_safe[0]['heroId']]
             if len(dire_hard) == 2:
@@ -350,7 +350,7 @@ def get_picks_and_pos(match_id):
                 if zero_cs > first_cs:
                     dire['pos 3'] = id_to_name.translate[dire_hard[0]['heroId']]
                     dire['pos 4'] = id_to_name.translate[dire_hard[1]['heroId']]
-                else:
+                elif zero_cs < first_cs:
                     dire['pos 3'] = id_to_name.translate[dire_hard[1]['heroId']]
                     dire['pos 4'] = id_to_name.translate[dire_hard[0]['heroId']]
             if len(radiant_mid) == 1:
@@ -366,7 +366,7 @@ def get_picks_and_pos(match_id):
                 if zero_cs > first_cs:
                     radiant['pos 2'] = id_to_name.translate[radiant_mid[0]['heroId']]
                     heroes_left.append(radiant_mid[1])
-                else:
+                elif zero_cs < first_cs:
                     radiant['pos 2'] = id_to_name.translate[radiant_mid[1]['heroId']]
                     heroes_left.append(radiant_mid[0])
             if len(dire_mid) == 1:
@@ -382,7 +382,7 @@ def get_picks_and_pos(match_id):
                 if zero_cs > first_cs:
                     dire['pos 2'] = id_to_name.translate[dire_mid[0]['heroId']]
                     heroes_left.append(dire_mid[1])
-                else:
+                elif zero_cs < first_cs:
                     dire['pos 2'] = id_to_name.translate[dire_mid[1]['heroId']]
                     heroes_left.append(dire_mid[0])
             positions = ['pos 1', 'pos 2', 'pos 3', 'pos 4', 'pos 5']
@@ -413,7 +413,6 @@ def get_picks_and_pos(match_id):
                 return radiant, dire, match_id
             else:
                 check_time += 15
-                print(url)
                 print(f'пики не полные\n{radiant}\n{dire}')
     else:
         print('карта уже расчитана')

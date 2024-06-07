@@ -600,6 +600,10 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         add_url(antiplagiat_url)
 
 # testing
-# radiant_heroes_and_positions={'pos 1': 'Troll Warlord', 'pos 2': 'Zeus', 'pos 3': 'Kunkka', 'pos 4': 'Techies', 'pos 5': "Elder Titan"}
-# dire_heroes_and_positions={'pos 1': 'Lifestealer', 'pos 2': 'Leshrac', 'pos 3': 'Dark Seer', 'pos 4': 'Disruptor', 'pos 5': 'Io'}
-# dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_positions, dire_heroes_and_positions=dire_heroes_and_positions, radiant_team_name='Tundra', dire_team_name='Heroic', score=['0','0'])
+# {'pos 1': 'Wraith King', 'pos 5': 'Venomancer', 'pos 2': 'Dragon Knight', 'pos 3': 'Timbersaw', 'pos 4': 'Keeper of the Light'}
+#
+# radiant_heroes_and_positions={'pos 1': 'Wraith King', 'pos 5': 'Venomancer', 'pos 2': 'Dragon Knight', 'pos 3': 'Timbersaw', 'pos 4': 'Keeper of the Light'}
+#
+# dire_heroes_and_positions={'pos 1': 'Gyrocopter', 'pos 5': 'Io', 'pos 3': 'Mars', 'pos 4': 'Phoenix', 'pos 2': 'Rubick'}
+#
+# dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_positions, dire_heroes_and_positions=dire_heroes_and_positions, radiant_team_name='Tundra', dire_team_name='Heroic', score=['0','0'], tier=2)

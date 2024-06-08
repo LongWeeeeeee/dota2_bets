@@ -133,16 +133,19 @@ def analyze_draft(output_message, sinergy, counterpick, pos1_vs_team, core_match
         other_values_check = all(value >= 0 for value in other_values) + all(value <= 0 for value in other_values)
         singery_or_counterpick = all(value >= 0 for value in [counterpick, sinergy]) + all(
             value <= 0 for value in [counterpick, sinergy])
-        over10 = all(value <= -10 for value in [counterpick, sinergy]) + all(
+        both_over10 = all(value <= -10 for value in [counterpick, sinergy]) + all(
             value >= 10 for value in [counterpick, sinergy])
-        both_over10 = all(value >= 10 for value in [counterpick, sinergy]) * all(
-            value >= 0 for value in [counterpick, sinergy])
+        both_over5 = all(value <= -5 for value in [counterpick, sinergy]) + all(
+            value >= 5 for value in [counterpick, sinergy])
+        any_over5 = (all(value > 0 for value in [counterpick, sinergy]) * any(
+            value >= 5 for value in [counterpick, sinergy])) + (all(value < 0 for value in [counterpick, sinergy]) * any(
+            value <= -5 for value in [counterpick, sinergy]))
         if all_positive_or_negative and both_over10:
-            output_message += f'ОТЛИЧНАЯ СТАВКА\n'
-        elif other_values_check and over10:
+            output_message += f'ОТЛИЧНАЯ СТАВКА ALL IN\n'
+        elif other_values_check and both_over5:
             output_message += f'ХОРОШАЯ СТАВКА\n'
-        elif (singery_or_counterpick and over10) or all_positive_or_negative or other_values_check:
-            output_message += f'РИСКОВАЯ СТАВКА на 1 ФЛЕТ\n'
+        elif (singery_or_counterpick and any_over5) or all_positive_or_negative or other_values_check:
+            output_message += f'РИСКОВАЯ СТАВКА\n'
         else:
             output_message += f'ПЛОХАЯ СТАВКА!!!\n'
     else:
@@ -568,6 +571,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
 
     if not 'ПЛОХАЯ СТАВКА!!!' in output_message:
         send_message(output_message)
+        print(output_message)
+    else:
         print(output_message)
     if egb:
         if 'ОТЛИЧНАЯ СТАВКА' in output_message or 'ХОРОШАЯ СТАВКА' in output_message:

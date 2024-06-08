@@ -412,12 +412,12 @@ def get_picks_and_pos(match_id):
                 return radiant, dire, match_id
             else:
                 check_time += 15
-                print(f'пики не полные\n{radiant}\n{dire}')
     else:
         print('карта уже расчитана')
 
 
 while True:
+    map = False
     try:
         importlib.reload(id_to_name)
         response = requests.get(url, params=params, headers=headers)
@@ -436,9 +436,13 @@ while True:
                             dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id, score = [0,0], egb=True)
                     else:
                         print('карта не найдена, вероятно, матч только начался')
+                        map = True
     except: pass
-    print('сплю 3 минуты')
-    time.sleep(160)
+    if map:
+        time.sleep(30)
+    else:
+        print('сплю 3 минуты')
+        time.sleep(160)
 # answer = get_picks_and_pos(match_id=7781964303)
 # if answer is not None:
 #     radiant, dire, match_id = answer

@@ -568,17 +568,18 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             output_message += f'{radiant_heroes_and_positions["pos 4"]} pos 4 with {radiant_heroes_and_positions["pos 5"]} pos 5 Нету на dota2protracker\n'
         if dire_pos4_with_pos5 is None:
             output_message += f'{dire_heroes_and_positions["pos 4"]} pos 4 with {dire_heroes_and_positions["pos 5"]} pos 5 Нету на dota2protracker\n'
-
-    if not 'ПЛОХАЯ СТАВКА!!!' in output_message:
-        send_message(output_message)
-        print(output_message)
-    else:
-        print(output_message)
     if egb:
         if 'ОТЛИЧНАЯ СТАВКА' in output_message or 'ХОРОШАЯ СТАВКА' in output_message:
             send_message(output_message)
         else:
             print(output_message)
+    else:
+        if not 'ПЛОХАЯ СТАВКА!!!' in output_message:
+            send_message(output_message)
+            print(output_message)
+        else:
+            print(output_message)
+
 
     if antiplagiat_url is not None:
         add_url(antiplagiat_url)

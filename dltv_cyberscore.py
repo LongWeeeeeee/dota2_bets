@@ -229,11 +229,12 @@ def get_map_id(match):
         radiant_team_name = match['team_radiant']['name'].lower()
         dire_team_name = match['team_dire']['name'].lower()
         score = match['best_of_score']
-        if 'FISSURE' in match['tournament']['name'] or 'Riyadh' in match['tournament']['name']:
+        keywords = ['FISSURE', 'Riyadh', 'International']
+        if any(keyword in match['tournament']['name'] for keyword in keywords):
             tier = 1
         else:
             tier = match['tournament']['tier']
-        if tier in [1, 2, 3]:
+        if tier in [1, 2]:
             for karta in match['related_matches']:
                 if karta['status'] == 'online':
                     map_id = karta['id']
@@ -565,15 +566,9 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         if dire_pos4_with_pos5 is None:
             output_message += f'{dire_heroes_and_positions["pos 4"]} pos 4 with {dire_heroes_and_positions["pos 5"]} pos 5 Нету на dota2protracker\n'
 
-    if tier in [2, 3]:
-        if 'ОТЛИЧНАЯ СТАВКА' in output_message or 'ХОРОШАЯ СТАВКА' in output_message or 'НОРМ СТАВКА на 1 ФЛЕТ' in output_message:
-            send_message(output_message)
-        else:
-            print(output_message)
-    elif tier == 1:
-        if not 'ПЛОХАЯ СТАВКА!!!' in output_message:
-            send_message(output_message)
-            print(output_message)
+    if not 'ПЛОХАЯ СТАВКА!!!' in output_message:
+        send_message(output_message)
+        print(output_message)
     if egb:
         if 'ОТЛИЧНАЯ СТАВКА' in output_message or 'ХОРОШАЯ СТАВКА' in output_message:
             send_message(output_message)

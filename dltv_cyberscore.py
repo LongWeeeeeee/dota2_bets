@@ -144,9 +144,10 @@ def analyze_draft(output_message, sinergy, counterpick, pos1_vs_team, core_match
             value >=15  for value in [counterpick, sinergy])) + (
                                 all(value < 0 for value in [counterpick, sinergy]) * any(
                             value <= -15 for value in [counterpick, sinergy]))
+        counterpick_over10 = (all(value > 0 for value in [counterpick, sinergy]) * counterpick >= 10) +(all(value < 0 for value in [counterpick, sinergy]) * counterpick <= -10)
         if all_positive_or_negative and both_over10:
             output_message += f'ОТЛИЧНАЯ СТАВКА ALL IN\n'
-        elif other_values_check and (both_over5 or any_over15):
+        elif (other_values_check and (both_over5 or any_over15)) or singery_or_counterpick and counterpick_over10:
             output_message += f'ХОРОШАЯ СТАВКА\n'
         elif (singery_or_counterpick and any_over5) or all_positive_or_negative or other_values_check:
             output_message += f'РИСКОВАЯ СТАВКА\n'

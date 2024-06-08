@@ -433,7 +433,7 @@ while True:
                         if answer is not None:
                             radiant, dire, match_id = answer
                             print(f'Radint pick: {radiant}\nDire pick: {dire}')
-                            dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id, tier=2)
+                            dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id, score = [0,0], egb=True)
                     else:
                         print('карта не найдена, вероятно, матч только начался')
     except: pass

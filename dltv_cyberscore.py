@@ -120,6 +120,37 @@ def get_team_positions(url):
     else:
         print('нету live матчей')
 
+def analyze_draft(output_message, sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team,
+                  sups):
+    values = [sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team, sups]
+    other_values = [sinergy, counterpick, core_matchup, sups]
+    values_nones = sum(1 for value in values if value is None)
+    other_values_nones = sum(1 for value in other_values if value is None)
+    nones = (values_nones <= 2) * (other_values_nones <= 1)
+    if nones:
+        values, other_values = [value for value in values if value is not None], [value for value in other_values if value is not None]
+        all_positive_or_negative = all(value >= 0 for value in values) + all(value <= 0 for value in values)
+        other_values_check = all(value >= 0 for value in other_values) + all(value <= 0 for value in other_values)
+        singery_or_counterpick = all(value >= 0 for value in [counterpick, sinergy]) + all(
+            value <= 0 for value in [counterpick, sinergy])
+        over10 = all(value <= -10 for value in [counterpick, sinergy]) + all(
+            value >= 10 for value in [counterpick, sinergy])
+        both_over10 = all(value >= 10 for value in [counterpick, sinergy]) * all(
+            value >= 0 for value in [counterpick, sinergy])
+        if all_positive_or_negative and both_over10:
+            output_message += f'ОТЛИЧНАЯ СТАВКА\n'
+        elif other_values_check and over10:
+            output_message += f'ХОРОШАЯ СТАВКА\n'
+        elif (singery_or_counterpick and over10) or all_positive_or_negative or other_values_check:
+            output_message += f'РИСКОВАЯ СТАВКА на 1 ФЛЕТ\n'
+        else:
+            output_message += f'ПЛОХАЯ СТАВКА!!!\n'
+    else:
+        output_message += f'ПЛОХАЯ СТАВКА!!!\n'
+    return output_message
+
+
+
 
 
 def fill_players_position(rows, players):
@@ -302,7 +333,7 @@ def send_message(message):
     requests.post(url, json=payload)
 
 
-def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, tier, antiplagiat_url=None, score=[0,0], core_matchup=None, output_message='', only_good_bets=None, only_best_bets=None):
+def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, score, tier=None, antiplagiat_url=None, core_matchup=None, output_message='', egb=None):
     print('dota2protracker')
     radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team, radiant_pos4_with_pos5, dire_pos4_with_pos5 = [], [], [], [] ,[], [], [], [], [], None, None
     for position in radiant_heroes_and_positions:
@@ -493,109 +524,62 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             dire_pos2_vs_team)
     if core_matchup is not None:
         core_matchup -= 50
-    check = False
-    values = [sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team, sups]
-    other_values = [sinergy, counterpick, core_matchup, sups]
-    nones = sum(1 for value in values if value is None)
-    if nones <= 2:
-        for i in range(nones):
-            values.remove(None)
-        all_positive = all(value >= 0 for value in values)
-        all_negative = all(value <= 0 for value in values)
-        one_negative = sum(1 for value in values if value <= 0) == 1
-        one_positive = sum(1 for value in values if value >= 0) == 1
-        other_values_check = None
-        if None not in other_values:
-            other_values_check = sum(1 for value in values if value >= 0) - sum(1 for value in values if value <= 0)
-        if counterpick is not None and sinergy is not None:
-            singery_or_counterpick = sum(1 for value in [counterpick, sinergy] if value < 0) + sum(-1 for value in [counterpick, sinergy] if value > 0)
-            over5=(sum(1 for value in [counterpick, sinergy] if value < -5) + sum(
-                1 for value in [counterpick, sinergy] if value > 5))
-        for hero in list(radiant_heroes_and_positions.values()):
-            if hero in game_changer_list:
-                output_message += f'Аккуратно! У {radiant_team_name} есть {hero}, который может изменить исход боя\n'
-                check = True
-        for hero in list(dire_heroes_and_positions.values()):
-            if hero in game_changer_list:
-                output_message += f'Аккуратно! У {dire_team_name} есть {hero}, который может изменить исход боя\n'
-                check = True
-        if all_positive or all_negative:
-            if not check:
-                if nones == 0:
-                    output_message += f'ОТЛИЧНАЯ СТАВКА\n'
-                    output_message += f'МОЖНО ПОСТАВИТЬ НА ТМ ИЛИ ВМ\n'
-                else:
-                    output_message += f'ХОРОШАЯ СТАВКА\n'
-            else:
-                if nones == 0:
-                    output_message += f'ХОРОШАЯ СТАВКА\n'
-                else:
-                    output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
-        elif other_values_check is not None and other_values_check in [4, -4]:
-            if nones == 0:
-                output_message += f'ХОРОШАЯ СТАВКА\n'
-            else:
-                output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
-            if not check:
-                output_message += f'МОЖНО ПОСТАВИТЬ НА ТМ ИЛИ ВМ\n'
-        elif counterpick is not None and sinergy is not None and singery_or_counterpick in [2, -2]:
-            if over5 > 0:
-                output_message += f'НОРМ СТАВКА на 1 ФЛЕТ\n'
-            else:
-                output_message += f'СОМНИТЕЛЬНАЯ СТАВКА, ТОЛЬКО НА ФАВОРИТА\n'
-            if not check:
-                output_message += f'МОЖНО ПОСТАВИТЬ НА ТМ ИЛИ ВМ\n'
-        else:
-            if not check:
-                output_message += f'МОЖНО ПОСТАВИТЬ НА ТМ ИЛИ ВМ\n'
-            else:
-                output_message += f'МОЖНО ПОСТАВИТЬ НА ТБ\n'
-            output_message += f'ПЛОХАЯ СТАВКА!!!\n'
-    else:
-        output_message += f'ПЛОХАЯ СТАВКА!!!\n'
-
-
+    output_message = analyze_draft(output_message, sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team,
+                  sups)
+    for hero in list(radiant_heroes_and_positions.values()):
+        if hero in game_changer_list:
+            output_message += f'Аккуратно! У {radiant_team_name} есть {hero}, который может изменить исход боя\n'
+            check = True
+    for hero in list(dire_heroes_and_positions.values()):
+        if hero in game_changer_list:
+            output_message += f'Аккуратно! У {dire_team_name} есть {hero}, который может изменить исход боя\n'
+            check = True
     output_message += f'Sinergy: {sinergy}\nCounterpick: {counterpick}\nPos1_vs_team: {pos1_vs_team}\nPos2vs_team: {pos2_vs_team}\nPos3vs_team: {pos3_vs_team}\nCore matchup: {core_matchup}\nSups: {sups}\n'
     if radiant_pos4_with_pos5 is None:
         output_message += f'pos 4 {radiant_heroes_and_positions["pos 4"]} with pos 5 {radiant_heroes_and_positions["pos 5"]} нету на proracker\n'
     if dire_pos4_with_pos5 is None:
         output_message += f'pos 4 {dire_heroes_and_positions["pos 4"]} with pos 5 {dire_heroes_and_positions["pos 5"]} нету на proracker\n'
     if len(radiant_pos3_vs_team) < 1:
-        output_message+= f'Недостаточно данных pos 3 {radiant_heroes_and_positions["pos 3"]} vs {dire_heroes_and_positions}\n'
+        output_message += f'Недостаточно данных pos 3 {radiant_heroes_and_positions["pos 3"]} vs {dire_heroes_and_positions}\n'
     if len(dire_pos3_vs_team) < 1:
-        output_message+= f'Недостаточно данных pos 3 {dire_heroes_and_positions["pos 3"]} vs {radiant_heroes_and_positions}\n'
+        output_message += f'Недостаточно данных pos 3 {dire_heroes_and_positions["pos 3"]} vs {radiant_heroes_and_positions}\n'
     if len(dire_pos2_vs_team) < 1:
-        output_message+= f'Недостаточно данных pos 2 {dire_heroes_and_positions["pos 2"]} vs {radiant_heroes_and_positions}\n'
-    if len(radiant_pos2_vs_team) <1:
-        output_message+=f'Недостаточно данных pos 2 {radiant_heroes_and_positions["pos 2"]} vs {dire_heroes_and_positions}\n'
+        output_message += f'Недостаточно данных pos 2 {dire_heroes_and_positions["pos 2"]} vs {radiant_heroes_and_positions}\n'
+    if len(radiant_pos2_vs_team) < 1:
+        output_message += f'Недостаточно данных pos 2 {radiant_heroes_and_positions["pos 2"]} vs {dire_heroes_and_positions}\n'
     if len(radiant_pos1_vs_team) < 1:
-        output_message+=f'Недостаточно данных pos 1 {radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions}\n'
+        output_message += f'Недостаточно данных pos 1 {radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions}\n'
     if len(dire_pos1_vs_team) < 1:
-        output_message+=f'Недостаточно данных pos 1 {dire_heroes_and_positions["pos 1"]} vs {radiant_heroes_and_positions}\n'
+        output_message += f'Недостаточно данных pos 1 {dire_heroes_and_positions["pos 1"]} vs {radiant_heroes_and_positions}\n'
     if core_matchup is None:
-        output_message+=f'{radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions["pos 1"]} нету на dota2protracker\n'
+        output_message += f'{radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions["pos 1"]} нету на dota2protracker\n'
     if len(dire_wr_with) < 1:
-        output_message+=f'Недостаточная выборка винрейтов у {dire_team_name} между командой\n{dire_heroes_and_positions}\n'
+        output_message += f'Недостаточная выборка винрейтов у {dire_team_name} между командой\n{dire_heroes_and_positions}\n'
     if len(radiant_wr_with) < 1:
-        output_message+=f'Недостаточная выборка винрейтов у {radiant_team_name} между командой\n{radiant_heroes_and_positions}\n'
+        output_message += f'Недостаточная выборка винрейтов у {radiant_team_name} между командой\n{radiant_heroes_and_positions}\n'
     if len(radiant_wr_against) < 1:
-        output_message+=f'Недостаточная выборка винрейтов у команду между друг друга\n{radiant_heroes_and_positions}\n{dire_heroes_and_positions}\n'
+        output_message += f'Недостаточная выборка винрейтов у команду между друг друга\n{radiant_heroes_and_positions}\n{dire_heroes_and_positions}\n'
     if sups is None:
         if radiant_pos4_with_pos5 is None:
             output_message += f'{radiant_heroes_and_positions["pos 4"]} pos 4 with {radiant_heroes_and_positions["pos 5"]} pos 5 Нету на dota2protracker\n'
         if dire_pos4_with_pos5 is None:
             output_message += f'{dire_heroes_and_positions["pos 4"]} pos 4 with {dire_heroes_and_positions["pos 5"]} pos 5 Нету на dota2protracker\n'
 
-
-    if tier != 1:
+    if tier in [2, 3]:
         if 'ОТЛИЧНАЯ СТАВКА' in output_message or 'ХОРОШАЯ СТАВКА' in output_message or 'НОРМ СТАВКА на 1 ФЛЕТ' in output_message:
             send_message(output_message)
         else:
             print(output_message)
-    else:
+    elif tier == 1:
         if not 'ПЛОХАЯ СТАВКА!!!' in output_message:
             send_message(output_message)
             print(output_message)
+    if egb:
+        if 'ОТЛИЧНАЯ СТАВКА' in output_message or 'ХОРОШАЯ СТАВКА' in output_message:
+            send_message(output_message)
+        else:
+            print(output_message)
+
     if antiplagiat_url is not None:
         add_url(antiplagiat_url)
 

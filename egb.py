@@ -93,6 +93,7 @@ def get_strats_graph_match(map_id=None):
         isRadiant
         networth
         playbackData{
+            
           csEvents{
             time
           }
@@ -130,7 +131,7 @@ def get_picks_and_pos(match_id):
         players = json.loads(response.text)['data']['live']['match']['players']
 
 
-        def get_picks(check_time=60):
+        def get_picks(check_time):
             radiant, dire, heroes_left, index = {}, {}, [], None
             radiant_hard, radiant_safe, dire_hard, dire_safe, radiant_mid, dire_mid = [], [], [], [], [], []
             for player in players:
@@ -403,10 +404,8 @@ def get_picks_and_pos(match_id):
                         radiant[positions_copy[0]] = id_to_name.translate[player['heroId']]
             return radiant, dire
 
-        check_time = 60
+        check_time = 80
         while check_time < 256:
-            if check_time > 240:
-                pass
             radiant, dire = get_picks(check_time)
             if len(radiant) == 5 and len(dire) == 5:
                 print(f"https://stratz.com/matches/{match_id}/live\n{radiant}\n{dire}")
@@ -419,25 +418,23 @@ def get_picks_and_pos(match_id):
 
 
 while True:
-    try:
-        importlib.reload(id_to_name)
-        response = requests.get(url, params=params, headers=headers)
-        if response.status_code == 200:
-            data = json.loads(response.text)
-            for bet in data['bets']:
-                if bet['esports'] and bet['streams_enabled'] and bet['game'] == 'Dota 2' and bet['tourn'] in ['Incubator','Ladder Games']:
-                    players_ids, dire_and_radiant = get_players(bet)
-                    response = get_strats_graph_match()
-                    exac_match = get_exac_match(response, players_ids)
-                    if exac_match is not None:
-                        answer = get_picks_and_pos(match_id=exac_match['matchId'])
-                        if answer is not None:
-                            radiant, dire, match_id = answer
-                            print(f'Radint pick: {radiant}\nDire pick: {dire}')
-                            dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id, tier=2)
-                    else:
-                        print('карта не найдена, вероятно, матч только начался')
-    except: pass
+    importlib.reload(id_to_name)
+    response = requests.get(url, params=params, headers=headers)
+    if response.status_code == 200:
+        data = json.loads(response.text)
+        for bet in data['bets']:
+            if bet['esports'] and bet['streams_enabled'] and bet['game'] == 'Dota 2' and bet['tourn'] in ['Incubator','Ladder Games']:
+                players_ids, dire_and_radiant = get_players(bet)
+                response = get_strats_graph_match()
+                exac_match = get_exac_match(response, players_ids)
+                if exac_match is not None:
+                    answer = get_picks_and_pos(match_id=exac_match['matchId'])
+                    if answer is not None:
+                        radiant, dire, match_id = answer
+                        print(f'Radint pick: {radiant}\nDire pick: {dire}')
+                        dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id, tier=2)
+                else:
+                    print('карта не найдена, вероятно, матч только начался')
     print('сплю 3 минуты')
     time.sleep(160)
 # answer = get_picks_and_pos(match_id=7781964303)

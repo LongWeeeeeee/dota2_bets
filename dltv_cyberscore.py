@@ -122,32 +122,32 @@ def get_team_positions(url):
 
 def analyze_draft(output_message, sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team,
                   sups):
-    values = [sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team, sups]
-    other_values = [sinergy, counterpick, core_matchup, sups]
-    values_nones = sum(1 for value in values if value is None)
-    other_values_nones = sum(1 for value in other_values if value is None)
-    nones = (values_nones <= 2) * (other_values_nones <= 1)
-    if nones:
-        values, other_values = [value for value in values if value is not None], [value for value in other_values if value is not None]
-        all_positive_or_negative = all(value >= 0 for value in values) + all(value <= 0 for value in values)
-        other_values_check = all(value >= 0 for value in other_values) + all(value <= 0 for value in other_values)
-        singery_or_counterpick = all(value >= 0 for value in [counterpick, sinergy]) + all(
-            value <= 0 for value in [counterpick, sinergy])
-        both_over10 = all(value <= -10 for value in [counterpick, sinergy]) + all(
-            value >= 10 for value in [counterpick, sinergy])
-        both_over5 = all(value <= -5 for value in [counterpick, sinergy]) + all(
-            value >= 5 for value in [counterpick, sinergy])
-        any_over5 = (all(value > 0 for value in [counterpick, sinergy]) * any(
-            value >= 5 for value in [counterpick, sinergy])) + (all(value < 0 for value in [counterpick, sinergy]) * any(
-            value <= -5 for value in [counterpick, sinergy]))
-        any_over15 = (all(value > 0 for value in [counterpick, sinergy]) * any(
-            value >=15  for value in [counterpick, sinergy])) + (
-                                all(value < 0 for value in [counterpick, sinergy]) * any(
-                            value <= -15 for value in [counterpick, sinergy]))
-        counterpick_over10 = (all(value > 0 for value in [counterpick, sinergy]) * counterpick >= 10) +(all(value < 0 for value in [counterpick, sinergy]) * counterpick <= -10)
+    values = {'sinergy':sinergy, 'counterpick':counterpick, 'pos1_vs_team':pos1_vs_team, 'core_matchup':core_matchup, 'pos2_vs_team':pos2_vs_team, 'pos3_vs_team':pos3_vs_team, 'sups':sups}
+    other_values = {'sinergy':sinergy, 'counterpick':counterpick, 'core_matchup':core_matchup, 'sups':sups}
+    # values_nones = sum(1 for value in values.values() if value is None)
+    # other_values_nones = sum(1 for value in other_values.values() if value is None)
+    # nones = (values_nones <= 2) * (other_values_nones <= 1)
+    # if nones:
+    if True:
+        # values, other_values = [value for value in values if value is not None], [value for value in other_values if value is not None]
+        all_positive_or_negative = all(value >= 0 for value in values.values() if value is not None) + all(value <= 0 for value in values.values() if value is not None)
+        other_values_check = all(value >= 0 for value in other_values.values() if value is not None) + all(value <= 0 for value in other_values.values() if value is not None)
+        singery_or_counterpick = all(value >= 0 for value in [counterpick, sinergy] if value is not None) + all(
+            value <= 0 for value in [counterpick, sinergy] if value is not None)
+        both_over10 = all(value <= -10 for value in [counterpick, sinergy] if value is not None) + all(
+            value >= 10 for value in [counterpick, sinergy] if value is not None)
+        both_over5 = all(value <= -5 for value in [counterpick, sinergy] if value is not None) + all(
+            value >= 5 for value in [counterpick, sinergy] if value is not None)
+        any_over5 = (all(value > 0 for value in [counterpick, sinergy] if value is not None ) * any(
+            value >= 5 for value in [counterpick, sinergy] if value is not None)) + (all(value < 0 for value in [counterpick, sinergy] if value is not None) * any(
+            value <= -5 for value in [counterpick, sinergy] if value is not None))
+        if counterpick is not None:
+            counterpick_over10 = (all(value > 0 for value in [counterpick, sinergy] if value is not None) * counterpick >= 10) +(all(value < 0 for value in [counterpick, sinergy] if value is not None) * counterpick <= -10)
+        else:
+            counterpick_over10 = False
         if all_positive_or_negative and both_over10:
             output_message += f'ОТЛИЧНАЯ СТАВКА ALL IN\n'
-        elif (other_values_check and (both_over5 or any_over15)) or singery_or_counterpick and counterpick_over10:
+        elif (other_values_check and both_over5) or (singery_or_counterpick and counterpick_over10):
             output_message += f'ХОРОШАЯ СТАВКА\n'
         elif (singery_or_counterpick and any_over5) or all_positive_or_negative or other_values_check:
             output_message += f'РИСКОВАЯ СТАВКА\n'
@@ -302,12 +302,12 @@ def if_picks_are_done(soup):
 
 
 def clean_up(inp, lenght=0):
-    if len(inp) >= lenght:
+    if len(inp) > lenght:
         copy = inp.copy()
         for i in inp:
-            if i >45 and i <55:
+            if i >=44 and i <=56:
                 copy.remove(i)
-        if len(copy) == 0:
+        if len(copy) < 2:
             return inp
         else:
             return copy
@@ -507,15 +507,15 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         sups = radiant_pos4_with_pos5 - dire_pos4_with_pos5
     else:
         sups = None
-    dire_wr_with = clean_up(dire_wr_with, 5)
-    radiant_wr_with = clean_up(radiant_wr_with, 5)
-    radiant_wr_against = clean_up(radiant_wr_against, 6)
-    radiant_pos1_vs_team = clean_up(radiant_pos1_vs_team)
-    dire_pos1_vs_team = clean_up(dire_pos1_vs_team)
-    radiant_pos2_vs_team = clean_up(radiant_pos2_vs_team)
-    dire_pos2_vs_team = clean_up(dire_pos2_vs_team)
-    radiant_pos3_vs_team = clean_up(radiant_pos3_vs_team)
-    dire_pos3_vs_team = clean_up(dire_pos3_vs_team)
+    dire_wr_with = clean_up(dire_wr_with, 4)
+    radiant_wr_with = clean_up(radiant_wr_with, 4)
+    radiant_wr_against = clean_up(radiant_wr_against, 5)
+    # radiant_pos1_vs_team = clean_up(radiant_pos1_vs_team)
+    # dire_pos1_vs_team = clean_up(dire_pos1_vs_team)
+    # radiant_pos2_vs_team = clean_up(radiant_pos2_vs_team)
+    # dire_pos2_vs_team = clean_up(dire_pos2_vs_team)
+    # radiant_pos3_vs_team = clean_up(radiant_pos3_vs_team)
+    # dire_pos3_vs_team = clean_up(dire_pos3_vs_team)
     sinergy, counterpick ,pos1_vs_team, pos2_vs_team, pos3_vs_team  = None, None, None, None, None
     output_message += f'{radiant_team_name} vs {dire_team_name}\n'
     if len(radiant_wr_with) > 0 and len(dire_wr_with) > 0:
@@ -592,8 +592,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
 # testing
 # {'pos 1': 'Wraith King', 'pos 5': 'Venomancer', 'pos 2': 'Dragon Knight', 'pos 3': 'Timbersaw', 'pos 4': 'Keeper of the Light'}
 #
-# radiant_heroes_and_positions={'pos 1': 'Wraith King', 'pos 5': 'Venomancer', 'pos 2': 'Dragon Knight', 'pos 3': 'Timbersaw', 'pos 4': 'Keeper of the Light'}
+# radiant_heroes_and_positions={'pos 1': 'Weaver', 'pos 5': 'Io', 'pos 2': 'Leshrac', 'pos 3': 'Axe', 'pos 4': 'Dark Willow'}
 #
-# dire_heroes_and_positions={'pos 1': 'Gyrocopter', 'pos 5': 'Io', 'pos 3': 'Mars', 'pos 4': 'Phoenix', 'pos 2': 'Rubick'}
+# dire_heroes_and_positions={'pos 1': 'Alchemist', 'pos 5': 'Tinker', 'pos 3': 'Bristleback', 'pos 4': 'Mirana', 'pos 2': 'Magnus'}
 #
 # dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_positions, dire_heroes_and_positions=dire_heroes_and_positions, radiant_team_name='Tundra', dire_team_name='Heroic', score=['0','0'], tier=2)

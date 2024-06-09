@@ -408,7 +408,7 @@ def get_picks_and_pos(match_id):
         while check_time < 256:
             radiant, dire = get_picks(check_time)
             if len(radiant) == 5 and len(dire) == 5:
-                print(f"https://stratz.com/matches/{match_id}/live\n{radiant}\n{dire}")
+                print(f"https://stratz.com/matches/{match_id}/live")
                 return radiant, dire, match_id
             else:
                 check_time += 15

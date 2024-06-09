@@ -305,9 +305,9 @@ def clean_up(inp, lenght=0):
     if len(inp) > lenght:
         copy = inp.copy()
         for i in inp:
-            if i >=44 and i <=56:
+            if i >=45 and i <=55:
                 copy.remove(i)
-        if len(copy) < 2:
+        if len(copy) < 3:
             return inp
         else:
             return copy
@@ -510,16 +510,17 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     dire_wr_with = clean_up(dire_wr_with, 4)
     radiant_wr_with = clean_up(radiant_wr_with, 4)
     radiant_wr_against = clean_up(radiant_wr_against, 5)
-    # radiant_pos1_vs_team = clean_up(radiant_pos1_vs_team)
-    # dire_pos1_vs_team = clean_up(dire_pos1_vs_team)
-    # radiant_pos2_vs_team = clean_up(radiant_pos2_vs_team)
-    # dire_pos2_vs_team = clean_up(dire_pos2_vs_team)
-    # radiant_pos3_vs_team = clean_up(radiant_pos3_vs_team)
-    # dire_pos3_vs_team = clean_up(dire_pos3_vs_team)
+    radiant_pos1_vs_team = clean_up(radiant_pos1_vs_team)
+    dire_pos1_vs_team = clean_up(dire_pos1_vs_team)
+    radiant_pos2_vs_team = clean_up(radiant_pos2_vs_team)
+    dire_pos2_vs_team = clean_up(dire_pos2_vs_team)
+    radiant_pos3_vs_team = clean_up(radiant_pos3_vs_team)
+    dire_pos3_vs_team = clean_up(dire_pos3_vs_team)
     sinergy, counterpick ,pos1_vs_team, pos2_vs_team, pos3_vs_team  = None, None, None, None, None
     output_message += f'{radiant_team_name} vs {dire_team_name}\n'
     if len(radiant_wr_with) > 0 and len(dire_wr_with) > 0:
         sinergy = (sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))
+    ##ПОЧЕМУ ТУТ -50?
     if len(radiant_wr_against) > 0:
         counterpick = sum(radiant_wr_against) / len(radiant_wr_against) - 50
     if len(radiant_pos1_vs_team) > 0 and len(dire_pos1_vs_team) > 0:

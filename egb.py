@@ -392,8 +392,9 @@ def get_picks_and_pos(match_id):
 
 
 while True:
+    map = False
     try:
-        map = False
+
         importlib.reload(id_to_name)
         response = requests.get(url, params=params, headers=headers)
         if response.status_code == 200:

@@ -182,7 +182,7 @@ def get_picks_and_pos(match_id):
                     elif len(dire_mid) == 0:
                         dire_mid.append(player)
             if len(radiant_safe) == 2:
-                zero_networth, first_networth = 0, 0
+                zero_networth, first_networth, zero_cs, first_cs = 0, 0, 0, 0
                 for event in radiant_safe[0]['playbackData']['goldEvents']:
                     if event['time'] > check_time:
                         zero_networth = event['networth']
@@ -191,14 +191,23 @@ def get_picks_and_pos(match_id):
                     if event['time'] > check_time:
                         first_networth = event['networth']
                         break
-                if zero_networth > first_networth:
+                
+                for event in radiant_safe[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs += 1
+                        break
+                for event in radiant_safe[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs += 1
+                        break
+                if zero_networth > first_networth and zero_cs > first_cs:
                     radiant['pos 1'] = id_to_name.translate[radiant_safe[0]['heroId']]
                     radiant['pos 5'] = id_to_name.translate[radiant_safe[1]['heroId']]
-                elif zero_networth < first_networth:
+                elif zero_networth < first_networth and zero_cs < first_cs:
                     radiant['pos 1'] = id_to_name.translate[radiant_safe[1]['heroId']]
                     radiant['pos 5'] = id_to_name.translate[radiant_safe[0]['heroId']]
             if len(radiant_hard) == 2:
-                zero_networth, first_networth = 0, 0
+                zero_networth, first_networth, zero_cs, first_cs = 0, 0, 0, 0
                 for event in radiant_hard[0]['playbackData']['goldEvents']:
                     if event['time'] > check_time:
                         zero_networth = event['networth']
@@ -207,14 +216,22 @@ def get_picks_and_pos(match_id):
                     if event['time'] > check_time:
                         first_networth = event['networth']
                         break
-                if zero_networth > first_networth:
+                for event in radiant_hard[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs += 1
+                        break
+                for event in radiant_hard[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs += 1
+                        break
+                if zero_networth > first_networth and zero_cs > first_cs:
                     radiant['pos 3'] = id_to_name.translate[radiant_hard[0]['heroId']]
                     radiant['pos 4'] = id_to_name.translate[radiant_hard[1]['heroId']]
-                elif zero_networth < first_networth:
+                if zero_networth < first_networth and zero_cs < first_cs:
                     radiant['pos 3'] = id_to_name.translate[radiant_hard[1]['heroId']]
                     radiant['pos 4'] = id_to_name.translate[radiant_hard[0]['heroId']]
             if len(dire_safe) == 2:
-                zero_networth, first_networth = 0, 0
+                zero_networth, first_networth, zero_cs, first_cs = 0, 0, 0, 0
                 for event in dire_safe[0]['playbackData']['goldEvents']:
                     if event['time'] > check_time:
                         zero_networth = event['networth']
@@ -223,14 +240,22 @@ def get_picks_and_pos(match_id):
                     if event['time'] > check_time:
                         first_networth = event['networth']
                         break
-                if zero_networth > first_networth:
+                for event in dire_safe[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs += 1
+                        break
+                for event in dire_safe[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs += 1
+                        break
+                if zero_networth > first_networth and zero_cs > first_cs:
                     dire['pos 1'] = id_to_name.translate[dire_safe[0]['heroId']]
                     dire['pos 5'] = id_to_name.translate[dire_safe[1]['heroId']]
-                elif zero_networth < first_networth:
+                if zero_networth < first_networth and zero_cs < first_cs:
                     dire['pos 1'] = id_to_name.translate[dire_safe[1]['heroId']]
                     dire['pos 5'] = id_to_name.translate[dire_safe[0]['heroId']]
             if len(dire_hard) == 2:
-                zero_networth, first_networth = 0, 0
+                zero_networth, first_networth, zero_cs, first_cs = 0, 0, 0, 0
                 for event in dire_hard[0]['playbackData']['goldEvents']:
                     if event['time'] > check_time:
                         zero_networth = event['networth']
@@ -239,16 +264,24 @@ def get_picks_and_pos(match_id):
                     if event['time'] > check_time:
                         first_networth = event['networth']
                         break
-                if zero_networth > first_networth:
+                for event in dire_hard[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs += 1
+                        break
+                for event in dire_hard[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs += 1
+                        break
+                if zero_networth > first_networth and zero_cs > first_cs:
                     dire['pos 3'] = id_to_name.translate[dire_hard[0]['heroId']]
                     dire['pos 4'] = id_to_name.translate[dire_hard[1]['heroId']]
-                elif zero_networth < first_networth:
+                if zero_networth < first_networth and zero_cs < first_cs:
                     dire['pos 3'] = id_to_name.translate[dire_hard[1]['heroId']]
                     dire['pos 4'] = id_to_name.translate[dire_hard[0]['heroId']]
             if len(radiant_mid) == 1:
                 radiant['pos 2'] = id_to_name.translate[radiant_mid[0]['heroId']]
             elif len(radiant_mid) == 2:
-                zero_networth, first_networth = 0, 0
+                zero_networth, first_networth, zero_cs, first_cs = 0, 0, 0, 0
                 for event in radiant_mid[0]['playbackData']['goldEvents']:
                     if event['time'] > check_time:
                         zero_networth = event['networth']
@@ -257,16 +290,24 @@ def get_picks_and_pos(match_id):
                     if event['time'] > check_time:
                         first_networth = event['networth']
                         break
-                if zero_networth > first_networth:
+                for event in radiant_mid[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs += 1
+                        break
+                for event in radiant_mid[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs += 1
+                        break
+                if zero_networth > first_networth and zero_cs > first_cs:
                     radiant['pos 2'] = id_to_name.translate[radiant_mid[0]['heroId']]
                     heroes_left.append(radiant_mid[1])
-                elif zero_networth < first_networth:
+                if zero_networth < first_networth and zero_cs < first_cs:
                     radiant['pos 2'] = id_to_name.translate[radiant_mid[1]['heroId']]
                     heroes_left.append(radiant_mid[0])
             if len(dire_mid) == 1:
                 dire['pos 2'] = id_to_name.translate[dire_mid[0]['heroId']]
             elif len(dire_mid) == 2:
-                zero_networth, first_networth = 0, 0
+                zero_networth, first_networth, zero_cs, first_cs = 0, 0, 0, 0
                 for event in dire_mid[0]['playbackData']['goldEvents']:
                     if event['time'] > check_time:
                         zero_networth = event['networth']
@@ -275,10 +316,18 @@ def get_picks_and_pos(match_id):
                     if event['time'] > check_time:
                         first_networth = event['networth']
                         break
-                if zero_networth > first_networth:
+                for event in dire_mid[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs += 1
+                        break
+                for event in dire_mid[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs += 1
+                        break
+                if zero_networth > first_networth and zero_cs > first_cs:
                     dire['pos 2'] = id_to_name.translate[dire_mid[0]['heroId']]
                     heroes_left.append(dire_mid[1])
-                elif zero_networth < first_networth:
+                if zero_networth < first_networth and zero_cs < first_cs:
                     dire['pos 2'] = id_to_name.translate[dire_mid[1]['heroId']]
                     heroes_left.append(dire_mid[0])
             for player in heroes_left:
@@ -314,7 +363,7 @@ def get_picks_and_pos(match_id):
                     elif len(dire_mid) == 0:
                         dire_mid.append(player)
             if len(radiant_safe) == 2:
-                zero_networth, first_networth = 0, 0
+                zero_networth, first_networth, zero_cs, first_cs = 0, 0, 0, 0
                 for event in radiant_safe[0]['playbackData']['goldEvents']:
                     if event['time'] > check_time:
                         zero_networth = event['networth']
@@ -323,14 +372,23 @@ def get_picks_and_pos(match_id):
                     if event['time'] > check_time:
                         first_networth = event['networth']
                         break
-                if zero_networth > first_networth:
+
+                for event in radiant_safe[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs += 1
+                        break
+                for event in radiant_safe[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs += 1
+                        break
+                if zero_networth > first_networth and zero_cs > first_cs:
                     radiant['pos 1'] = id_to_name.translate[radiant_safe[0]['heroId']]
                     radiant['pos 5'] = id_to_name.translate[radiant_safe[1]['heroId']]
-                elif zero_networth < first_networth:
+                elif zero_networth < first_networth and zero_cs < first_cs:
                     radiant['pos 1'] = id_to_name.translate[radiant_safe[1]['heroId']]
                     radiant['pos 5'] = id_to_name.translate[radiant_safe[0]['heroId']]
             if len(radiant_hard) == 2:
-                zero_networth, first_networth = 0, 0
+                zero_networth, first_networth, zero_cs, first_cs = 0, 0, 0, 0
                 for event in radiant_hard[0]['playbackData']['goldEvents']:
                     if event['time'] > check_time:
                         zero_networth = event['networth']
@@ -339,28 +397,46 @@ def get_picks_and_pos(match_id):
                     if event['time'] > check_time:
                         first_networth = event['networth']
                         break
-                if zero_networth > first_networth:
+                for event in radiant_hard[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs += 1
+                        break
+                for event in radiant_hard[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs += 1
+                        break
+                if zero_networth > first_networth and zero_cs > first_cs:
                     radiant['pos 3'] = id_to_name.translate[radiant_hard[0]['heroId']]
                     radiant['pos 4'] = id_to_name.translate[radiant_hard[1]['heroId']]
-                elif zero_networth < first_networth:
+                if zero_networth < first_networth and zero_cs < first_cs:
                     radiant['pos 3'] = id_to_name.translate[radiant_hard[1]['heroId']]
                     radiant['pos 4'] = id_to_name.translate[radiant_hard[0]['heroId']]
             if len(dire_safe) == 2:
-                zero_networth, first_networth = 0, 0
+                zero_networth, first_networth, zero_cs, first_cs = 0, 0, 0, 0
                 for event in dire_safe[0]['playbackData']['goldEvents']:
                     if event['time'] > check_time:
                         zero_networth = event['networth']
+                        break
                 for event in dire_safe[1]['playbackData']['goldEvents']:
                     if event['time'] > check_time:
                         first_networth = event['networth']
-                if zero_networth > first_networth:
+                        break
+                for event in dire_safe[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs += 1
+                        break
+                for event in dire_safe[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs += 1
+                        break
+                if zero_networth > first_networth and zero_cs > first_cs:
                     dire['pos 1'] = id_to_name.translate[dire_safe[0]['heroId']]
                     dire['pos 5'] = id_to_name.translate[dire_safe[1]['heroId']]
-                elif zero_networth < first_networth:
+                if zero_networth < first_networth and zero_cs < first_cs:
                     dire['pos 1'] = id_to_name.translate[dire_safe[1]['heroId']]
                     dire['pos 5'] = id_to_name.translate[dire_safe[0]['heroId']]
             if len(dire_hard) == 2:
-                zero_networth, first_networth = 0, 0
+                zero_networth, first_networth, zero_cs, first_cs = 0, 0, 0, 0
                 for event in dire_hard[0]['playbackData']['goldEvents']:
                     if event['time'] > check_time:
                         zero_networth = event['networth']
@@ -369,16 +445,24 @@ def get_picks_and_pos(match_id):
                     if event['time'] > check_time:
                         first_networth = event['networth']
                         break
-                if zero_networth > first_networth:
+                for event in dire_hard[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs += 1
+                        break
+                for event in dire_hard[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs += 1
+                        break
+                if zero_networth > first_networth and zero_cs > first_cs:
                     dire['pos 3'] = id_to_name.translate[dire_hard[0]['heroId']]
                     dire['pos 4'] = id_to_name.translate[dire_hard[1]['heroId']]
-                elif zero_networth < first_networth:
+                if zero_networth < first_networth and zero_cs < first_cs:
                     dire['pos 3'] = id_to_name.translate[dire_hard[1]['heroId']]
                     dire['pos 4'] = id_to_name.translate[dire_hard[0]['heroId']]
             if len(radiant_mid) == 1:
                 radiant['pos 2'] = id_to_name.translate[radiant_mid[0]['heroId']]
             elif len(radiant_mid) == 2:
-                zero_networth, first_networth = 0, 0
+                zero_networth, first_networth, zero_cs, first_cs = 0, 0, 0, 0
                 for event in radiant_mid[0]['playbackData']['goldEvents']:
                     if event['time'] > check_time:
                         zero_networth = event['networth']
@@ -387,16 +471,24 @@ def get_picks_and_pos(match_id):
                     if event['time'] > check_time:
                         first_networth = event['networth']
                         break
-                if zero_networth > first_networth:
+                for event in radiant_mid[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs += 1
+                        break
+                for event in radiant_mid[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs += 1
+                        break
+                if zero_networth > first_networth and zero_cs > first_cs:
                     radiant['pos 2'] = id_to_name.translate[radiant_mid[0]['heroId']]
                     heroes_left.append(radiant_mid[1])
-                elif zero_networth < first_networth:
+                if zero_networth < first_networth and zero_cs < first_cs:
                     radiant['pos 2'] = id_to_name.translate[radiant_mid[1]['heroId']]
                     heroes_left.append(radiant_mid[0])
             if len(dire_mid) == 1:
                 dire['pos 2'] = id_to_name.translate[dire_mid[0]['heroId']]
             elif len(dire_mid) == 2:
-                zero_networth, first_networth = 0, 0
+                zero_networth, first_networth, zero_cs, first_cs = 0, 0, 0, 0
                 for event in dire_mid[0]['playbackData']['goldEvents']:
                     if event['time'] > check_time:
                         zero_networth = event['networth']
@@ -405,10 +497,18 @@ def get_picks_and_pos(match_id):
                     if event['time'] > check_time:
                         first_networth = event['networth']
                         break
-                if zero_networth > first_networth:
+                for event in dire_mid[0]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        zero_cs += 1
+                        break
+                for event in dire_mid[1]['playbackData']['csEvents']:
+                    if event['time'] < check_time:
+                        first_cs += 1
+                        break
+                if zero_networth > first_networth and zero_cs > first_cs:
                     dire['pos 2'] = id_to_name.translate[dire_mid[0]['heroId']]
                     heroes_left.append(dire_mid[1])
-                elif zero_networth < first_networth:
+                if zero_networth < first_networth and zero_cs < first_cs:
                     dire['pos 2'] = id_to_name.translate[dire_mid[1]['heroId']]
                     heroes_left.append(dire_mid[0])
             positions = ['pos 1', 'pos 2', 'pos 3', 'pos 4', 'pos 5']
@@ -443,27 +543,27 @@ def get_picks_and_pos(match_id):
 
 while True:
     map = False
-    try:
-        importlib.reload(id_to_name)
-        response = requests.get(url, params=params, headers=headers)
-        if response.status_code == 200:
-            data = json.loads(response.text)
-            for bet in data['bets']:
-                if bet['esports'] and bet['streams_enabled'] and bet['game'] == 'Dota 2' and bet['tourn'] in ['Incubator','Ladder Games']:
-                    players_ids, dire_and_radiant = get_players(bet)
-                    response = get_strats_graph_match()
-                    exac_match = get_exac_match(response, players_ids)
-                    if exac_match is not None:
-                        answer = get_picks_and_pos(match_id=exac_match['matchId'])
-                        if answer is not None:
-                            radiant, dire, match_id = answer
-                            print(f'Radint pick: {radiant}\nDire pick: {dire}')
-                            dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id, score = [0,0], egb=True)
-                    else:
-                        print('карта не найдена, вероятно, матч только начался')
-                        map = True
-    except Exception as e:
-        print(e)
+# try:
+    importlib.reload(id_to_name)
+    response = requests.get(url, params=params, headers=headers)
+    if response.status_code == 200:
+        data = json.loads(response.text)
+        for bet in data['bets']:
+            if bet['esports'] and bet['streams_enabled'] and bet['game'] == 'Dota 2' and bet['tourn'] in ['Incubator','Ladder Games']:
+                players_ids, dire_and_radiant = get_players(bet)
+                response = get_strats_graph_match()
+                exac_match = get_exac_match(response, players_ids)
+                if exac_match is not None:
+                    answer = get_picks_and_pos(match_id=exac_match['matchId'])
+                    if answer is not None:
+                        radiant, dire, match_id = answer
+                        print(f'Radint pick: {radiant}\nDire pick: {dire}')
+                        dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id, score = [0,0], egb=True)
+                else:
+                    print('карта не найдена, вероятно, матч только начался')
+                    map = True
+    # except Exception as e:
+    #     print(e)
     if map:
         print('сплю 30 секунд')
         time.sleep(30)

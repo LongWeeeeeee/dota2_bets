@@ -376,7 +376,7 @@ def get_picks_and_pos(match_id):
     if if_unique(match_id) is not None:
         response = get_strats_graph_match(match_id)
         players = json.loads(response.text)['data']['live']['match']['players']
-        check_time = 60
+        check_time = 75
         while check_time < 400:
             radiant, dire = get_picks(check_time, players)
             if len(radiant) == 5 and len(dire) == 5:

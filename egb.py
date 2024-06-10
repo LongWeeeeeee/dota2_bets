@@ -195,10 +195,12 @@ def get_picks_and_pos(match_id):
                 for event in radiant_safe[0]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         zero_cs += 1
+                    else:
                         break
                 for event in radiant_safe[1]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         first_cs += 1
+                    else:
                         break
                 if zero_networth > first_networth and zero_cs > first_cs:
                     radiant['pos 1'] = id_to_name.translate[radiant_safe[0]['heroId']]
@@ -219,10 +221,12 @@ def get_picks_and_pos(match_id):
                 for event in radiant_hard[0]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         zero_cs += 1
+                    else:
                         break
                 for event in radiant_hard[1]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         first_cs += 1
+                    else:
                         break
                 if zero_networth > first_networth and zero_cs > first_cs:
                     radiant['pos 3'] = id_to_name.translate[radiant_hard[0]['heroId']]
@@ -243,10 +247,12 @@ def get_picks_and_pos(match_id):
                 for event in dire_safe[0]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         zero_cs += 1
+                    else:
                         break
                 for event in dire_safe[1]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         first_cs += 1
+                    else:
                         break
                 if zero_networth > first_networth and zero_cs > first_cs:
                     dire['pos 1'] = id_to_name.translate[dire_safe[0]['heroId']]
@@ -267,10 +273,12 @@ def get_picks_and_pos(match_id):
                 for event in dire_hard[0]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         zero_cs += 1
+                    else:
                         break
                 for event in dire_hard[1]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         first_cs += 1
+                    else:
                         break
                 if zero_networth > first_networth and zero_cs > first_cs:
                     dire['pos 3'] = id_to_name.translate[dire_hard[0]['heroId']]
@@ -293,10 +301,12 @@ def get_picks_and_pos(match_id):
                 for event in radiant_mid[0]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         zero_cs += 1
+                    else:
                         break
                 for event in radiant_mid[1]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         first_cs += 1
+                    else:
                         break
                 if zero_networth > first_networth and zero_cs > first_cs:
                     radiant['pos 2'] = id_to_name.translate[radiant_mid[0]['heroId']]
@@ -319,10 +329,12 @@ def get_picks_and_pos(match_id):
                 for event in dire_mid[0]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         zero_cs += 1
+                    else:
                         break
                 for event in dire_mid[1]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         first_cs += 1
+                    else:
                         break
                 if zero_networth > first_networth and zero_cs > first_cs:
                     dire['pos 2'] = id_to_name.translate[dire_mid[0]['heroId']]
@@ -376,10 +388,12 @@ def get_picks_and_pos(match_id):
                 for event in radiant_safe[0]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         zero_cs += 1
+                    else:
                         break
                 for event in radiant_safe[1]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         first_cs += 1
+                    else:
                         break
                 if zero_networth > first_networth and zero_cs > first_cs:
                     radiant['pos 1'] = id_to_name.translate[radiant_safe[0]['heroId']]
@@ -400,10 +414,12 @@ def get_picks_and_pos(match_id):
                 for event in radiant_hard[0]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         zero_cs += 1
+                    else:
                         break
                 for event in radiant_hard[1]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         first_cs += 1
+                    else:
                         break
                 if zero_networth > first_networth and zero_cs > first_cs:
                     radiant['pos 3'] = id_to_name.translate[radiant_hard[0]['heroId']]
@@ -424,10 +440,12 @@ def get_picks_and_pos(match_id):
                 for event in dire_safe[0]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         zero_cs += 1
+                    else:
                         break
                 for event in dire_safe[1]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         first_cs += 1
+                    else:
                         break
                 if zero_networth > first_networth and zero_cs > first_cs:
                     dire['pos 1'] = id_to_name.translate[dire_safe[0]['heroId']]
@@ -448,10 +466,12 @@ def get_picks_and_pos(match_id):
                 for event in dire_hard[0]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         zero_cs += 1
+                    else:
                         break
                 for event in dire_hard[1]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         first_cs += 1
+                    else:
                         break
                 if zero_networth > first_networth and zero_cs > first_cs:
                     dire['pos 3'] = id_to_name.translate[dire_hard[0]['heroId']]
@@ -474,10 +494,12 @@ def get_picks_and_pos(match_id):
                 for event in radiant_mid[0]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         zero_cs += 1
+                    else:
                         break
                 for event in radiant_mid[1]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         first_cs += 1
+                    else:
                         break
                 if zero_networth > first_networth and zero_cs > first_cs:
                     radiant['pos 2'] = id_to_name.translate[radiant_mid[0]['heroId']]
@@ -500,10 +522,12 @@ def get_picks_and_pos(match_id):
                 for event in dire_mid[0]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         zero_cs += 1
+                    else:
                         break
                 for event in dire_mid[1]['playbackData']['csEvents']:
                     if event['time'] < check_time:
                         first_cs += 1
+                    else:
                         break
                 if zero_networth > first_networth and zero_cs > first_cs:
                     dire['pos 2'] = id_to_name.translate[dire_mid[0]['heroId']]
@@ -537,6 +561,7 @@ def get_picks_and_pos(match_id):
                 return radiant, dire, match_id
             else:
                 check_time += 15
+        print('неудалось выяснить пики')
     else:
         print('карта уже расчитана')
 

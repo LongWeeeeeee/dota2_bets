@@ -505,6 +505,10 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                 if 'pos 3' in data_pos and data_hero == dire_heroes_and_positions['pos 3'] and tracker_position == position:
                     dire_pos3_vs_team.append(100-data_wr)
     #
+    if type(antiplagiat_url) == int:
+        output_message += f'https://stratz.com/matches/{antiplagiat_url}/live\n'
+    else:
+        output_message += antiplagiat_url + '\n'
     output_message += f'Счет: {score}\n'
     if radiant_pos4_with_pos5 is not None and dire_pos4_with_pos5 is not None:
         sups = radiant_pos4_with_pos5 - dire_pos4_with_pos5

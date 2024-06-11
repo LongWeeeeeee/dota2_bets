@@ -7,24 +7,6 @@ from dltv_cyberscore import dota2protracker, if_unique, send_message
 import requests
 
 
-url = "https://egb.com/bets"
-params = {
-    "active": "true",
-    "st": "1714418601",
-    "ut": "1714418584"
-}
-
-headers = {
-    "Host": "egb.com",
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0",
-    "Accept": "application/json",
-    "Accept-Language": "en-US,en;q=0.5",
-    "Content-Type": "application/json",
-    "X-CSRF-Token": "UUu1IL8sY0iZFFc2_FYI4ICk-WT34IRRGjz19DND8CbKEJZ9zTvbeAdcw72OYEecZiDlBaZimaYP-VuJwtmkAQ",
-    "DNT": "1",
-    "Sec-GPC": "1",
-}
-
 
 def get_players(bet):
     dire_and_radiant = {}

@@ -38,9 +38,11 @@ def get_players(bet):
         if player_names[0] not in id_to_name.blacklist_players and player_names[1] not in id_to_name.blacklist_players:
             if player_names[0] in id_to_name.egb or player_names[1] in id_to_name.egb:
                 if player_names[0] in id_to_name.egb:
-                    players_ids.append(id_to_name.egb[player_names[0]]['steamId'])
+                    for player in id_to_name.egb[player_names[0]]['steamId']:
+                        players_ids.append(player)
                 elif player_names[1] in id_to_name.egb:
-                    players_ids.append(id_to_name.egb[player_names[1]]['steamId'])
+                    for player in id_to_name.egb[player_names[1]]['steamId']:
+                        players_ids.append(player)
             else:
                 print(f'{player_names[0]} и {player_names[1]} не найдны')
                 send_message(f'{player_names[0]} и {player_names[1]} не найдны')
@@ -51,7 +53,8 @@ def get_players(bet):
     elif len(player_names) == 1:
         if player_names[0] not in id_to_name.blacklist_players:
             if player_names[0] in id_to_name.egb:
-                players_ids.append(id_to_name.egb[player_names[0]]['steamId'])
+                for player in id_to_name.egb[player_names[0]]['steamId']:
+                    players_ids.append(player)
             else:
                 print(f'{player_names[0]} не найден')
                 send_message(f'{player_names[0]} не найден')
@@ -180,14 +183,14 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
                 break
         if zero_networth > first_networth and zero_cs > first_cs:
             for player in id_to_name.egb:
-                if id_to_name.egb[player]['steamId'] == radiant_safe[1]['steamAccountId']:
+                if radiant_safe[1]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                     if 'pos 5' not in id_to_name.egb[player]['position']:
                         message  = (f'{player} играет не на своей роли: {id_to_name.translate[radiant_safe[1]["heroId"]]} pos 5\n')
                         if message not in output_message:
                             output_message += message
-                elif id_to_name.egb[player]['steamId'] == radiant_safe[0]['steamAccountId']:
+                elif radiant_safe[0]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                     if 'pos 1' not in id_to_name.egb[player]['position']:
-                        message = (f'{player} играет не на своей роли: {id_to_name.translate[radiant_safe[0]["heroId"]]} pos 1')
+                        message = (f'{player} играет не на своей роли: {id_to_name.translate[radiant_safe[0]["heroId"]]} pos 1\n')
                         if message not in output_message:
                             output_message += message
 
@@ -195,14 +198,14 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
             radiant['pos 5'] = id_to_name.translate[radiant_safe[1]['heroId']]
         elif zero_networth < first_networth and zero_cs < first_cs:
             for player in id_to_name.egb:
-                if id_to_name.egb[player]['steamId'] == radiant_safe[1]['steamAccountId']:
+                if radiant_safe[1]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                     if 'pos 1' not in id_to_name.egb[player]['position']:
-                        message = (f'{player} играет не на своей роли: {id_to_name.translate[radiant_safe[1]["heroId"]]} pos 1')
+                        message = (f'{player} играет не на своей роли: {id_to_name.translate[radiant_safe[1]["heroId"]]} pos 1\n')
                         if message not in output_message:
                             output_message += message
-                elif id_to_name.egb[player]['steamId'] == radiant_safe[0]['steamAccountId']:
+                elif radiant_safe[0]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                     if 'pos 5' not in id_to_name.egb[player]['position']:
-                        message = (f'{player} играет не на своей роли: {id_to_name.translate[radiant_safe[0]["heroId"]]} pos 5')
+                        message = (f'{player} играет не на своей роли: {id_to_name.translate[radiant_safe[0]["heroId"]]} pos 5\n')
                         if message not in output_message:
                             output_message += message
 
@@ -230,14 +233,14 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
                 break
         if zero_networth > first_networth and zero_cs > first_cs:
             for player in id_to_name.egb:
-                if id_to_name.egb[player]['steamId'] == radiant_hard[1]['steamAccountId']:
+                if radiant_hard[1]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                     if 'pos 4' not in id_to_name.egb[player]['position']:
-                        message = (f'{player} играет не на своей роли: {id_to_name.translate[radiant_hard[1]["heroId"]]} pos 4')
+                        message = (f'{player} играет не на своей роли: {id_to_name.translate[radiant_hard[1]["heroId"]]} pos 4\n')
                         if message not in output_message:
                             output_message +=message
-                elif id_to_name.egb[player]['steamId'] == radiant_hard[0]['steamAccountId']:
+                elif radiant_hard[0]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                     if 'pos 3' not in id_to_name.egb[player]['position']:
-                        message = (f'{player} играет не на своей роли: {id_to_name.translate[radiant_hard[0]["heroId"]]} pos 3')
+                        message = (f'{player} играет не на своей роли: {id_to_name.translate[radiant_hard[0]["heroId"]]} pos 3\n')
                         if message not in output_message:
                             output_message +=message
 
@@ -245,14 +248,14 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
             radiant['pos 4'] = id_to_name.translate[radiant_hard[1]['heroId']]
         if zero_networth < first_networth and zero_cs < first_cs:
             for player in id_to_name.egb:
-                if id_to_name.egb[player]['steamId'] == radiant_hard[1]['steamAccountId']:
+                if radiant_hard[1]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                     if 'pos 3' not in id_to_name.egb[player]['position']:
-                        message = (f'{player} играет не на своей роли: {id_to_name.translate[radiant_hard[1]["heroId"]]} pos 3')
+                        message = (f'{player} играет не на своей роли: {id_to_name.translate[radiant_hard[1]["heroId"]]} pos 3\n')
                         if message not in output_message:
                             output_message +=message
-                elif id_to_name.egb[player]['steamId'] == radiant_hard[0]['steamAccountId']:
+                elif radiant_hard[0]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                     if 'pos 4' not in id_to_name.egb[player]['position']:
-                        message = (f'{player} играет не на своей роли: {id_to_name.translate[radiant_hard[0]["heroId"]]} pos 4')
+                        message = (f'{player} играет не на своей роли: {id_to_name.translate[radiant_hard[0]["heroId"]]} pos 4\n')
                         if message not in output_message:
                             output_message +=message
 
@@ -280,28 +283,28 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
                 break
         if zero_networth > first_networth and zero_cs > first_cs:
             for player in id_to_name.egb:
-                if id_to_name.egb[player]['steamId'] == dire_safe[1]['steamAccountId']:
+                if dire_safe[1]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                     if 'pos 5' not in id_to_name.egb[player]['position']:
-                        message = (f'{player} играет не на своей роли: {id_to_name.translate[dire_safe[1]["heroId"]]} pos 5')
+                        message = (f'{player} играет не на своей роли: {id_to_name.translate[dire_safe[1]["heroId"]]} pos 5\n')
                         if message not in output_message:
                             output_message +=message
-                elif id_to_name.egb[player]['steamId'] == dire_safe[0]['steamAccountId']:
+                elif dire_safe[0]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                     if 'pos 1' not in id_to_name.egb[player]['position']:
-                        message = (f'{player} играет не на своей роли: {id_to_name.translate[dire_safe[0]["heroId"]]} pos 1')
+                        message = (f'{player} играет не на своей роли: {id_to_name.translate[dire_safe[0]["heroId"]]} pos 1\n')
                         if message not in output_message:
                             output_message += message
             dire['pos 1'] = id_to_name.translate[dire_safe[0]['heroId']]
             dire['pos 5'] = id_to_name.translate[dire_safe[1]['heroId']]
         if zero_networth < first_networth and zero_cs < first_cs:
             for player in id_to_name.egb:
-                if id_to_name.egb[player]['steamId'] == dire_safe[1]['steamAccountId']:
+                if dire_safe[1]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                     if 'pos 1' not in id_to_name.egb[player]['position']:
-                        message = (f'{player} играет не на своей роли: {id_to_name.translate[dire_safe[1]["heroId"]]} pos 1')
+                        message = (f'{player} играет не на своей роли: {id_to_name.translate[dire_safe[1]["heroId"]]} pos 1\n')
                         if message not in output_message:
                             output_message +=message
-                elif id_to_name.egb[player]['steamId'] == dire_safe[0]['steamAccountId']:
+                elif dire_safe[0]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                     if 'pos 5' not in id_to_name.egb[player]['position']:
-                        message=(f'{player} играет не на своей роли: {id_to_name.translate[dire_safe[0]["heroId"]]} pos 5')
+                        message=(f'{player} играет не на своей роли: {id_to_name.translate[dire_safe[0]["heroId"]]} pos 5\n')
                         if message not in output_message:
                             output_message +=message
 
@@ -329,14 +332,14 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
                 break
         if zero_networth > first_networth and zero_cs > first_cs:
             for player in id_to_name.egb:
-                if id_to_name.egb[player]['steamId'] == dire_hard[1]['steamAccountId']:
+                if dire_hard[1]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                     if 'pos 4' not in id_to_name.egb[player]['position']:
-                        message = (f'{player} играет не на своей роли: {id_to_name.translate[dire_hard[1]["heroId"]]} pos 4')
+                        message = (f'{player} играет не на своей роли: {id_to_name.translate[dire_hard[1]["heroId"]]} pos 4\n')
                         if message not in output_message:
                             output_message += message
-                elif id_to_name.egb[player]['steamId'] == dire_hard[0]['steamAccountId']:
+                elif dire_hard[0]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                     if 'pos 3' not in id_to_name.egb[player]['position']:
-                        message = (f'{player} играет не на своей роли: {id_to_name.translate[dire_hard[0]["heroId"]]} pos 3')
+                        message = (f'{player} играет не на своей роли: {id_to_name.translate[dire_hard[0]["heroId"]]} pos 3\n')
                         if message not in output_message:
                             output_message += message
 
@@ -344,14 +347,14 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
             dire['pos 4'] = id_to_name.translate[dire_hard[1]['heroId']]
         if zero_networth < first_networth and zero_cs < first_cs:
             for player in id_to_name.egb:
-                if id_to_name.egb[player]['steamId'] == dire_hard[1]['steamAccountId']:
+                if dire_hard[1]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                     if 'pos 3' not in id_to_name.egb[player]['position']:
-                        message = (f'{player} играет не на своей роли: {id_to_name.translate[dire_hard[1]["heroId"]]} pos 3')
+                        message = (f'{player} играет не на своей роли: {id_to_name.translate[dire_hard[1]["heroId"]]} pos 3\n')
                         if message not in output_message:
                             output_message += message
-                elif id_to_name.egb[player]['steamId'] == dire_hard[0]['steamAccountId']:
+                elif dire_hard[0]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                     if 'pos 4' not in id_to_name.egb[player]['position']:
-                        message = (f'{player} играет не на своей роли: {id_to_name.translate[dire_hard[0]["heroId"]]} pos 4')
+                        message = (f'{player} играет не на своей роли: {id_to_name.translate[dire_hard[0]["heroId"]]} pos 4\n')
                         if message not in output_message:
                             output_message += message
 
@@ -359,9 +362,9 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
             dire['pos 4'] = id_to_name.translate[dire_hard[0]['heroId']]
     if len(radiant_mid) == 1:
         for player in id_to_name.egb:
-            if id_to_name.egb[player]['steamId'] == radiant_mid[0]['steamAccountId']:
+            if radiant_mid[0]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                 if 'pos 2' not in id_to_name.egb[player]['position']:
-                    message = (f'{player} играет не на своей роли: {id_to_name.translate[radiant_mid[0]["heroId"]]} pos 2')
+                    message = (f'{player} играет не на своей роли: {id_to_name.translate[radiant_mid[0]["heroId"]]} pos 2\n')
                     if message not in output_message:
                         output_message+= message
         radiant['pos 2'] = id_to_name.translate[radiant_mid[0]['heroId']]
@@ -387,9 +390,9 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
                 break
         if zero_networth > first_networth and zero_cs > first_cs:
             for player in id_to_name.egb:
-                if id_to_name.egb[player]['steamId'] == radiant_mid[0]['steamAccountId']:
+                if radiant_mid[0]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                     if 'pos 2' not in id_to_name.egb[player]['position']:
-                        message = (f'{player} играет не на своей роли: {id_to_name.translate[radiant_mid[0]["heroId"]]} pos 2')
+                        message = (f'{player} играет не на своей роли: {id_to_name.translate[radiant_mid[0]["heroId"]]} pos 2\n')
                         if message not in output_message:
                             output_message+=message
 
@@ -397,9 +400,9 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
             heroes_left.append(radiant_mid[1])
         if zero_networth < first_networth and zero_cs < first_cs:
             for player in id_to_name.egb:
-                if id_to_name.egb[player]['steamId'] == radiant_mid[1]['steamAccountId']:
+                if radiant_mid[1]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                     if 'pos 2' not in id_to_name.egb[player]['position']:
-                        message = (f'{player} играет не на своей роли: {id_to_name.translate[radiant_mid[1]["heroId"]]} pos 2')
+                        message = (f'{player} играет не на своей роли: {id_to_name.translate[radiant_mid[1]["heroId"]]} pos 2\n')
                         if message not in output_message:
                             output_message+=message
 
@@ -407,9 +410,9 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
             heroes_left.append(radiant_mid[0])
     if len(dire_mid) == 1:
         for player in id_to_name.egb:
-            if id_to_name.egb[player]['steamId'] == dire_mid[0]['steamAccountId']:
+            if dire_mid[0]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                 if 'pos 2' not in id_to_name.egb[player]['position']:
-                    message = (f'{player} играет не на своей роли: {id_to_name.translate[dire_mid[0]["heroId"]]} pos 2')
+                    message = (f'{player} играет не на своей роли: {id_to_name.translate[dire_mid[0]["heroId"]]} pos 2\n')
                     if message not in output_message:
                         output_message+=message
 
@@ -436,9 +439,9 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
                 break
         if zero_networth > first_networth and zero_cs > first_cs:
             for player in id_to_name.egb:
-                if id_to_name.egb[player]['steamId'] == dire_mid[0]['steamAccountId']:
+                if dire_mid[0]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                     if 'pos 2' not in id_to_name.egb[player]['position']:
-                        message=(f'{player} играет не на своей роли: {id_to_name.translate[dire_mid[0]["heroId"]]} pos 2')
+                        message=(f'{player} играет не на своей роли: {id_to_name.translate[dire_mid[0]["heroId"]]} pos 2\n')
                         if message not in output_message:
                             output_message+=message
 
@@ -446,9 +449,9 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
             heroes_left.append(dire_mid[1])
         if zero_networth < first_networth and zero_cs < first_cs:
             for player in id_to_name.egb:
-                if id_to_name.egb[player]['steamId'] == dire_mid[1]['steamAccountId']:
+                if dire_mid[1]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                     if 'pos 2' not in id_to_name.egb[player]['position']:
-                        message=(f'{player} играет не на своей роли: {id_to_name.translate[dire_mid[1]["heroId"]]} pos 2')
+                        message=(f'{player} играет не на своей роли: {id_to_name.translate[dire_mid[1]["heroId"]]} pos 2\n')
                         if message not in output_message:
                             output_message+=message
             dire['pos 2'] = id_to_name.translate[dire_mid[1]['heroId']]

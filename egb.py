@@ -43,7 +43,7 @@ def get_players(bet):
             else:
                 print(f'{player_names[0]} и {player_names[1]} не найдны')
                 send_message(f'{player_names[0]} и {player_names[1]} не найдны')
-                return
+                return True
         else:
             print('blacklisted')
             return True
@@ -55,7 +55,7 @@ def get_players(bet):
             else:
                 print(f'{player_names[0]} не найден')
                 send_message(f'{player_names[0]} не найден')
-                return
+                return True
         else:
             print('blacklisted')
             return True
@@ -522,7 +522,6 @@ def get_picks_and_pos(match_id):
         while check_time < 400:
             radiant, dire, output_message = get_picks(check_time, players)
             if len(radiant) == 5 and len(dire) == 5:
-                print(f"https://stratz.com/matches/{match_id}/live")
                 return radiant, dire, match_id, output_message
             else:
                 check_time += 15

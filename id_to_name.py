@@ -493,7 +493,7 @@ egb = {
     'phantomem': {'steamId': {108958769}, 'position': 'pos 5'},
     'quinn': {'steamId': {221666230}, 'position': 'pos 2'},
     'antoha': {'steamId': {178692606}, 'position': 'pos 5'},
-    'cooman': {'steamId': {175463659}, 'position': 'pos 1'},
+    'cooman': {'steamId': {175463659}, 'position': {'pos 1', 'pos2'}},
     'lil_nickdota': {'steamId': {114585639}, 'position': 'pos 3'},
     'resolut1on': {'steamId': {86725175}, 'position': 'pos 3'},
     'sonneiko': {'steamId': {369342470, 117421467}, 'position': 'pos 5'},

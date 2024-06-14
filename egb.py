@@ -636,17 +636,20 @@ def check_players_skill(radiant, dire, output_message):
                                 output_message+=(f'Dire {dire[pos]["hero_name"]} {pos} играет не на своей позиции\n')
         pass
 
-
-    output_message+=(f'Radiant найдено {len(radiant_impact)} игроков из 5\nDire найдено {len(dire_impact)} игроков из 5\n')
-    radiant_average_impact = sum(radiant_impact.values())/len(radiant_impact)
-    dire_average_impact = sum(dire_impact.values())/len(dire_impact)
-    if radiant_average_impact > dire_average_impact:
-        impact_diff = radiant_average_impact- dire_average_impact
-        output_message+=(f'Radiant impact лучше в среднем на {impact_diff}\n')
-    elif radiant_average_impact < dire_average_impact:
-        impact_diff = dire_average_impact - radiant_average_impact
-        output_message+=(f'Dire impact лучше в среднем на {impact_diff}\n')
+    if len(dire_impact) != 0 and len(radiant_impact) != 0:
+        output_message+=(f'Radiant найдено {len(radiant_impact)} игроков из 5\nDire найдено {len(dire_impact)} игроков из 5\n')
+        radiant_average_impact = sum(radiant_impact.values())/len(radiant_impact)
+        dire_average_impact = sum(dire_impact.values())/len(dire_impact)
+        if radiant_average_impact > dire_average_impact:
+            impact_diff = radiant_average_impact- dire_average_impact
+            output_message+=(f'Radiant impact лучше в среднем на {impact_diff}\n')
+        elif radiant_average_impact < dire_average_impact:
+            impact_diff = dire_average_impact - radiant_average_impact
+            output_message+=(f'Dire impact лучше в среднем на {impact_diff}\n')
+    else:
+        impact_diff = None
     return output_message, impact_diff
+
 
 
 

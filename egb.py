@@ -639,10 +639,12 @@ def check_players_skill(radiant, dire, output_message):
     radiant_average_impact = sum(radiant_impact.values())/len(radiant_impact)
     dire_average_impact = sum(dire_impact.values())/len(dire_impact)
     if radiant_average_impact > dire_average_impact:
-        output_message+=(f'Radiant impact лучше в среднем на {radiant_average_impact- dire_average_impact}\n')
+        impact_diff = radiant_average_impact- dire_average_impact
+        output_message+=(f'Radiant impact лучше в среднем на {impact_diff}\n')
     elif radiant_average_impact < dire_average_impact:
-        output_message+=(f'Dire impact лучше в среднем на {dire_average_impact - radiant_average_impact}\n')
-    return output_message
+        impact_diff = dire_average_impact - radiant_average_impact
+        output_message+=(f'Dire impact лучше в среднем на {impact_diff}\n')
+    return output_message, impact_diff
 
 
 
@@ -669,11 +671,11 @@ while True:
                             if answer is not None:
                                 if answer != True:
                                     radiant, dire, match_id, output_message = answer
-                                    output_message = check_players_skill(radiant, dire, output_message)
+                                    output_message, impact_diff = check_players_skill(radiant, dire, output_message)
                                     output = ", ".join([f"'{pos}' : '{data['hero_name']}'" for pos, data in radiant.items()])
                                     dire_output= ", ".join([f"'{pos}' : '{data['hero_name']}'" for pos, data in dire.items()])
                                     print(f'Radint pick: {output}\nDire pick: {dire_output}')
-                                    dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id, score = [0,0], egb=True, output_message=output_message)
+                                    dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id, score = [0,0], egb=True, output_message=output_message, impact_diff=impact_diff)
                                 else:
                                     map = True
                         else:

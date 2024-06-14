@@ -558,7 +558,7 @@ def check_players_skill(radiant, dire, output_message):
               supportCount
               matchCount
             }
-            heroesPerformance(request:{startDateTime:1686085200, take: 10000,gameModeIds:[22,2], heroIds:%s,positionIds:[POSITION_1, POSITION_2, POSITION_3, POSITION_4, POSITION_5]}){
+            heroesPerformance(request:{startDateTime:1715029200, take: 15,gameModeIds:[22,2], heroIds:%s,positionIds:[POSITION_1, POSITION_2, POSITION_3, POSITION_4, POSITION_5]}){
               positionScore{
                 matchCount
                 id

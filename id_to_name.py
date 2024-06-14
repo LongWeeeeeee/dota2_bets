@@ -514,7 +514,7 @@ egb = {
     'noticed': {'steamId': {195108598}, 'position': 'pos 3'},
     'stariy_bog': {'steamId': {393024955}, 'position': 'pos 2'},
     'speedmanq': {'steamId': {1060164724}, 'position': 'pos 1'},
-    'yapzor': {'steamId': {89117038}, 'position': '4'},
+    'yapzor': {'steamId': {89117038}, 'position': 'pos 4'},
     'iltw': {'steamId': {113995822}, 'position': 'pos 1'},
     'watson': {'steamId': {171262902}, 'position': 'pos 1'},
     '9class': {'steamId': {164199202}, 'position': 'pos 4'},

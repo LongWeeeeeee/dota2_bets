@@ -510,7 +510,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     #
     if type(antiplagiat_url) == int:
         output_message += f'https://stratz.com/matches/{antiplagiat_url}/live\n'
-    else:
+    elif antiplagiat_url is not None:
         output_message += antiplagiat_url + '\n'
     output_message += f'Счет: {score}\n'
     if radiant_pos4_with_pos5 is not None and dire_pos4_with_pos5 is not None:
@@ -604,8 +604,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
 # testing
 # {'pos 1': 'Wraith King', 'pos 5': 'Venomancer', 'pos 2': 'Dragon Knight', 'pos 3': 'Timbersaw', 'pos 4': 'Keeper of the Light'}
 #
-# radiant_heroes_and_positions={'pos 1': 'Weaver', 'pos 5': 'Io', 'pos 2': 'Leshrac', 'pos 3': 'Axe', 'pos 4': 'Dark Willow'}
+# radiant_heroes_and_positions={'pos 1':{'hero_name':'Weaver'}, 'pos 5':{'hero_name':'Io'}, 'pos 2':{'hero_name':'Leshrac'}, 'pos 3':{'hero_name':'Axe'}, 'pos 4':{'hero_name':'Dark Willow'}}
 #
-# dire_heroes_and_positions={'pos 1': 'Alchemist', 'pos 5': 'Tinker', 'pos 3': 'Bristleback', 'pos 4': 'Mirana', 'pos 2': 'Magnus'}
+# dire_heroes_and_positions={'pos 1':{'hero_name':'Alchemist'}, 'pos 5':{'hero_name':'Tinker'}, 'pos 3':{'hero_name':'Bristleback'}, 'pos 4':{'hero_name':'Mirana'}, 'pos 2':{'hero_name':'Magnus'}}
 #
 # dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_positions, dire_heroes_and_positions=dire_heroes_and_positions, radiant_team_name='Tundra', dire_team_name='Heroic', score=['0','0'], tier=2)

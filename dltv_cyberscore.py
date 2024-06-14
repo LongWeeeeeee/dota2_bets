@@ -530,7 +530,6 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     output_message += f'{radiant_team_name} vs {dire_team_name}\n'
     if len(radiant_wr_with) > 0 and len(dire_wr_with) > 0:
         sinergy = (sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))
-    ##ПОЧЕМУ ТУТ -50?
     if len(radiant_wr_against) > 0:
         counterpick = sum(radiant_wr_against) / len(radiant_wr_against) - 50
     if len(radiant_pos1_vs_team) > 0 and len(dire_pos1_vs_team) > 0:

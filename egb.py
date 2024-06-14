@@ -371,7 +371,7 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
         for player in id_to_name.egb:
             if radiant_mid[0]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                 if 'pos 2' not in id_to_name.egb[player]['position']:
-                    message = (f'Dire {player} играет не на своей роли: {id_to_name.translate[radiant_mid[0]["heroId"]]} pos 2\n')
+                    message = (f'Radiant {player} играет не на своей роли: {id_to_name.translate[radiant_mid[0]["heroId"]]} pos 2\n')
                     if message not in output_message:
                         output_message+= message
         radiant['pos 2']= {'hero_id': radiant_mid[0]['heroId'], 'hero_name': id_to_name.translate[radiant_mid[0]['heroId']], 'steamAccountId' : radiant_mid[0]['steamAccountId']}

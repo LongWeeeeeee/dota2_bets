@@ -580,9 +580,11 @@ egb = {
     'smilling knight': {'steamId': {155162307}, 'position': 'pos 1'},
     'boxi': {'steamId': {77490514}, 'position': 'pos 4'},
     'mira': {'steamId': {256156323}, 'position': 'pos 4'},
-    'afganistan_doto': {'steamId': {858200619}, 'position': 'pos 5'}
+    'afganistan_doto': {'steamId': {858200619}, 'position': 'pos 5'},
+    'iceiceice': {'steamId': {84772440}, 'position': 'pos 3'},
 }
 
+add_players =set()
 
 blacklist_players = {
     'febby',

@@ -6,6 +6,7 @@ import time
 from dltv_cyberscore import dota2protracker, if_unique, send_message
 import requests
 
+
 url = "https://egb.com/bets"
 params = {
     "active": "true",
@@ -41,9 +42,15 @@ def get_players(bet):
                     for player in id_to_name.egb[player_names[1]]['steamId']:
                         players_ids.append(player)
             else:
-                print(f'{player_names[0]} и {player_names[1]} не найдны')
-                send_message(f'{player_names[0]} и {player_names[1]} не найдны')
-                return True
+                data = id_to_name.add_players
+                if any(player not in data for player in player_names):
+                    if player_names[0] not in data:
+                        data.add(player_names[0])
+                        send_message(f'{player_names[0]} не найден')
+                    if player_names[1] not in data:
+                        data.add(player_names[1])
+                        send_message(f'{player_names[1]} не найден')
+                    return True
         else:
             print('blacklisted')
             return True
@@ -53,9 +60,11 @@ def get_players(bet):
                 for player in id_to_name.egb[player_names[0]]['steamId']:
                     players_ids.append(player)
             else:
-                print(f'{player_names[0]} не найден')
-                send_message(f'{player_names[0]} не найден')
-                return True
+                data = id_to_name.add_players
+                if player_names[0] not in data:
+                    data.add(player_names[0])
+                    send_message(f'{player_names[0]} не найден')
+                    return True
         else:
             print('blacklisted')
             return True
@@ -191,8 +200,8 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
                         if message not in output_message:
                             output_message += message
 
-            radiant['pos 1'] = id_to_name.translate[radiant_safe[0]['heroId']]
-            radiant['pos 5'] = id_to_name.translate[radiant_safe[1]['heroId']]
+            radiant['pos 1'] = {'hero_id': radiant_safe[0]['heroId'], 'hero_name': id_to_name.translate[radiant_safe[0]['heroId']], 'steamAccountId' : radiant_safe[0]['steamAccountId']}
+            radiant['pos 5'] = {'hero_id': radiant_safe[1]['heroId'], 'hero_name': id_to_name.translate[radiant_safe[1]['heroId']], 'steamAccountId' : radiant_safe[1]['steamAccountId']}
         elif zero_networth < first_networth and zero_cs < first_cs:
             for player in id_to_name.egb:
                 if radiant_safe[1]['steamAccountId'] in id_to_name.egb[player]['steamId']:
@@ -206,8 +215,8 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
                         if message not in output_message:
                             output_message += message
 
-            radiant['pos 1'] = id_to_name.translate[radiant_safe[1]['heroId']]
-            radiant['pos 5'] = id_to_name.translate[radiant_safe[0]['heroId']]
+            radiant['pos 1'] = {'hero_id': radiant_safe[1]['heroId'] , 'hero_name': id_to_name.translate[radiant_safe[1]['heroId']], 'steamAccountId' : radiant_safe[1]['steamAccountId']}
+            radiant['pos 5'] = {'hero_id': radiant_safe[0]['heroId'], 'hero_name': id_to_name.translate[radiant_safe[0]['heroId']], 'steamAccountId' : radiant_safe[0]['steamAccountId']}
     if len(radiant_hard) == 2:
         zero_networth, first_networth, zero_cs, first_cs = 0, 0, 0, 0
         for event in radiant_hard[0]['playbackData']['goldEvents']:
@@ -241,8 +250,9 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
                         if message not in output_message:
                             output_message +=message
 
-            radiant['pos 3'] = id_to_name.translate[radiant_hard[0]['heroId']]
-            radiant['pos 4'] = id_to_name.translate[radiant_hard[1]['heroId']]
+
+            radiant['pos 3'] = {'hero_id': radiant_hard[0]['heroId'], 'hero_name': id_to_name.translate[radiant_hard[0]['heroId']], 'steamAccountId' : radiant_hard[0]['steamAccountId']}
+            radiant['pos 4'] = {'hero_id': radiant_hard[1]['heroId'], 'hero_name': id_to_name.translate[radiant_hard[1]['heroId']], 'steamAccountId' : radiant_hard[1]['steamAccountId']}
         elif zero_networth < first_networth and zero_cs < first_cs:
             for player in id_to_name.egb:
                 if radiant_hard[1]['steamAccountId'] in id_to_name.egb[player]['steamId']:
@@ -256,8 +266,8 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
                         if message not in output_message:
                             output_message +=message
 
-            radiant['pos 3'] = id_to_name.translate[radiant_hard[1]['heroId']]
-            radiant['pos 4'] = id_to_name.translate[radiant_hard[0]['heroId']]
+            radiant['pos 3']= {'hero_id': radiant_hard[1]['heroId'], 'hero_name': id_to_name.translate[radiant_hard[1]['heroId']], 'steamAccountId' : radiant_hard[1]['steamAccountId']}
+            radiant['pos 4']= {'hero_id': radiant_hard[0]['heroId'], 'hero_name': id_to_name.translate[radiant_hard[0]['heroId']], 'steamAccountId' : radiant_hard[0]['steamAccountId']}
     if len(dire_safe) == 2:
         zero_networth, first_networth, zero_cs, first_cs = 0, 0, 0, 0
         for event in dire_safe[0]['playbackData']['goldEvents']:
@@ -290,8 +300,8 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
                         message = (f'Dire {player} играет не на своей роли: {id_to_name.translate[dire_safe[0]["heroId"]]} pos 1\n')
                         if message not in output_message:
                             output_message += message
-            dire['pos 1'] = id_to_name.translate[dire_safe[0]['heroId']]
-            dire['pos 5'] = id_to_name.translate[dire_safe[1]['heroId']]
+            dire['pos 1']= {'hero_id': dire_safe[0]['heroId'], 'hero_name': id_to_name.translate[dire_safe[0]['heroId']], 'steamAccountId' : dire_safe[0]['steamAccountId']}
+            dire['pos 5']= {'hero_id': dire_safe[1]['heroId'], 'hero_name': id_to_name.translate[dire_safe[1]['heroId']], 'steamAccountId' : dire_safe  [1]['steamAccountId']}
         if zero_networth < first_networth and zero_cs < first_cs:
             for player in id_to_name.egb:
                 if dire_safe[1]['steamAccountId'] in id_to_name.egb[player]['steamId']:
@@ -305,8 +315,8 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
                         if message not in output_message:
                             output_message +=message
 
-            dire['pos 1'] = id_to_name.translate[dire_safe[1]['heroId']]
-            dire['pos 5'] = id_to_name.translate[dire_safe[0]['heroId']]
+            dire['pos 1']= {'hero_id': dire_safe[1]['heroId'], 'hero_name': id_to_name.translate[dire_safe[1]['heroId']], 'steamAccountId' : dire_safe[1]['steamAccountId']}
+            dire['pos 5']= {'hero_id': dire_safe[0]['heroId'], 'hero_name': id_to_name.translate[dire_safe[0]['heroId']], 'steamAccountId' : dire_safe[0]['steamAccountId']}
     if len(dire_hard) == 2:
         zero_networth, first_networth, zero_cs, first_cs = 0, 0, 0, 0
         for event in dire_hard[0]['playbackData']['goldEvents']:
@@ -340,8 +350,8 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
                         if message not in output_message:
                             output_message += message
 
-            dire['pos 3'] = id_to_name.translate[dire_hard[0]['heroId']]
-            dire['pos 4'] = id_to_name.translate[dire_hard[1]['heroId']]
+            dire['pos 3']= {'hero_id': dire_hard[0]['heroId'], 'hero_name': id_to_name.translate[dire_hard[0]['heroId']], 'steamAccountId' : dire_hard[0]['steamAccountId']}
+            dire['pos 4']= {'hero_id': dire_hard[1]['heroId'], 'hero_name': id_to_name.translate[dire_hard[1]['heroId']], 'steamAccountId' : dire_hard[1]['steamAccountId']}
         elif zero_networth < first_networth and zero_cs < first_cs:
             for player in id_to_name.egb:
                 if dire_hard[1]['steamAccountId'] in id_to_name.egb[player]['steamId']:
@@ -355,8 +365,8 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
                         if message not in output_message:
                             output_message += message
 
-            dire['pos 3'] = id_to_name.translate[dire_hard[1]['heroId']]
-            dire['pos 4'] = id_to_name.translate[dire_hard[0]['heroId']]
+            dire['pos 3']= {'hero_id': dire_hard[1]['heroId'], 'hero_name': id_to_name.translate[dire_hard[1]['heroId']], 'steamAccountId' : dire_hard[1]['steamAccountId']}
+            dire['pos 4']= {'hero_id': dire_hard[0]['heroId'], 'hero_name': id_to_name.translate[dire_hard[0]['heroId']], 'steamAccountId' : dire_hard[0]['steamAccountId']}
     if len(radiant_mid) == 1:
         for player in id_to_name.egb:
             if radiant_mid[0]['steamAccountId'] in id_to_name.egb[player]['steamId']:
@@ -364,7 +374,7 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
                     message = (f'Dire {player} играет не на своей роли: {id_to_name.translate[radiant_mid[0]["heroId"]]} pos 2\n')
                     if message not in output_message:
                         output_message+= message
-        radiant['pos 2'] = id_to_name.translate[radiant_mid[0]['heroId']]
+        radiant['pos 2']= {'hero_id': radiant_mid[0]['heroId'], 'hero_name': id_to_name.translate[radiant_mid[0]['heroId']], 'steamAccountId' : radiant_mid[0]['steamAccountId']}
     elif len(radiant_mid) == 2:
         zero_networth, first_networth, zero_cs, first_cs = 0, 0, 0, 0
         for event in radiant_mid[0]['playbackData']['goldEvents']:
@@ -393,7 +403,7 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
                         if message not in output_message:
                             output_message+=message
 
-            radiant['pos 2'] = id_to_name.translate[radiant_mid[0]['heroId']]
+            radiant['pos 2']= {'hero_id': radiant_mid[0]['heroId'], 'hero_name': id_to_name.translate[radiant_mid[0]['heroId']], 'steamAccountId' : radiant_mid[0]['steamAccountId']}
             heroes_left.append(radiant_mid[1])
         elif zero_networth < first_networth and zero_cs < first_cs:
             for player in id_to_name.egb:
@@ -403,7 +413,7 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
                         if message not in output_message:
                             output_message+=message
 
-            radiant['pos 2'] = id_to_name.translate[radiant_mid[1]['heroId']]
+            radiant['pos 2']= {'hero_id': radiant_mid[1]['heroId'], 'hero_name': id_to_name.translate[radiant_mid[1]['heroId']], 'steamAccountId' : radiant_mid[1]['steamAccountId']}
             heroes_left.append(radiant_mid[0])
     if len(dire_mid) == 1:
         for player in id_to_name.egb:
@@ -413,7 +423,7 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
                     if message not in output_message:
                         output_message+=message
 
-        dire['pos 2'] = id_to_name.translate[dire_mid[0]['heroId']]
+        dire['pos 2']= {'hero_id': dire_mid[0]['heroId'], 'hero_name': id_to_name.translate[dire_mid[0]['heroId']], 'steamAccountId' : dire_mid[0]['steamAccountId']}
     elif len(dire_mid) == 2:
         zero_networth, first_networth, zero_cs, first_cs = 0, 0, 0, 0
         for event in dire_mid[0]['playbackData']['goldEvents']:
@@ -442,7 +452,7 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
                         if message not in output_message:
                             output_message+=message
 
-            dire['pos 2'] = id_to_name.translate[dire_mid[0]['heroId']]
+            dire['pos 2']= {'hero_id': dire_mid[0]['heroId'], 'hero_name': id_to_name.translate[dire_mid[0]['heroId']], 'steamAccountId' : dire_mid[0]['steamAccountId']}
             heroes_left.append(dire_mid[1])
         elif zero_networth < first_networth and zero_cs < first_cs:
             for player in id_to_name.egb:
@@ -451,7 +461,7 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
                         message=(f'Dire {player} играет не на своей роли: {id_to_name.translate[dire_mid[1]["heroId"]]} pos 2\n')
                         if message not in output_message:
                             output_message+=message
-            dire['pos 2'] = id_to_name.translate[dire_mid[1]['heroId']]
+            dire['pos 2']= {'hero_id': dire_mid[1]['heroId'], 'hero_name': id_to_name.translate[dire_mid[1]['heroId']], 'steamAccountId' : dire_mid[1]['steamAccountId']}
             heroes_left.append(dire_mid[0])
     return radiant, dire, heroes_left, output_message
 
@@ -501,7 +511,7 @@ def get_picks(check_time, players):
             positions_copy.remove(key)
         for player in heroes_left:
             if player['isRadiant']:
-                radiant[positions_copy[0]] = id_to_name.translate[player['heroId']]
+                radiant[positions_copy[0]]= {'hero_id':player['heroId'] , 'hero_name': id_to_name.translate[player['heroId']], 'steamAccountId' : player['steamAccountId']}
 
     if len(dire) == 4:
         positions_copy = positions.copy()
@@ -509,7 +519,7 @@ def get_picks(check_time, players):
             positions_copy.remove(key)
         for player in heroes_left:
             if not player['isRadiant']:
-                radiant[positions_copy[0]] = id_to_name.translate[player['heroId']]
+                radiant[positions_copy[0]]= {'hero_id': player['heroId'], 'hero_name': id_to_name.translate[player['heroId']], 'steamAccountId' : player['steamAccountId']}
     return radiant, dire, output_message
 
 
@@ -531,6 +541,115 @@ def get_picks_and_pos(match_id):
         print('карта уже расчитана')
 
 
+def check_players_skill(radiant, dire, output_message):
+    radiant_steam_account_ids = [player['steamAccountId'] for player in radiant.values()]
+    dire_steam_account_ids = [player['steamAccountId'] for player in dire.values()]
+    radiant_hero_ids = [player['hero_id'] for player in radiant.values()]
+    dire_hero_ids = [player['hero_id'] for player in dire.values()]
+    #radaint
+    radiant_impact, dire_impact = {},{}
+    for hero_ids, steam_account_ids in zip([radiant_hero_ids, dire_hero_ids], [radiant_steam_account_ids, dire_steam_account_ids]):
+        player_query = '''
+        {
+          players(steamAccountIds:%s){
+            steamAccountId
+                simpleSummary{
+              coreCount
+              supportCount
+              matchCount
+            }
+            heroesPerformance(request:{startDateTime:1686085200, take: 10000,gameModeIds:[22,2], heroIds:%s,positionIds:[POSITION_1, POSITION_2, POSITION_3, POSITION_4, POSITION_5]}){
+              positionScore{
+                matchCount
+                id
+                imp
+              }
+              hero{
+                id
+              }
+              
+            }
+        
+        
+          }
+        }
+         '''% (steam_account_ids, hero_ids)
+        headers = {"Authorization": f"Bearer {api_token}"}
+        response = requests.post('https://api.stratz.com/graphql', json={"query": player_query}, headers=headers)
+        data = json.loads(response.text)
+        for player in data['data']['players']:
+            steam_account_id = player['steamAccountId']
+            if player['steamAccountId'] in radiant_steam_account_ids:
+                isRadiant = True
+            elif player['steamAccountId'] in dire_steam_account_ids:
+                isRadiant = False
+            if isRadiant:
+                for position in radiant:
+                    if radiant[position]['steamAccountId'] == steam_account_id:
+                        hero_id = radiant[position]['hero_id']
+                        pos = position
+            elif not isRadiant:
+                for position in dire:
+                    if dire[position]['steamAccountId'] == steam_account_id:
+                        hero_id = dire[position]['hero_id']
+                        pos = position
+            for hero_perfomance in player['heroesPerformance']:
+                check_hero_id = hero_perfomance['hero']['id']
+                for position_score in hero_perfomance['positionScore']:
+                    pos_found = position_score['id'].replace('POSITION_', '') == pos.replace('pos ', '')
+                    if pos_found and check_hero_id == hero_id and position_score['matchCount'] >5:
+                        impact = position_score['imp']
+                        if isRadiant:
+                            radiant_impact[steam_account_id] = impact
+                        else:
+                            dire_impact[steam_account_id] = impact
+        if isRadiant:
+            output_message += (f"Radiant hiden profiles: {len(data['errors'])}\n")
+            for radiant_id in radiant_steam_account_ids:
+                if radiant_id not in radiant_impact:
+                    if 'errors' in data:
+                        if not any(str(radiant_id) in error['message'] for error in data['errors']):
+                            for pos in radiant:
+                                if radiant[pos]['steamAccountId'] == radiant_id:
+                                    output_message+=(f'Radiant {radiant[pos]["hero_name"]} {pos} играет не на своей позиции\n')
+                                    break
+                    else:
+                        for pos in radiant:
+                            if radiant[pos]['steamAccountId'] == radiant_id:
+                                output_message+=(f'Radiant {radiant[pos]["hero_name"]} {pos} играет не на своей позиции\n')
+                                break
+
+        elif not isRadiant:
+            output_message += (f"Dire hiden profiles: {len(data['errors'])}\n")
+            for dire_id in dire_steam_account_ids:
+                if dire_id not in dire_impact:
+                    if 'errors' in data:
+                        if not any(str(dire_id) in error['message'] for error in data['errors']):
+                            for pos in dire:
+                                if dire[pos]['steamAccountId'] == dire_id:
+                                    output_message+=(f'Dire {dire[pos]["hero_name"]} {pos} играет не на своей позиции\n')
+                    else:
+                        for pos in dire:
+                            if dire[pos]['steamAccountId'] == dire_id:
+                                output_message+=(f'Dire {dire[pos]["hero_name"]} {pos} играет не на своей позиции\n')
+        pass
+
+
+    output_message+=(f'Radiant найдено {len(radiant_impact)} игроков из 5\nDire найдено {len(dire_impact)} игроков из 5\n')
+    radiant_average_impact = sum(radiant_impact.values())/len(radiant_impact)
+    dire_average_impact = sum(dire_impact.values())/len(dire_impact)
+    if radiant_average_impact > dire_average_impact:
+        output_message+=(f'Radiant impact лучше в среднем на {radiant_average_impact- dire_average_impact}\n')
+    elif radiant_average_impact < dire_average_impact:
+        output_message+=(f'Dire impact лучше в среднем на {dire_average_impact - radiant_average_impact}\n')
+    return output_message
+
+
+
+
+
+
+
 while True:
     map = False
     importlib.reload(id_to_name)
@@ -550,7 +669,10 @@ while True:
                             if answer is not None:
                                 if answer != True:
                                     radiant, dire, match_id, output_message = answer
-                                    print(f'Radint pick: {radiant}\nDire pick: {dire}')
+                                    output_message = check_players_skill(radiant, dire, output_message)
+                                    output = ", ".join([f"'{pos}' : '{data['hero_name']}'" for pos, data in radiant.items()])
+                                    dire_output= ", ".join([f"'{pos}' : '{data['hero_name']}'" for pos, data in dire.items()])
+                                    print(f'Radint pick: {output}\nDire pick: {dire_output}')
                                     dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id, score = [0,0], egb=True, output_message=output_message)
                                 else:
                                     map = True

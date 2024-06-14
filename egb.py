@@ -604,7 +604,8 @@ def check_players_skill(radiant, dire, output_message):
                         else:
                             dire_impact[steam_account_id] = impact
         if isRadiant:
-            output_message += (f"Radiant hiden profiles: {len(data['errors'])}\n")
+            if 'errors' in data:
+                output_message += (f"Radiant hiden profiles: {len(data['errors'])}\n")
             for radiant_id in radiant_steam_account_ids:
                 if radiant_id not in radiant_impact:
                     if 'errors' in data:
@@ -620,7 +621,8 @@ def check_players_skill(radiant, dire, output_message):
                                 break
 
         elif not isRadiant:
-            output_message += (f"Dire hiden profiles: {len(data['errors'])}\n")
+            if 'errors' in data:
+                output_message += (f"Dire hiden profiles: {len(data['errors'])}\n")
             for dire_id in dire_steam_account_ids:
                 if dire_id not in dire_impact:
                     if 'errors' in data:

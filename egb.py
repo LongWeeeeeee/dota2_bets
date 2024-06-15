@@ -23,7 +23,7 @@ headers = {
     "X-CSRF-Token": "UUu1IL8sY0iZFFc2_FYI4ICk-WT34IRRGjz19DND8CbKEJZ9zTvbeAdcw72OYEecZiDlBaZimaYP-VuJwtmkAQ",
     "DNT": "1",
     "Sec-GPC": "1",}
-
+players_to_add = id_to_name.add_players
 def get_players(bet):
     dire_and_radiant = {}
     players = [player for player in bet['game_label'].lower().replace(' team', '').split(' vs ')]
@@ -44,11 +44,11 @@ def get_players(bet):
             else:
                 data = id_to_name.add_players
                 if any(player not in data for player in player_names):
-                    if player_names[0] not in data:
-                        data.add(player_names[0])
+                    if player_names[0] not in players_to_add:
+                        players_to_add.add(player_names[0])
                         send_message(f'{player_names[0]} не найден')
-                    if player_names[1] not in data:
-                        data.add(player_names[1])
+                    if player_names[1] not in players_to_add:
+                        players_to_add.add(player_names[1])
                         send_message(f'{player_names[1]} не найден')
                     return True
         else:
@@ -60,9 +60,9 @@ def get_players(bet):
                 for player in id_to_name.egb[player_names[0]]['steamId']:
                     players_ids.append(player)
             else:
-                data = id_to_name.add_players
-                if player_names[0] not in data:
-                    data.add(player_names[0])
+
+                if player_names[0] not in players_to_add:
+                    players_to_add.add(player_names[0])
                     send_message(f'{player_names[0]} не найден')
                     return True
         else:

@@ -140,8 +140,8 @@ def analyze_draft(output_message, sinergy, counterpick, pos1_vs_team, core_match
         other_values_check = all(value >= 0 for value in other_values.values() if value is not None) + all(value <= 0 for value in other_values.values() if value is not None)
         singery_or_counterpick = all(value >= 0 for value in [counterpick, sinergy] if value is not None) + all(
             value <= 0 for value in [counterpick, sinergy] if value is not None)
-        both_over10 = all(value <= -10 for value in [counterpick, sinergy] if value is not None) + all(
-            value >= 10 for value in [counterpick, sinergy] if value is not None)
+        both_over9 = all(value <= -9 for value in [counterpick, sinergy] if value is not None) + all(
+            value >= 9 for value in [counterpick, sinergy] if value is not None)
         both_over5 = all(value <= -5 for value in [counterpick, sinergy] if value is not None) + all(
             value >= 5 for value in [counterpick, sinergy] if value is not None)
         any_over20 = (all(value > 0 for value in [counterpick, sinergy] if value is not None ) * any(
@@ -151,9 +151,9 @@ def analyze_draft(output_message, sinergy, counterpick, pos1_vs_team, core_match
             counterpick_over10 = (all(value > 0 for value in [counterpick, sinergy] if value is not None) * counterpick >= 10) +(all(value < 0 for value in [counterpick, sinergy] if value is not None) * counterpick <= -10)
         else:
             counterpick_over10 = False
-        if all_positive_or_negative and both_over10:
+        if all_positive_or_negative and both_over9:
             output_message += f'ОТЛИЧНАЯ СТАВКА ALL IN\n'
-        elif (other_values_check and both_over5) or (singery_or_counterpick and counterpick_over10) or any_over20:
+        elif (other_values_check and both_over5) or (singery_or_counterpick and counterpick_over10) or any_over20 or both_over9:
             output_message += f'ХОРОШАЯ СТАВКА\n'
         elif (singery_or_counterpick and both_over5) or all_positive_or_negative or other_values_check :
             output_message += f'РИСКОВАЯ СТАВКА\n'
@@ -406,7 +406,9 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                             break
                         if 'pos 5' in data_pos and data_hero == radiant_heroes_and_positions['pos 5']['hero_name'] and tracker_position == position:
                             radiant_pos4_with_pos5 = data_wr
-    radiant_wr_with = [radiant_pos4_with_pos5] + radiant_pos3_with_team + radiant_pos2_with_team + radiant_pos1_with_team
+    if radiant_pos4_with_pos5 is not None:
+        radiant_wr_with += [radiant_pos4_with_pos5]
+    radiant_wr_with = radiant_pos3_with_team + radiant_pos2_with_team + radiant_pos1_with_team
     for position in dire_heroes_and_positions:
         if position != 'pos 5':
             hero_url = dire_heroes_and_positions[position]['hero_name'].replace(' ', '%20')
@@ -460,7 +462,9 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                             break
                         if 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']['hero_name'] and tracker_position == position:
                             dire_pos4_with_pos5 = data_wr
-    dire_wr_with = [dire_pos4_with_pos5] + dire_pos3_with_team + dire_pos2_with_team + dire_pos1_with_team
+    if dire_pos4_with_pos5 is not None:
+        dire_wr_with += [dire_pos4_with_pos5]
+    dire_wr_with = dire_pos3_with_team + dire_pos2_with_team + dire_pos1_with_team
     for position in radiant_heroes_and_positions:
         hero_url = radiant_heroes_and_positions[position]['hero_name'].replace(' ', '%20')
         url = f'https://dota2protracker.com/hero/{hero_url}'
@@ -576,12 +580,12 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             output_message += f'{dire_heroes_and_positions["pos 4"]["hero_name"]} pos 4 with {dire_heroes_and_positions["pos 5"]["hero_name"]} pos 5 Нету на dota2protracker\n'
     if impact_diff is not None and (impact_diff >= 10 or impact_diff <= -10):
         send_message(output_message)
-    if tier in [1, 2, 3]:
+    elif tier in [2, 3]:
         if 'ОТЛИЧНАЯ СТАВКА' in output_message or 'ХОРОШАЯ СТАВКА' in output_message:
             send_message(output_message)
         else:
             print(output_message)
-    elif egb:
+    elif tier == 1 or egb:
         if not 'ПЛОХАЯ СТАВКА!!!' in output_message:
             send_message(output_message)
             print(output_message)

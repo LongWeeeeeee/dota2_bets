@@ -508,15 +508,15 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         sups = radiant_pos4_with_pos5 - dire_pos4_with_pos5
     else:
         sups = None
-    dire_wr_with = clean_up(dire_wr_with, 4)
-    radiant_wr_with = clean_up(radiant_wr_with, 4)
-    radiant_wr_against = clean_up(radiant_wr_against, 5)
-    radiant_pos1_vs_team = clean_up(radiant_pos1_vs_team)
-    dire_pos1_vs_team = clean_up(dire_pos1_vs_team)
-    radiant_pos2_vs_team = clean_up(radiant_pos2_vs_team)
-    dire_pos2_vs_team = clean_up(dire_pos2_vs_team)
-    radiant_pos3_vs_team = clean_up(radiant_pos3_vs_team)
-    dire_pos3_vs_team = clean_up(dire_pos3_vs_team)
+    # dire_wr_with = clean_up(dire_wr_with, 4)
+    # radiant_wr_with = clean_up(radiant_wr_with, 4)
+    # radiant_wr_against = clean_up(radiant_wr_against, 5)
+    # radiant_pos1_vs_team = clean_up(radiant_pos1_vs_team)
+    # dire_pos1_vs_team = clean_up(dire_pos1_vs_team)
+    # radiant_pos2_vs_team = clean_up(radiant_pos2_vs_team)
+    # dire_pos2_vs_team = clean_up(dire_pos2_vs_team)
+    # radiant_pos3_vs_team = clean_up(radiant_pos3_vs_team)
+    # dire_pos3_vs_team = clean_up(dire_pos3_vs_team)
     sinergy, counterpick ,pos1_vs_team, pos2_vs_team, pos3_vs_team  = None, None, None, None, None
     output_message += f'{radiant_team_name} vs {dire_team_name}\n'
     if len(radiant_wr_with) > 0 and len(dire_wr_with) > 0:

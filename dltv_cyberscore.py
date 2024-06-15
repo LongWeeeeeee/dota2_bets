@@ -151,7 +151,7 @@ def analyze_draft(output_message, sinergy, counterpick, pos1_vs_team, core_match
             counterpick_over10 = (all(value > 0 for value in [counterpick, sinergy] if value is not None) * counterpick >= 10) +(all(value < 0 for value in [counterpick, sinergy] if value is not None) * counterpick <= -10)
         else:
             counterpick_over10 = False
-        if all_positive_or_negative and both_over9:
+        if other_values_check and both_over9:
             output_message += f'ОТЛИЧНАЯ СТАВКА ALL IN\n'
         elif (other_values_check and both_over5) or (singery_or_counterpick and counterpick_over10) or any_over20 or both_over9:
             output_message += f'ХОРОШАЯ СТАВКА\n'

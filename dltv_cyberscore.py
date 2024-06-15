@@ -576,12 +576,12 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             output_message += f'{dire_heroes_and_positions["pos 4"]["hero_name"]} pos 4 with {dire_heroes_and_positions["pos 5"]["hero_name"]} pos 5 Нету на dota2protracker\n'
     if impact_diff is not None and (impact_diff >= 10 or impact_diff <= -10):
         send_message(output_message)
-    if tier in [2, 3]:
+    if tier in [1, 2, 3]:
         if 'ОТЛИЧНАЯ СТАВКА' in output_message or 'ХОРОШАЯ СТАВКА' in output_message:
             send_message(output_message)
         else:
             print(output_message)
-    elif tier == 1 or egb:
+    elif egb:
         if not 'ПЛОХАЯ СТАВКА!!!' in output_message:
             send_message(output_message)
             print(output_message)

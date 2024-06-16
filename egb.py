@@ -504,7 +504,7 @@ def check_players_skill(radiant, dire, output_message, R_pos_strng, D_pos_strng)
     radiant_hero_ids = [player['hero_id'] for player in radiant.values()]
     dire_hero_ids = [player['hero_id'] for player in dire.values()]
     #radaint
-    radiant_impact, dire_impact = {},{}
+    radiant_impact, dire_impact, players_check = {},{},False
     for hero_ids, steam_account_ids in zip([radiant_hero_ids, dire_hero_ids], [radiant_steam_account_ids, dire_steam_account_ids]):
         player_query = '''
         {
@@ -561,7 +561,8 @@ def check_players_skill(radiant, dire, output_message, R_pos_strng, D_pos_strng)
                         else:
                             dire_impact[steam_account_id] = impact
         if isRadiant:
-            radiant_errors_len = len(data['errors'])
+            if 'errors' in data:
+                radiant_errors_len = len(data['errors'])
             for radiant_id in radiant_steam_account_ids:
                 if radiant_id not in radiant_impact:
                     if 'errors' in data:
@@ -579,7 +580,8 @@ def check_players_skill(radiant, dire, output_message, R_pos_strng, D_pos_strng)
                                     break
 
         elif not isRadiant:
-            dire_errors_len = len(data['errors'])
+            if 'errors' in data:
+                dire_errors_len = len(data['errors'])
             for dire_id in dire_steam_account_ids:
                 if dire_id not in dire_impact:
                     if 'errors' in data:
@@ -604,14 +606,28 @@ def check_players_skill(radiant, dire, output_message, R_pos_strng, D_pos_strng)
         radiant_average_impact = sum(radiant_impact.values())/len(radiant_impact)
         dire_average_impact = sum(dire_impact.values())/len(dire_impact)
         if radiant_average_impact > dire_average_impact:
-            impact_diff = radiant_average_impact- dire_average_impact
-            output_message+=(f'\nRadiant impact лучше в среднем на {impact_diff}\n')
+            impact_diff = radiant_average_impact - dire_average_impact
+            output_message += (f'\nRadiant impact лучше в среднем на {impact_diff}\n')
+            if len(R_pos_strng) <= len(D_pos_strng):
+                if impact_diff < 0: impact_diff *= -1
+                if impact_diff >= 10:
+                    players_check = True
         elif radiant_average_impact < dire_average_impact:
             impact_diff = dire_average_impact - radiant_average_impact
-            output_message+=(f'\nDire impact лучше в среднем на {impact_diff}\n')
+            output_message += (f'\nDire impact лучше в среднем на {impact_diff}\n')
+            if len(D_pos_strng) <= len(R_pos_strng):
+                if impact_diff < 0: impact_diff *= -1
+                if impact_diff >= 10:
+                    players_check = True
     else:
         impact_diff = None
-    return output_message, impact_diff, R_pos_strng, D_pos_strng
+        if len(R_pos_strng) >= len(D_pos_strng):
+            if len(dire_impact) != 0:
+                impact_diff = sum(dire_impact.values()) / len(dire_impact)
+        elif len(R_pos_strng) <= len(D_pos_strng):
+            if len(radiant_impact) != 0:
+                impact_diff = sum(radiant_impact.values()) / len(radiant_impact)
+    return output_message, impact_diff, R_pos_strng, D_pos_strng, players_check
 
 
 
@@ -639,11 +655,11 @@ while True:
                             if answer is not None:
                                 if answer != True:
                                     radiant, dire, match_id, output_message, R_pos_strng, D_pos_strng = answer
-                                    output_message, impact_diff, R_pos_strng, D_pos_strng = check_players_skill(radiant, dire, output_message, R_pos_strng, D_pos_strng)
+                                    output_message, impact_diff, R_pos_strng, D_pos_strng, player_check = check_players_skill(radiant, dire, output_message, R_pos_strng, D_pos_strng)
                                     output = ", ".join([f"'{pos}' : '{data['hero_name']}'" for pos, data in radiant.items()])
                                     dire_output= ", ".join([f"'{pos}' : '{data['hero_name']}'" for pos, data in dire.items()])
                                     print(f'Radint pick: {output}\nDire pick: {dire_output}')
-                                    dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id, score = [0,0], egb=True, output_message=output_message, impact_diff=impact_diff, R_pos_strng=R_pos_strng, D_pos_strng=D_pos_strng)
+                                    dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id, score = [0,0], egb=True, output_message=output_message, impact_diff=impact_diff, R_pos_strng=R_pos_strng, D_pos_strng=D_pos_strng, player_check=player_check)
                                 else:
                                     map = True
                         else:

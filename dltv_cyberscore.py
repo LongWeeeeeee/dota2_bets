@@ -348,7 +348,7 @@ def send_message(message):
     requests.post(url, json=payload)
 
 
-def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, score, R_pos_strng=None, D_pos_strng=None, impact_diff=None, tier=None, antiplagiat_url=None, core_matchup=None, output_message='', egb=None):
+def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, score, R_pos_strng=None, D_pos_strng=None, player_check = None, impact_diff=None, tier=None, antiplagiat_url=None, core_matchup=None, output_message='', egb=None):
     print('dota2protracker')
     radiant_pos1_with_team, radiant_pos2_with_team, radiant_pos3_with_team, dire_pos1_with_team, dire_pos2_with_team, dire_pos3_with_team = [], [], [], [], [], []
     radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team, radiant_pos4_with_pos5, dire_pos4_with_pos5 = [], [], [], [] ,[], [], [], [], [], None, None
@@ -578,9 +578,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             output_message += f'{radiant_heroes_and_positions["pos 4"]["hero_name"]} pos 4 with {radiant_heroes_and_positions["pos 5"]["hero_name"]} pos 5 Нету на dota2protracker\n'
         if dire_pos4_with_pos5 is None:
             output_message += f'{dire_heroes_and_positions["pos 4"]["hero_name"]} pos 4 with {dire_heroes_and_positions["pos 5"]["hero_name"]} pos 5 Нету на dota2protracker\n'
-    if impact_diff is not None and (impact_diff >= 10 or impact_diff <= -10):
-        send_message(output_message)
-    elif tier in [2, 3]:
+    if tier in [2, 3]:
         if 'ОТЛИЧНАЯ СТАВКА' in output_message or 'ХОРОШАЯ СТАВКА' in output_message:
             send_message(output_message)
         else:
@@ -591,7 +589,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             print(output_message)
         else:
             if egb:
-                if len(R_pos_strng) != len(D_pos_strng):
+                if player_check:
                     send_message(output_message)
             print(output_message)
 

@@ -584,6 +584,7 @@ egb = {
     'iceiceice': {'steamId': {84772440}, 'position': 'pos 3'},
     'dj': {'steamId': {102099826}, 'position': 'pos 4'},
     'mangekyou': {'steamId': {1150772339}, 'position': {'pos 2', 'pos 3'}},
+    'yamichc': {'steamId': {335437141}, 'position': {}},
 }
 
 add_players =set()

@@ -1,8 +1,10 @@
-import time
-import requests
 import json
-import traceback
-from dltv_cyberscore import get_team_positions, dota2protracker,get_map_id
+import time
+
+import requests
+
+from dltv_cyberscore import get_team_positions, dota2protracker, get_map_id
+
 while True:
     url = 'https://api.cyberscore.live/api/v1/matches/?limit=20&type=liveOrUpcoming&locale=en'
     response = requests.get(url)

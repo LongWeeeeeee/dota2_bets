@@ -4,21 +4,17 @@
 # Отладка винрейта на старых матчах
 # Проверка того что все правильно работает
 # ранги неправильно работают
+import datetime
 import html
 import json
+import re
+
 import requests
 from bs4 import BeautifulSoup
-import re
-import datetime
 
 import id_to_name
 import keys
 from id_to_name import game_changer_list
-
-
-
-
-
 
 
 def get_urls(url, target_datetime = 0):
@@ -347,7 +343,7 @@ def send_message(message):
     requests.post(url, json=payload)
 
 
-def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, score, R_pos_strng=None, D_pos_strng=None, player_check = None, impact_diff=None, tier=None, antiplagiat_url=None, core_matchup=None, output_message='', egb=None):
+def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, score, r_pos_strng=None, d_pos_strng=None, player_check = None, impact_diff=None, tier=None, antiplagiat_url=None, core_matchup=None, output_message='', egb=None):
     print('dota2protracker')
     radiant_pos1_with_team, radiant_pos2_with_team, radiant_pos3_with_team, dire_pos1_with_team, dire_pos2_with_team, dire_pos3_with_team = [], [], [], [], [], []
     radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team, radiant_pos4_with_pos5, dire_pos4_with_pos5 = [], [], [], [] ,[], [], [], [], [], None, None

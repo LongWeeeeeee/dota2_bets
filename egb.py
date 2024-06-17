@@ -487,7 +487,9 @@ def get_picks_and_pos(match_id):
         check_time = 75
         while check_time < 400:
             radiant, dire, output_message, R_pos_strng, D_pos_strng = get_picks(check_time, players)
-            if len(radiant) == 5 and len(dire) == 5:
+            radiant_heroes = set([item['hero_name'] for pos, item, in radiant.items()])
+            dire_heroes = set([item['hero_name'] for pos, item, in dire.items()])
+            if len(radiant_heroes) == 5 and len(dire_heroes) == 5:
                 return radiant, dire, match_id, output_message, R_pos_strng, D_pos_strng
             else:
                 check_time += 15
@@ -621,12 +623,6 @@ def check_players_skill(radiant, dire, output_message, R_pos_strng, D_pos_strng)
                     players_check = True
     else:
         impact_diff = None
-        if len(R_pos_strng) >= len(D_pos_strng):
-            if len(dire_impact) != 0:
-                impact_diff = sum(dire_impact.values()) / len(dire_impact)
-        elif len(R_pos_strng) <= len(D_pos_strng):
-            if len(radiant_impact) != 0:
-                impact_diff = sum(radiant_impact.values()) / len(radiant_impact)
     return output_message, impact_diff, R_pos_strng, D_pos_strng, players_check
 
 

@@ -590,6 +590,7 @@ egb = {
 add_players =set()
 
 blacklist_players = {
+    'fritterus',
     'febby',
     'jubei',
 'invokergirl',

@@ -549,30 +549,32 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             output_message += f'Аккуратно! У {dire_team_name} есть {hero}, который может изменить исход боя\n'
             check = True
     output_message += f'Sinergy: {sinergy}\nCounterpick: {counterpick}\nPos1_vs_team: {pos1_vs_team}\nPos2vs_team: {pos2_vs_team}\nPos3vs_team: {pos3_vs_team}\nCore matchup: {core_matchup}\nSups: {sups}\n'
+    radiant_output = ", ".join([f"'{pos}' : '{data['hero_name']}'" for pos, data in radiant_heroes_and_positions.items()])
+    dire_output = ", ".join([f"'{pos}' : '{data['hero_name']}'" for pos, data in dire_heroes_and_positions.items()])
     if radiant_pos4_with_pos5 is None:
         output_message += f'pos 4 {radiant_heroes_and_positions["pos 4"]["hero_name"]} with pos 5 {radiant_heroes_and_positions["pos 5"]["hero_name"]} нету на proracker\n'
     if dire_pos4_with_pos5 is None:
         output_message += f'pos 4 {dire_heroes_and_positions["pos 4"]["hero_name"]} with pos 5 {dire_heroes_and_positions["pos 5"]["hero_name"]} нету на proracker\n'
     if len(radiant_pos3_vs_team) < 1:
-        output_message += f'Недостаточно данных pos 3 {radiant_heroes_and_positions["pos 3"]["hero_name"]} vs {dire_heroes_and_positions}\n'
+        output_message += f'Недостаточно данных pos 3 {radiant_heroes_and_positions["pos 3"]["hero_name"]} vs {dire_output}\n'
     if len(dire_pos3_vs_team) < 1:
-        output_message += f'Недостаточно данных pos 3 {dire_heroes_and_positions["pos 3"]["hero_name"]} vs {radiant_heroes_and_positions}\n'
+        output_message += f'Недостаточно данных pos 3 {dire_heroes_and_positions["pos 3"]["hero_name"]} vs {radiant_output}\n'
     if len(dire_pos2_vs_team) < 1:
-        output_message += f'Недостаточно данных pos 2 {dire_heroes_and_positions["pos 2"]["hero_name"]} vs {radiant_heroes_and_positions}\n'
+        output_message += f'Недостаточно данных pos 2 {dire_heroes_and_positions["pos 2"]["hero_name"]} vs {radiant_output}\n'
     if len(radiant_pos2_vs_team) < 1:
-        output_message += f'Недостаточно данных pos 2 {radiant_heroes_and_positions["pos 2"]["hero_name"]} vs {dire_heroes_and_positions}\n'
+        output_message += f'Недостаточно данных pos 2 {radiant_heroes_and_positions["pos 2"]["hero_name"]} vs {dire_output}\n'
     if len(radiant_pos1_vs_team) < 1:
-        output_message += f'Недостаточно данных pos 1 {radiant_heroes_and_positions["pos 1"]["hero_name"]} vs {dire_heroes_and_positions}\n'
+        output_message += f'Недостаточно данных pos 1 {radiant_heroes_and_positions["pos 1"]["hero_name"]} vs {dire_output}\n'
     if len(dire_pos1_vs_team) < 1:
-        output_message += f'Недостаточно данных pos 1 {dire_heroes_and_positions["pos 1"]["hero_name"]} vs {radiant_heroes_and_positions}\n'
+        output_message += f'Недостаточно данных pos 1 {dire_heroes_and_positions["pos 1"]["hero_name"]} vs {dire_output}\n'
     if core_matchup is None:
         output_message += f'{radiant_heroes_and_positions["pos 1"]} vs {dire_heroes_and_positions["pos 1"]["hero_name"]} нету на dota2protracker\n'
     if len(dire_wr_with) < 1:
-        output_message += f'Недостаточная выборка винрейтов у {dire_team_name} между командой\n{dire_heroes_and_positions}\n'
+        output_message += f'Недостаточная выборка винрейтов у {dire_team_name} между командой:\n{dire_output}\n'
     if len(radiant_wr_with) < 1:
-        output_message += f'Недостаточная выборка винрейтов у {radiant_team_name} между командой\n{radiant_heroes_and_positions}\n'
+        output_message += f'Недостаточная выборка винрейтов у {radiant_team_name} между командой:\n{radiant_output}\n'
     if len(radiant_wr_against) < 1:
-        output_message += f'Недостаточная выборка винрейтов у команду между друг друга\n{radiant_heroes_and_positions}\n{dire_heroes_and_positions}\n'
+        output_message += f'Недостаточная выборка винрейтов у команды между друг другом:\n{radiant_output}\n{dire_output}\n'
     if sups is None:
         if radiant_pos4_with_pos5 is None:
             output_message += f'{radiant_heroes_and_positions["pos 4"]["hero_name"]} pos 4 with {radiant_heroes_and_positions["pos 5"]["hero_name"]} pos 5 Нету на dota2protracker\n'
@@ -589,7 +591,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             print(output_message)
         else:
             if egb:
-                if player_check or impact_diff >= 10 or impact_diff <= -10:
+                if player_check or impact_diff >= 15 or impact_diff <= -15:
                     send_message(output_message)
             print(output_message)
 

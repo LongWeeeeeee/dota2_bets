@@ -142,13 +142,17 @@ def analyze_draft(output_message, sinergy, counterpick, pos1_vs_team, core_match
         any_over20 = (all(value > 0 for value in [counterpick, sinergy] if value is not None ) * any(
             value >= 20 for value in [counterpick, sinergy] if value is not None)) + (all(value < 0 for value in [counterpick, sinergy] if value is not None) * any(
             value <= -20 for value in [counterpick, sinergy] if value is not None))
+        any_over8 = (all(value > 0 for value in [counterpick, sinergy] if value is not None) * any(
+            value >= 8 for value in [counterpick, sinergy] if value is not None)) + (
+                                 all(value < 0 for value in [counterpick, sinergy] if value is not None) * any(
+                             value <= -8 for value in [counterpick, sinergy] if value is not None))
         if counterpick is not None:
-            counterpick_over8 = (all(value > 0 for value in [counterpick, sinergy] if value is not None) * counterpick >= 10) +(all(value < 0 for value in [counterpick, sinergy] if value is not None) * counterpick <= -10)
+            counterpick_over8 = (all(value > 0 for value in [counterpick, sinergy] if value is not None) * counterpick >= 8) +(all(value < 0 for value in [counterpick, sinergy] if value is not None) * counterpick <= -8)
         else:
             counterpick_over8 = False
         if other_values_check and both_over9:
             output_message += f'ОТЛИЧНАЯ СТАВКА ALL IN\n'
-        elif (other_values_check and both_over5) or (singery_or_counterpick and counterpick_over8) or any_over20 or both_over9:
+        elif (other_values_check and both_over5) or any_over20 or both_over9 or (both_over5 and any_over8):
             output_message += f'ХОРОШАЯ СТАВКА\n'
         elif (singery_or_counterpick and both_over5) or all_positive_or_negative or other_values_check or counterpick_over8:
             output_message += f'РИСКОВАЯ СТАВКА\n'

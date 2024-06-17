@@ -1,11 +1,12 @@
-import id_to_name
 import importlib
 import json
 import time
-from dltv_cyberscore import dota2protracker
+import traceback
 import requests
-from egb import get_players, get_picks_and_pos, get_exac_match, get_strats_graph_match
 
+import id_to_name
+from dltv_cyberscore import dota2protracker
+from egb import get_players, get_picks_and_pos, get_exac_match, get_strats_graph_match, check_players_skill
 
 url = "https://egb.com/bets"
 params = {
@@ -43,15 +44,31 @@ while True:
                                 answer = get_picks_and_pos(match_id=exac_match['matchId'])
                                 if answer is not None:
                                     if answer != True:
-                                        radiant, dire, match_id, output_message = answer
-                                        print(f'Radint pick: {radiant}\nDire pick: {dire}')
-                                        dota2protracker(radiant_heroes_and_positions=radiant, dire_heroes_and_positions=dire, radiant_team_name=dire_and_radiant['radiant'], dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id, score = [0,0], egb=True, output_message=output_message)
+                                        radiant, dire, match_id, output_message, R_pos_strng, D_pos_strng = answer
+                                        output_message, impact_diff, R_pos_strng, D_pos_strng, player_check = check_players_skill(
+                                            radiant, dire, output_message, R_pos_strng, D_pos_strng)
+                                        output = ", ".join(
+                                            [f"'{pos}' : '{data['hero_name']}'" for pos, data in radiant.items()])
+                                        dire_output = ", ".join(
+                                            [f"'{pos}' : '{data['hero_name']}'" for pos, data in dire.items()])
+                                        print(f'Radint pick: {output}\nDire pick: {dire_output}')
+                                        dota2protracker(radiant_heroes_and_positions=radiant,
+                                                        dire_heroes_and_positions=dire,
+                                                        radiant_team_name=dire_and_radiant['radiant'],
+                                                        dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id,
+                                                        score=[0, 0], egb=True, output_message=output_message,
+                                                        impact_diff=impact_diff, player_check=player_check)
                                     else:
                                         map = True
                             else:
                                 print('карта не найдена, вероятно, матч только начался')
                                 map = True
-    except: pass
+    except:
+        full_traceback = traceback.format_exc()
+        print(full_traceback)
+        with open('error_log.txt', 'a') as f:
+            f.write(full_traceback)
+            f.write('\n')
     if map:
         print('сплю 30 секунд')
         time.sleep(30)

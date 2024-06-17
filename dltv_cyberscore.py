@@ -130,11 +130,10 @@ def analyze_draft(output_message, sinergy, counterpick, pos1_vs_team, core_match
                   sups):
     values = {'sinergy':sinergy, 'counterpick':counterpick, 'pos1_vs_team':pos1_vs_team, 'core_matchup':core_matchup, 'pos2_vs_team':pos2_vs_team, 'pos3_vs_team':pos3_vs_team, 'sups':sups}
     other_values = {'sinergy':sinergy, 'counterpick':counterpick, 'core_matchup':core_matchup, 'sups':sups}
-    # values_nones = sum(1 for value in values.values() if value is None)
-    # other_values_nones = sum(1 for value in other_values.values() if value is None)
-    # nones = (values_nones <= 2) * (other_values_nones <= 1)
-    # if nones:
-    if True:
+    values_nones = sum(1 for value in values.values() if value is None)
+    other_values_nones = sum(1 for value in other_values.values() if value is None)
+    nones = (values_nones <= 2) * (other_values_nones <= 1)
+    if nones:
         # values, other_values = [value for value in values if value is not None], [value for value in other_values if value is not None]
         all_positive_or_negative = all(value >= 0 for value in values.values() if value is not None) + all(value <= 0 for value in values.values() if value is not None)
         other_values_check = all(value >= 0 for value in other_values.values() if value is not None) + all(value <= 0 for value in other_values.values() if value is not None)

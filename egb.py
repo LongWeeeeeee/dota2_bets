@@ -556,7 +556,7 @@ def check_players_skill(radiant, dire, output_message, R_pos_strng, D_pos_strng)
                 check_hero_id = hero_perfomance['hero']['id']
                 for position_score in hero_perfomance['positionScore']:
                     pos_found = position_score['id'].replace('POSITION_', '') == pos.replace('pos ', '')
-                    if pos_found and check_hero_id == hero_id and position_score['matchCount'] >1:
+                    if pos_found and check_hero_id == hero_id and position_score['matchCount'] >=4:
                         impact = position_score['imp']
                         if isRadiant:
                             radiant_impact[steam_account_id] = impact
@@ -621,6 +621,8 @@ def check_players_skill(radiant, dire, output_message, R_pos_strng, D_pos_strng)
                 if impact_diff < 0: impact_diff *= -1
                 if impact_diff >= 10:
                     players_check = True
+        else:
+            impact_diff = 0
     else:
         impact_diff = None
     return output_message, impact_diff, R_pos_strng, D_pos_strng, players_check

@@ -306,7 +306,7 @@ def clean_up(inp, lenght=0):
     if len(inp) > lenght:
         copy = inp.copy()
         for i in inp:
-            if i >=48 and i <=52:
+            if i >=44 and i <=54:
                 copy.remove(i)
         if len(copy) < 3:
             return inp

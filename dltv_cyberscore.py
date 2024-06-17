@@ -591,7 +591,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         else:
             if egb:
                 if impact_diff is not None:
-                    if player_check or impact_diff >= 15 or impact_diff <= -15:
+                    if player_check or impact_diff >= 10 or impact_diff <= -10:
                         send_message(output_message)
             print(output_message)
 

@@ -9,6 +9,7 @@ import html
 import json
 import re
 
+from database import heroes_data
 import requests
 from bs4 import BeautifulSoup
 
@@ -111,12 +112,13 @@ def get_team_positions(url):
                 if id_to_name.translate[id] == heroes[i]:
                     hero_id = id
                     radiant_heroes_and_pos[f'pos {i+1}'] = {'hero_id':hero_id, 'hero_name' : heroes[i]}
-
-        for i in range(5):
+        c = 0
+        for i in range(5, 10):
             for id in id_to_name.translate:
                 if id_to_name.translate[id] == heroes[i]:
                     hero_id = id
-                    dire_heroes_and_pos[f'pos {i+1}'] = {'hero_id':hero_id, 'hero_name' : heroes[i+5]}
+                    dire_heroes_and_pos[f'pos {c+1}'] = {'hero_id':hero_id, 'hero_name' : heroes[i]}
+                    c+=1
 
         return radiant_heroes_and_pos, dire_heroes_and_pos
     else:
@@ -591,7 +593,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         else:
             if egb:
                 if impact_diff is not None:
-                    if player_check or impact_diff >= 10 or impact_diff <= -10:
+                    if player_check:
                         send_message(output_message)
             print(output_message)
 

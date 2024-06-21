@@ -346,6 +346,7 @@ egb = {
 }
 
 blacklist_players = {
+    'qsonya',
     'fritterus',
     'febby',
     'jubei',

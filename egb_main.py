@@ -45,7 +45,7 @@ while True:
                                 if answer is not None:
                                     if answer != True:
                                         radiant, dire, match_id, output_message, R_pos_strng, D_pos_strng = answer
-                                        output_message, impact_diff, R_pos_strng, D_pos_strng, radiant_players_check, dire_players_check, radiant_impactandplayers, dire_impactandplayers = check_players_skill(
+                                        output_message, impact_diff, R_pos_strng, D_pos_strng, radiant_players_check, dire_players_check, radiant_impactandplayers, dire_impactandplayers, radiant_message_add, dire_message_add, impact_message = check_players_skill(
                                             radiant, dire, output_message, R_pos_strng, D_pos_strng)
                                         output = ", ".join(
                                             [f"'{pos}' : '{data['hero_name']}'" for pos, data in radiant.items()])
@@ -57,7 +57,7 @@ while True:
                                                         radiant_team_name=dire_and_radiant['radiant'],
                                                         dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id,
                                                         score=[0, 0], egb=True, output_message=output_message,
-                                                        radiant_players_check=radiant_players_check, dire_players_check=dire_players_check, radiant_impactandplayers=radiant_impactandplayers, dire_impactandplayers=dire_impactandplayers)
+                                                        radiant_players_check=radiant_players_check, dire_players_check=dire_players_check, radiant_impactandplayers=radiant_impactandplayers, dire_impactandplayers=dire_impactandplayers, radiant_message_add=radiant_message_add, dire_message_add=dire_message_add, impact_message=impact_message)
                                     else:
                                         map = True
                             else:

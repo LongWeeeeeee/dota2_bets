@@ -596,18 +596,20 @@ def check_players_skill(radiant, dire, output_message, R_pos_strng, D_pos_strng)
                                 if dire_id not in D_pos_strng:
                                     D_pos_strng[dire_id] = f'{dire[pos]["hero_name"]} {pos} играет не на своей позиции\n'
                                     break
+    radiant_message_add, dire_message_add = '' ,''
     if len(D_pos_strng) != 0:
-        output_message += 'Dire:\n' + ''.join(['· ' + message for message in D_pos_strng.values()])
+        dire_message_add = 'Dire:\n' + ''.join(['· ' + message for message in D_pos_strng.values()])
     if len(R_pos_strng) != 0:
-        output_message += '\nRadiant:\n' + ''.join(['· ' + message for message in R_pos_strng.values()])
-    radiant_impactandplayers, dire_impactandplayers, radiant_players_check, dire_players_check = False, False, False, False
+        radiant_message_add = '\nRadiant:\n' + ''.join(['· ' + message for message in R_pos_strng.values()])
+    radiant_impactandplayers, dire_impactandplayers, radiant_players_check, dire_players_check, impact_message = False, False, False, False, None
     if len(dire_impact) != 0 and len(radiant_impact) != 0:
-        output_message+=(f'\nRadiant найдено {len(radiant_impact)}/5 игроков, {radiant_errors_len} из которых скрытые\nDire найдено {len(dire_impact)}/5 игроков, {dire_errors_len} из которых скрытые\n')
+        radiant_message_add+=(f'Найдено {len(radiant_impact)}/5 игроков, {radiant_errors_len} из которых скрытые')
+        dire_message_add += (f'Найдено {len(dire_impact)}/5 игроков, {dire_errors_len} из которых скрытые')
         radiant_average_impact = sum(radiant_impact.values())/len(radiant_impact)
         dire_average_impact = sum(dire_impact.values())/len(dire_impact)
         if radiant_average_impact > dire_average_impact:
             impact_diff = radiant_average_impact - dire_average_impact
-            output_message += (f'\nRadiant impact лучше в среднем на {impact_diff}\n')
+            impact_message = (f'\nRadiant impact лучше в среднем на {impact_diff}\n')
             if len(R_pos_strng) < len(D_pos_strng):
                 radiant_impactandplayers = True
                 if impact_diff < 0: impact_diff *= -1
@@ -618,7 +620,7 @@ def check_players_skill(radiant, dire, output_message, R_pos_strng, D_pos_strng)
 
         elif radiant_average_impact < dire_average_impact:
             impact_diff = dire_average_impact - radiant_average_impact
-            output_message += (f'\nDire impact лучше в среднем на {impact_diff}\n')
+            impact_message = (f'\nDire impact лучше в среднем на {impact_diff}\n')
             if len(D_pos_strng) < len(R_pos_strng):
                 dire_impactandplayers = True
                 if impact_diff < 0: impact_diff *= -1
@@ -631,4 +633,4 @@ def check_players_skill(radiant, dire, output_message, R_pos_strng, D_pos_strng)
             impact_diff = 0
     else:
         impact_diff = None
-    return output_message, impact_diff, R_pos_strng, D_pos_strng, radiant_players_check, dire_players_check, radiant_impactandplayers, dire_impactandplayers
+    return output_message, impact_diff, R_pos_strng, D_pos_strng, radiant_players_check, dire_players_check, radiant_impactandplayers, dire_impactandplayers, radiant_message_add, dire_message_add, impact_message

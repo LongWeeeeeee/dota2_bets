@@ -9,7 +9,6 @@ import html
 import json
 import re
 
-from database import heroes_data
 import requests
 from bs4 import BeautifulSoup
 

@@ -23,7 +23,7 @@ headers = {
     "DNT": "1",
     "Sec-GPC": "1",}
 
-players_to_add = id_to_name.add_players
+players_to_add = set()
 def get_players(bet):
     dire_and_radiant = {}
     players = [player for player in bet['game_label'].lower().replace(' team', '').split(' vs ')]
@@ -205,7 +205,6 @@ def know_the_position(radiant_safe, check_time, radiant_hard, radiant_mid, dire_
                 elif radiant_safe[0]['steamAccountId'] in id_to_name.egb[player]['steamId']:
                     if 'pos 5' not in id_to_name.egb[player]['position'] and len( id_to_name.egb[player]['position']) != 0:
                         R_pos_strng[radiant_safe[0]['steamAccountId']] = f'{player} играет не на своей роли: {id_to_name.translate[radiant_safe[0]["heroId"]]} pos 5\n'
-
             radiant['pos 1'] = {'hero_id': radiant_safe[1]['heroId'] , 'hero_name': id_to_name.translate[radiant_safe[1]['heroId']], 'steamAccountId' : radiant_safe[1]['steamAccountId']}
             radiant['pos 5'] = {'hero_id': radiant_safe[0]['heroId'], 'hero_name': id_to_name.translate[radiant_safe[0]['heroId']], 'steamAccountId' : radiant_safe[0]['steamAccountId']}
     if len(radiant_hard) == 2:
@@ -602,6 +601,7 @@ def check_players_skill(radiant, dire, output_message, R_pos_strng, D_pos_strng)
         output_message += 'Dire:\n' + ''.join(['· ' + message for message in D_pos_strng.values()])
     if len(R_pos_strng) != 0:
         output_message += '\nRadiant:\n' + ''.join(['· ' + message for message in R_pos_strng.values()])
+    impactandplayers = False
     if len(dire_impact) != 0 and len(radiant_impact) != 0:
         output_message+=(f'\nRadiant найдено {len(radiant_impact)}/5 игроков, {radiant_errors_len} из которых скрытые\nDire найдено {len(dire_impact)}/5 игроков, {dire_errors_len} из которых скрытые\n')
         radiant_average_impact = sum(radiant_impact.values())/len(radiant_impact)
@@ -609,19 +609,26 @@ def check_players_skill(radiant, dire, output_message, R_pos_strng, D_pos_strng)
         if radiant_average_impact > dire_average_impact:
             impact_diff = radiant_average_impact - dire_average_impact
             output_message += (f'\nRadiant impact лучше в среднем на {impact_diff}\n')
-            if len(R_pos_strng) <= len(D_pos_strng):
+            if len(R_pos_strng) < len(D_pos_strng):
+                impactandplayers = True
                 if impact_diff < 0: impact_diff *= -1
                 if impact_diff >= 10:
                     players_check = True
+            elif len(R_pos_strng) <= len(D_pos_strng):
+                impactandplayers = True
+
         elif radiant_average_impact < dire_average_impact:
             impact_diff = dire_average_impact - radiant_average_impact
             output_message += (f'\nDire impact лучше в среднем на {impact_diff}\n')
-            if len(D_pos_strng) <= len(R_pos_strng):
+            if len(D_pos_strng) < len(R_pos_strng):
                 if impact_diff < 0: impact_diff *= -1
                 if impact_diff >= 10:
                     players_check = True
+            elif len(D_pos_strng) <= len(R_pos_strng):
+                impactandplayers = True
+
         else:
             impact_diff = 0
     else:
         impact_diff = None
-    return output_message, impact_diff, R_pos_strng, D_pos_strng, players_check
+    return output_message, impact_diff, R_pos_strng, D_pos_strng, players_check, impactandplayers

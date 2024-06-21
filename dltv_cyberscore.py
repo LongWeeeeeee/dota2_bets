@@ -153,10 +153,22 @@ def analyze_draft(output_message, sinergy, counterpick, pos1_vs_team, core_match
         else:
             counterpick_over8 = False
         if other_values_check and both_over9:
+            if counterpick > 0:
+                radiant_predict = True
+            elif counterpick < 0:
+                dire_predict = True
             output_message += f'ОТЛИЧНАЯ СТАВКА 2 ФЛЕТА\n'
         elif (other_values_check and both_over5) or any_over20 or both_over9 or (both_over5 and any_over8):
+            if counterpick > 0:
+                radiant_predict = True
+            elif counterpick < 0:
+                dire_predict = True
             output_message += f'ХОРОШАЯ СТАВКА 1 ФЛЕТ\n'
         elif (singery_or_counterpick and both_over5) or all_positive_or_negative or other_values_check or counterpick_over8:
+            if counterpick > 0:
+                radiant_predict = True
+            elif counterpick < 0:
+                dire_predict = True
             output_message += f'РИСКОВАЯ СТАВКА ПОЛ ФЛЕТА\n'
         else:
             output_message += f'ПЛОХАЯ СТАВКА!!!\n'
@@ -349,7 +361,7 @@ def send_message(message):
     requests.post(url, json=payload)
 
 
-def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, score, r_pos_strng=None, d_pos_strng=None, player_check = None, impactandplayers=None, impact_diff=None, tier=None, antiplagiat_url=None, core_matchup=None, output_message='', egb=None):
+def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, score, tier=None, antiplagiat_url=None, core_matchup=None, output_message='', egb=None, radiant_players_check=None, dire_players_check=None, radiant_impactandplayers=None, dire_impactandplayers=None):
     print('dota2protracker')
     radiant_pos1_with_team, radiant_pos2_with_team, radiant_pos3_with_team, dire_pos1_with_team, dire_pos2_with_team, dire_pos3_with_team = [], [], [], [], [], []
     radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team, radiant_pos4_with_pos5, dire_pos4_with_pos5 = [], [], [], [] ,[], [], [], [], [], None, None
@@ -584,19 +596,20 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     if tier in [1, 2, 3]:
         if 'ОТЛИЧНАЯ СТАВКА' in output_message or 'ХОРОШАЯ СТАВКА' in output_message:
             if egb:
-                if impactandplayers or player_check:
+                if (radiant_impactandplayers and radiant_predict) or (radiant_players_check and radiant_predict) or (dire_impactandplayers and dire_predict) or (dire_players_check and dire_predict):
                     send_message(output_message)
-            send_message(output_message)
+            else:
+                send_message(output_message)
         else:
             print(output_message)
     elif egb:
         if not 'ПЛОХАЯ СТАВКА!!!' in output_message:
-            if impactandplayers or player_check:
+            if (radiant_impactandplayers and radiant_predict) or (radiant_players_check and radiant_predict) or (dire_impactandplayers and dire_predict) or (dire_players_check and dire_predict):
                 send_message(output_message)
             else:
                 print(output_message)
         else:
-            if player_check:
+            if radiant_players_check or dire_players_check:
                 send_message(output_message)
             else:
                 print(output_message)

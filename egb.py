@@ -1,7 +1,6 @@
 import json
 
 import requests
-
 import id_to_name
 from dltv_cyberscore import if_unique, send_message
 from keys import api_token
@@ -554,7 +553,7 @@ def check_players_skill(radiant, dire, output_message, R_pos_strng, D_pos_strng)
                 check_hero_id = hero_perfomance['hero']['id']
                 for position_score in hero_perfomance['positionScore']:
                     pos_found = position_score['id'].replace('POSITION_', '') == pos.replace('pos ', '')
-                    if pos_found and check_hero_id == hero_id and position_score['matchCount'] >=4:
+                    if pos_found and check_hero_id == hero_id and position_score['matchCount'] >=2:
                         impact = position_score['imp']
                         if isRadiant:
                             radiant_impact[steam_account_id] = impact

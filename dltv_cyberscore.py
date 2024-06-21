@@ -125,6 +125,7 @@ def get_team_positions(url):
 
 def analyze_draft(output_message, sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team,
                   sups):
+    radiant_predict, dire_predict = False, False
     values = {'sinergy':sinergy, 'counterpick':counterpick, 'pos1_vs_team':pos1_vs_team, 'core_matchup':core_matchup, 'pos2_vs_team':pos2_vs_team, 'pos3_vs_team':pos3_vs_team, 'sups':sups}
     other_values = {'sinergy':sinergy, 'counterpick':counterpick, 'core_matchup':core_matchup, 'sups':sups}
     values_nones = sum(1 for value in values.values() if value is None)
@@ -173,7 +174,7 @@ def analyze_draft(output_message, sinergy, counterpick, pos1_vs_team, core_match
             output_message += f'ПЛОХАЯ СТАВКА!!!\n'
     else:
         output_message += f'ПЛОХАЯ СТАВКА!!!\n'
-    return output_message
+    return output_message, radiant_predict, dire_predict
 
 
 
@@ -550,7 +551,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             dire_pos2_vs_team)
     if core_matchup is not None:
         core_matchup -= 50
-    output_message = analyze_draft(output_message, sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team,
+    output_message, radiant_predict, dire_predict = analyze_draft(output_message, sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team,
                   sups)
     for hero in list(radiant_heroes_and_positions.values()):
         if hero in game_changer_list:

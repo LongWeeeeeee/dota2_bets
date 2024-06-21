@@ -602,7 +602,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     if impact_message is not None:
         output_message += impact_message
     if map_url is not None:
-        output_message += map_url
+        output_message += map_url + '\n'
     output_message += f'Счет: {score}\n'
     output_message += f'{radiant_team_name} vs {dire_team_name}\n'
     output_message += f'Sinergy: {sinergy}\nCounterpick: {counterpick}\nPos1_vs_team: {pos1_vs_team}\nPos2vs_team: {pos2_vs_team}\nPos3vs_team: {pos3_vs_team}\nCore matchup: {core_matchup}\nSups: {sups}\n'

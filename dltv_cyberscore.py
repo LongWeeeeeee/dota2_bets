@@ -123,7 +123,7 @@ def get_team_positions(url):
     else:
         print('нету live матчей')
 
-def analyze_draft(output_message, sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team,
+def analyze_draft(sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team,
                   sups):
     radiant_predict, dire_predict = False, False
     values = {'sinergy':sinergy, 'counterpick':counterpick, 'pos1_vs_team':pos1_vs_team, 'core_matchup':core_matchup, 'pos2_vs_team':pos2_vs_team, 'pos3_vs_team':pos3_vs_team, 'sups':sups}
@@ -149,7 +149,7 @@ def analyze_draft(output_message, sinergy, counterpick, pos1_vs_team, core_match
                                  all(value < 0 for value in [counterpick, sinergy] if value is not None) * any(
                              value <= -8 for value in [counterpick, sinergy] if value is not None))
         if counterpick is not None:
-            counterpick_over8 = (all(value > 0 for value in [counterpick, sinergy] if value is not None) * counterpick >= 8) +(all(value < 0 for value in [counterpick, sinergy] if value is not None) * counterpick <= -8)
+            counterpick_over8 = (counterpick >= 8) + (counterpick <= -8)
         else:
             counterpick_over8 = False
         if other_values_check and both_over9:
@@ -610,7 +610,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     output_message += f'Счет: {score}\n'
     output_message += f'{radiant_team_name} vs {dire_team_name}\n'
     output_message += verdict
-    output_message += f'Sinergy: {sinergy}\nCounterpick: {counterpick}\nPos1_vs_team: {pos1_vs_team}\nPos2vs_team: {pos2_vs_team}\nPos3vs_team: {pos3_vs_team}\nCore matchup: {core_matchup}\nSups: {sups}\n'
+    output_message += f'Sinergy: {sinergy}\nCounterpick: {counterpick}\nPos1_vs_team: {pos1_vs_team}\nPos2_vs_team: {pos2_vs_team}\nPos3_vs_team: {pos3_vs_team}\nCore matchup: {core_matchup}\nSups: {sups}\n'
 
     if tier in [1, 2, 3]:
         if 'ОТЛИЧНАЯ СТАВКА' in output_message or 'ХОРОШАЯ СТАВКА' in output_message:

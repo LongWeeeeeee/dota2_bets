@@ -336,7 +336,7 @@ egb = {
     'not me': {'steamId': {218231587}, 'position': {'pos 4'}},
     'Fraser': {'steamId': {92487440}, 'position': {'pos 3'}},
     'mitrofanushka': {'steamId': {130123201}, 'position': {'pos 1'}},
-    'daylight': {'steamId': {320017600}, 'positon': {'pos 1'}},
+    'daylight': {'steamId': {320017600}, 'position': {'pos 1'}},
     'volshebnik': {'steamId': {309345956}, 'position': {'pos 2'}},
     'dr.bum': {'steamId': {47977302}, 'position': {'pos 4'}},
     'player1': {'steamId': {170834508}, 'position': {'pos 1', 'pos 2', 'pos 3'}},

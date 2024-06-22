@@ -594,7 +594,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     if len(dire_pos1_vs_team) < 1:
         dire_text += f'Недостаточно данных pos 1 {dire_heroes_and_positions["pos 1"]["hero_name"]} vs {radiant_output}\n'
     if core_matchup is None:
-        output_message += f'Radiant {radiant_heroes_and_positions["pos 1"]} vs Dire {dire_heroes_and_positions["pos 1"]["hero_name"]} нету на dota2protracker\n'
+        output_message += f'Radiant {radiant_heroes_and_positions["pos 1"]["hero_name"]} vs Dire {dire_heroes_and_positions["pos 1"]["hero_name"]} нету на dota2protracker\n'
     if len(dire_wr_with) < 1:
         dire_text += f'Недостаточная выборка винрейтов у {dire_team_name} между командой:\n{dire_output}\n'
     if len(radiant_wr_with) < 1:
@@ -628,10 +628,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             else:
                 print(output_message)
         else:
-            if radiant_players_check or dire_players_check:
-                send_message(output_message)
-            else:
-                print(output_message)
+            print(output_message)
 
 
     if antiplagiat_url is not None:

@@ -604,7 +604,7 @@ def check_players_skill(radiant, dire, output_message, R_pos_strng, D_pos_strng)
     radiant_impactandplayers, dire_impactandplayers, radiant_players_check, dire_players_check, impact_message = False, False, False, False, None
     if len(dire_impact) != 0 and len(radiant_impact) != 0:
         radiant_message_add+=(f'Найдено {len(radiant_impact)}/5 игроков, {radiant_errors_len} из которых скрытые')
-        dire_message_add += (f'Найдено {len(dire_impact)}/5 игроков, {dire_errors_len} из которых скрытые')
+        dire_message_add += (f'  Найдено {len(dire_impact)}/5 игроков, {dire_errors_len} из которых скрытые')
         radiant_average_impact = sum(radiant_impact.values())/len(radiant_impact)
         dire_average_impact = sum(dire_impact.values())/len(dire_impact)
         if radiant_average_impact > dire_average_impact:

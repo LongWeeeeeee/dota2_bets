@@ -596,11 +596,11 @@ def check_players_skill(radiant, dire, output_message, R_pos_strng, D_pos_strng)
                                 if dire_id not in D_pos_strng:
                                     D_pos_strng[dire_id] = f'{dire[pos]["hero_name"]} {pos} играет не на своей позиции\n'
                                     break
-    radiant_message_add, dire_message_add = '' ,''
+    radiant_message_add, dire_message_add = 'Radiant:\n' ,'Dire:\n'
     if len(D_pos_strng) != 0:
-        dire_message_add = 'Dire:\n' + ''.join(['· ' + message for message in D_pos_strng.values()])
+        dire_message_add = ''.join(['· ' + message for message in D_pos_strng.values()])
     if len(R_pos_strng) != 0:
-        radiant_message_add = '\nRadiant:\n' + ''.join(['· ' + message for message in R_pos_strng.values()])
+        radiant_message_add = ''.join(['· ' + message for message in R_pos_strng.values()])
     radiant_impactandplayers, dire_impactandplayers, radiant_players_check, dire_players_check, impact_message = False, False, False, False, None
     if len(dire_impact) != 0 and len(radiant_impact) != 0:
         radiant_message_add+=(f'Найдено {len(radiant_impact)}/5 игроков, {radiant_errors_len} из которых скрытые')

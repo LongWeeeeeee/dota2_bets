@@ -208,7 +208,7 @@ egb = {
     'rincyq': {'steamId': {418942836}, 'position': 'pos 1'},
     'antares': {'steamId': {161839895}, 'position': 'pos 4'},
     'kaori': {'steamId': {320219866}, 'position': 'pos 5'},
-    'DarkLord^': {'steamId': {879017980}, 'position': 'pos 1'},
+    'darklord': {'steamId': {879017980}, 'position': 'pos 1'},
     'Bengan': {'steamId': {48823667}, 'position': 'pos 5'},
     'Sanctity-': {'steamId': {392169957}, 'position': 'pos 2'},
     'swedenstrong': {'steamId': {175311897}, 'position': 'pos 4'},

@@ -567,12 +567,16 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     dire_output = ", ".join([f"'{pos}' : '{data['hero_name']}'" for pos, data in dire_heroes_and_positions.items()])
     if radiant_message_add == '':
         radiant_text = 'RADIANT:\n'
-    else:
+    elif radiant_message_add is not None:
         radiant_text = '\n'
+    else:
+        radiant_text = None
     if dire_message_add == '':
         dire_text = 'DIRE:\n'
-    else:
+    elif dire_message_add is not None:
         dire_text = '\n'
+    else:
+        dire_text = None
     if radiant_pos4_with_pos5 is None:
         radiant_text += f'pos 4 {radiant_heroes_and_positions["pos 4"]["hero_name"]} with pos 5 {radiant_heroes_and_positions["pos 5"]["hero_name"]} нету на protracker\n'
     if dire_pos4_with_pos5 is None:
@@ -595,9 +599,9 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         dire_text += f'Недостаточная выборка винрейтов у {dire_team_name} между командой:\n{dire_output}\n'
     if len(radiant_wr_with) < 1:
         radiant_text += f'Недостаточная выборка винрейтов у {radiant_team_name} между командой:\n{radiant_output}\n'
-    if radiant_message_add != '' or radiant_text != 'RADIANT:\n':
+    if radiant_message_add not in ['', None] or radiant_text not in [None, 'Radiant:\n']:
         output_message += radiant_message_add + radiant_text + '\n'
-    if dire_message_add != '' or dire_text != 'RADIANT:\n':
+    if dire_message_add not in ['', None] or dire_text not in [None, 'Dire:\n']:
         output_message += dire_message_add + dire_text
     if impact_message is not None:
         output_message += impact_message

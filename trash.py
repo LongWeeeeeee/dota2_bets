@@ -345,53 +345,53 @@ def analyze_database(database, done = 0):
             json.dump(players_data, f2)
 def analyze_players(my_team, enemy_team):
     with open('heroes_data.txt', 'r') as f:
-            heroes_data = json.load(f)
-            team_avg_kills, team_avg_time, team_line_report, over35, over40, over45, over50, over55 = [], [], [], [], [], [], [], []
-            copy_team_pos_and_heroes = {}
-            for pos, data in my_team.items():
-                copy_team_pos_and_heroes[data['hero_id']] = pos
-            for hero_id in copy_team_pos_and_heroes:
-                pos = copy_team_pos_and_heroes[hero_id].replace('pos ', 'POSITION_')
-                data = heroes_data[str(hero_id)]
-                hero_name = translate[hero_id]
-                if pos in data:
-                    if 'over45' in data[pos]:
-                        maps = (data[pos]['over45'].count(1) + data[pos]['over45'].count(0))
-                        value = data[pos]['over45'].count(1) / maps
-                        over45.append(value)
-                    team_avg_time.append(sum(data[pos]['total_time'])/len(data[pos]['total_time'])/60)
-                    team_avg_kills.append(sum(data[pos]['total_kills'])/len(data[pos]['total_kills']))
-                    if pos == 'POSITION_1':
-                        try:
-                            team_mate_hero_id = str(my_team['pos 5']['hero_id'])
-                            team_mate_data = data[pos]['lane_report']['with_hero'][team_mate_hero_id]['POSITION_5']
-                        except KeyError:
-                            team_mate_data = data[pos]['lane_report']['personal']
-                        lane = team_mate_data.count(1) / (team_mate_data.count(1) + team_mate_data.count(0) + team_mate_data.count(2))
-                        team_line_report.append(lane)
-                    elif pos == 'POSITION_3':
-                        try:
-                            team_mate_hero_id = str(my_team['pos 4']['hero_id'])
-                            team_mate_data = \
-                            data[pos]['lane_report']['with_hero'][team_mate_hero_id]['POSITION_4']
-                        except KeyError:
-                            team_mate_data = data[pos]['lane_report']['personal']
-                        lane = team_mate_data.count(1) / (team_mate_data.count(1) + team_mate_data.count(0) + team_mate_data.count(2))
-                        team_line_report.append(lane)
-                    elif pos == 'POSITION_2':
-                        try:
-                            team_mate_hero_id = str(enemy_team['pos 2']['hero_id'])
-                            team_mate_data = \
-                            data[pos]['lane_report']['against_hero'][team_mate_hero_id]['POSITION_2']
-                        except KeyError:
-                            team_mate_data = data[pos]['lane_report']['personal']
-                        lane = team_mate_data.count(1) / (team_mate_data.count(1) + team_mate_data.count(0) + team_mate_data.count(2))
-                        team_line_report.append(lane)
-                    pass
-            team_over45_win = sum(over45) / len(over45)
-            team_avg_kills = sum(team_avg_kills)/len(team_avg_kills)
-            team_avg_time = sum(team_avg_time) / len(team_avg_time)
-            team_avg_lanes = sum(team_line_report) / len(team_line_report)
+        heroes_data = json.load(f)
+        team_avg_kills, team_avg_time, team_line_report, over35, over40, over45, over50, over55 = [], [], [], [], [], [], [], []
+        copy_team_pos_and_heroes = {}
+        for pos, data in my_team.items():
+            copy_team_pos_and_heroes[data['hero_id']] = pos
+        for hero_id in copy_team_pos_and_heroes:
+            pos = copy_team_pos_and_heroes[hero_id].replace('pos ', 'POSITION_')
+            data = heroes_data[str(hero_id)]
+            hero_name = translate[hero_id]
+            if pos in data:
+                if 'over45' in data[pos]:
+                    maps = (data[pos]['over45'].count(1) + data[pos]['over45'].count(0))
+                    value = data[pos]['over45'].count(1) / maps
+                    over45.append(value)
+                team_avg_time.append(sum(data[pos]['total_time'])/len(data[pos]['total_time'])/60)
+                team_avg_kills.append(sum(data[pos]['total_kills'])/len(data[pos]['total_kills']))
+                if pos == 'POSITION_1':
+                    try:
+                        team_mate_hero_id = str(my_team['pos 5']['hero_id'])
+                        team_mate_data = data[pos]['lane_report']['with_hero'][team_mate_hero_id]['POSITION_5']
+                    except KeyError:
+                        team_mate_data = data[pos]['lane_report']['personal']
+                    lane = team_mate_data.count(1) / (team_mate_data.count(1) + team_mate_data.count(0) + team_mate_data.count(2))
+                    team_line_report.append(lane)
+                elif pos == 'POSITION_3':
+                    try:
+                        team_mate_hero_id = str(my_team['pos 4']['hero_id'])
+                        team_mate_data = \
+                        data[pos]['lane_report']['with_hero'][team_mate_hero_id]['POSITION_4']
+                    except KeyError:
+                        team_mate_data = data[pos]['lane_report']['personal']
+                    lane = team_mate_data.count(1) / (team_mate_data.count(1) + team_mate_data.count(0) + team_mate_data.count(2))
+                    team_line_report.append(lane)
+                elif pos == 'POSITION_2':
+                    try:
+                        team_mate_hero_id = str(enemy_team['pos 2']['hero_id'])
+                        team_mate_data = \
+                        data[pos]['lane_report']['against_hero'][team_mate_hero_id]['POSITION_2']
+                    except KeyError:
+                        team_mate_data = data[pos]['lane_report']['personal']
+                    lane = team_mate_data.count(1) / (team_mate_data.count(1) + team_mate_data.count(0) + team_mate_data.count(2))
+                    team_line_report.append(lane)
+                pass
+        team_over45_win = sum(over45) / len(over45)
+        team_avg_kills = sum(team_avg_kills)/len(team_avg_kills)
+        team_avg_time = sum(team_avg_time) / len(team_avg_time)
+        team_avg_lanes = sum(team_line_report) / len(team_line_report)
     return team_avg_kills, team_avg_time, team_avg_lanes, team_over45_win
 # maps = get_maps()
 # pass

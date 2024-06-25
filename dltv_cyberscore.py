@@ -361,7 +361,7 @@ def send_message(message):
     requests.post(url, json=payload)
 
 
-def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, score, tier=None, antiplagiat_url=None, core_matchup=None, output_message='', egb=None, radiant_players_check=None, dire_players_check=None, radiant_impactandplayers=None, impact_message=None, dire_impactandplayers=None, radiant_message_add=None, dire_message_add=None):
+def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, score, tier=None, antiplagiat_url=None, core_matchup=None, output_message='', egb=None, radiant_players_check=None, lane_report=None, dire_players_check=None, radiant_impactandplayers=None, impact_message=None, dire_impactandplayers=None, radiant_message_add=None, dire_message_add=None):
     print('dota2protracker')
     radiant_pos1_with_team, radiant_pos2_with_team, radiant_pos3_with_team, dire_pos1_with_team, dire_pos2_with_team, dire_pos3_with_team = [], [], [], [], [], []
     radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team, radiant_pos4_with_pos5, dire_pos4_with_pos5 = [], [], [], [] ,[], [], [], [], [], None, None
@@ -623,7 +623,10 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             else:
                 send_message(output_message)
         else:
-            print(output_message)
+            if (lane_report is not None) and (lane_report >= 30 or lane_report <= -30):
+                send_message(output_message)
+            else:
+                print(output_message)
     elif egb:
         if not 'ПЛОХАЯ СТАВКА!!!' in output_message:
             if (radiant_impactandplayers and radiant_predict) or (radiant_players_check and radiant_predict) or (dire_impactandplayers and dire_predict) or (dire_players_check and dire_predict):

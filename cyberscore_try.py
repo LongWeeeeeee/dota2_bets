@@ -30,7 +30,7 @@ while True:
                     dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos,
                                     dire_heroes_and_positions=dire_heroes_and_pos,
                                     radiant_team_name=radiant_team_name,
-                                        dire_team_name=dire_team_name, score=score, antiplagiat_url=url, tier=tier, output_message=output_message)
+                                        dire_team_name=dire_team_name, score=score, antiplagiat_url=url, tier=tier, output_message=output_message, lane_report=lane_report)
     # except: pass
     print('Сплю 2 минуты')
     time.sleep(120)

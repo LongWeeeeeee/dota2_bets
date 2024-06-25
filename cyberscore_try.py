@@ -24,10 +24,8 @@ while True:
                     avg_time = round(((dire_team_avg_time + radiant_team_avg_time) / 2), 2)
                     diff = round(((radiant_over45 - dire_over45) * 100), 2)
                     lane_report = round(((radiant_lane_report - dire_lane_report) * 100), 2)
-                    print(
-                        f'Среднее количество килов: {avg_kills}\nСреднее время: {avg_time}\nРадиант после 45 минуты сильнее на: {diff}%\nRadiant lanes до 10 минуты: {lane_report}\n')
                     output_message = (
-                        f'Среднее количество килов: {avg_kills}\nСреднее время: {avg_time}\nРадиант после 45 минуты сильнее на: {diff}%\nRadiant lanes до 10 минуты: {lane_report}\n')
+                        f'Среднее количество килов: {avg_kills}\nСреднее время: {avg_time}\nРадиант после 45 минуты сильнее на: {diff}%\nRadiant lanes до 10 минуты: {lane_report}')
 
                     dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos,
                                     dire_heroes_and_positions=dire_heroes_and_pos,

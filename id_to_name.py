@@ -145,6 +145,8 @@ translate = {
  138: "Muerta",
 }
 egb = {
+    'admiralbulldog': {'steamId': {76482434}, 'position': {}},
+    'Lyrical': {'steamId':{193673646}, 'position': {}},
     'ainkrad': {'steamId': {196482746}, 'position': 'pos 2'},
     'bb3px': {'steamId': {93526520}, 'position': 'pos: 3'},
     'nefrit': {'steamId': {116249155}, 'position': {'pos 1', 'pos 3'}},
@@ -343,8 +345,20 @@ egb = {
     'mannik': {'steamId': {72393079}, 'position': {'pos 2'}},
     'hduo': {'steamId': {185059559}, 'position': {'pos 5'}},
     'afterlife': {'steamId': {86785083}, 'position': {'pos 3'}},
-}
+    'malady(smurf)': {'steamId': {889201734}, 'position':{}},
+    'sayuw': {'steamId': {145065875}, 'position':{}},
+    'setsu': {'steamId': {139822354}, 'position':{}},
+    'fy': {'steamId': {101695162}, 'position':{}},
+    'stojkov': {'steamId': {262476000}, 'position':{}},
+'mks': {'steamId': {220154695}, 'position':{}},
+'planet': {'steamId': {150961567}, 'position':{}},
+'': {'steamId': {}, 'position':{}},
+'': {'steamId': {}, 'position':{}},
+'': {'steamId': {}, 'position':{}},
+'': {'steamId': {}, 'position':{}},
+'': {'steamId': {}, 'position':{}},
 
+}
 blacklist_players = {
     'qsonya',
     'fritterus',

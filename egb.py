@@ -41,7 +41,7 @@ def get_players(bet):
                     for player in id_to_name.egb[player_names[1]]['steamId']:
                         players_ids.append(player)
             else:
-                data = id_to_name.add_players
+                data = players_to_add
                 if any(player not in data for player in player_names):
                     if player_names[0] not in players_to_add:
                         players_to_add.add(player_names[0])
@@ -508,11 +508,9 @@ def check_players_skill(radiant, dire, output_message, R_pos_strng, D_pos_strng)
         player_query = '''
         {
           players(steamAccountIds:%s){
-            steamAccountId
-                simpleSummary{
-              coreCount
-              supportCount
-              matchCount
+            steamAccount{
+              isAnonymous
+              id
             }
             heroesPerformance(request:{startDateTime:1715029200, take: 15,gameModeIds:[22,2], heroIds:%s,positionIds:[POSITION_1, POSITION_2, POSITION_3, POSITION_4, POSITION_5]}){
               positionScore{
@@ -523,7 +521,7 @@ def check_players_skill(radiant, dire, output_message, R_pos_strng, D_pos_strng)
               hero{
                 id
               }
-              
+        
             }
         
         
@@ -534,31 +532,39 @@ def check_players_skill(radiant, dire, output_message, R_pos_strng, D_pos_strng)
         response = requests.post('https://api.stratz.com/graphql', json={"query": player_query}, headers=headers)
         data = json.loads(response.text)
         for player in data['data']['players']:
-            steam_account_id = player['steamAccountId']
-            if player['steamAccountId'] in radiant_steam_account_ids:
+            steam_account_id = player['steamAccount']['id']
+            if steam_account_id in radiant_steam_account_ids:
                 isRadiant = True
-            elif player['steamAccountId'] in dire_steam_account_ids:
+            else:
                 isRadiant = False
             if isRadiant:
                 for position in radiant:
                     if radiant[position]['steamAccountId'] == steam_account_id:
                         hero_id = radiant[position]['hero_id']
                         pos = position
-            elif not isRadiant:
+            else:
                 for position in dire:
                     if dire[position]['steamAccountId'] == steam_account_id:
                         hero_id = dire[position]['hero_id']
                         pos = position
-            for hero_perfomance in player['heroesPerformance']:
-                check_hero_id = hero_perfomance['hero']['id']
-                for position_score in hero_perfomance['positionScore']:
-                    pos_found = position_score['id'].replace('POSITION_', '') == pos.replace('pos ', '')
-                    if pos_found and check_hero_id == hero_id and position_score['matchCount'] >=2:
-                        impact = position_score['imp']
-                        if isRadiant:
-                            radiant_impact[steam_account_id] = impact
-                        else:
-                            dire_impact[steam_account_id] = impact
+            if player['steamAccount']['isAnonymous']:
+                with open('players_imp_data.txt', 'r') as f3:
+                    players_data = json.load(f3)
+                    try:
+                        player_data = players_data[str(steam_account_id)][pos.replace('pos ', 'POSITION_')]
+                        avg_imp = sum(players_data)/len(player_data)
+                    except KeyError: pass
+            else:
+                for hero_perfomance in player['heroesPerformance']:
+                    check_hero_id = hero_perfomance['hero']['id']
+                    for position_score in hero_perfomance['positionScore']:
+                        pos_found = position_score['id'].replace('POSITION_', '') == pos.replace('pos ', '')
+                        if pos_found and check_hero_id == hero_id and position_score['matchCount'] >=2:
+                            impact = position_score['imp']
+                            if isRadiant:
+                                radiant_impact[steam_account_id] = impact
+                            else:
+                                dire_impact[steam_account_id] = impact
         if isRadiant:
             if 'errors' in data:
                 radiant_errors_len = len(data['errors'])

@@ -584,15 +584,27 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     if len(dire_pos1_vs_team) < 1:
         dire_text += f'\nНедостаточно данных pos 1 {dire_heroes_and_positions["pos 1"]["hero_name"]} vs {radiant_output}'
     if core_matchup is None:
-        output_message += f'\nRadiant {radiant_heroes_and_positions["pos 1"]["hero_name"]} vs Dire {dire_heroes_and_positions["pos 1"]["hero_name"]} нету на dota2protracker'
+        output_message += f'\nCore matchup Radiant {radiant_heroes_and_positions["pos 1"]["hero_name"]} vs Dire {dire_heroes_and_positions["pos 1"]["hero_name"]} нету на dota2protracker'
     if len(dire_wr_with) < 1:
         dire_text += f'\nНедостаточная выборка винрейтов у {dire_team_name} между командой:\n{dire_output}'
     if len(radiant_wr_with) < 1:
         radiant_text += f'\nНедостаточная выборка винрейтов у {radiant_team_name} между командой:\n{radiant_output}'
-    if radiant_message_add != 'Radiant:' or radiant_text != '':
-        output_message += '\n' + radiant_message_add + radiant_text
-    if dire_message_add != 'Dire:' or dire_text != '':
-        output_message += '\n' + dire_message_add + dire_text
+    if radiant_message_add not in ['Radiant:'] or radiant_text not in ['']:
+        if None not in [radiant_message_add, radiant_text]:
+            output_message += '\n' + radiant_message_add + radiant_text
+        else:
+            if radiant_message_add is not None:
+                output_message += '\n' + radiant_message_add
+            elif radiant_text is not None:
+                output_message += radiant_text
+    if dire_message_add not in ['Dire:'] or dire_text not in ['']:
+        if None not in [dire_message_add, dire_text]:
+            output_message += '\n' + dire_message_add + dire_text
+        else:
+            if dire_message_add is not None:
+                output_message += '\n' + dire_message_add
+            elif dire_text is not None:
+                output_message += dire_text
     if impact_message is not None:
         output_message += '\n' + impact_message
     if map_url is not None:
@@ -603,7 +615,8 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     output_message += f'\nSinergy: {sinergy}\nCounterpick: {counterpick}\nPos1_vs_team: {pos1_vs_team}\nPos2_vs_team: {pos2_vs_team}\nPos3_vs_team: {pos3_vs_team}\nCore matchup: {core_matchup}\nSups: {sups}'
 
     if tier in [1, 2, 3]:
-        if 'ОТЛИЧНАЯ СТАВКА' in output_message or 'ХОРОШАЯ СТАВКА' in output_message:
+        # if 'ОТЛИЧНАЯ СТАВКА' in output_message or 'ХОРОШАЯ СТАВКА' in output_message:
+        if not 'ПЛОХАЯ СТАВКА!!!' in output_message:
             if egb:
                 if (radiant_impactandplayers and radiant_predict) or (radiant_players_check and radiant_predict) or (dire_impactandplayers and dire_predict) or (dire_players_check and dire_predict):
                     send_message(output_message)

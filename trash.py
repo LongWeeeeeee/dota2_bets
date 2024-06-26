@@ -6,16 +6,14 @@ import time
 from dltv_cyberscore import analyze_draft, clean_up
 from id_to_name import translate, egb
 from database import maps
-import asyncio
-import aiohttp
 import json
 import time
-from aiolimiter import AsyncLimiter
-# Rate limiters for the API
-rate_limit_per_second = AsyncLimiter(20, 1)  # 20 requests per second
-rate_limit_per_minute = AsyncLimiter(250, 60)  # 250 requests per minute
-rate_limit_per_hour = AsyncLimiter(2000, 3600)  # 2000 requests per hour
-rate_limit_per_day = AsyncLimiter(10000, 86400)  # 10000 requests per day
+# from aiolimiter import AsyncLimiter
+# # Rate limiters for the API
+# rate_limit_per_second = AsyncLimiter(20, 1)  # 20 requests per second
+# rate_limit_per_minute = AsyncLimiter(250, 60)  # 250 requests per minute
+# rate_limit_per_hour = AsyncLimiter(2000, 3600)  # 2000 requests per hour
+# rate_limit_per_day = AsyncLimiter(10000, 86400)  # 10000 requests per day
 # radiant_heroes_and_pos = {'pos 1': {'hero_id': 54, 'hero_name': 'Lifestealer'}, 'pos 2': {'hero_id': 11, 'hero_name': 'Shadow Fiend'}, 'pos 3': {'hero_id': 137, 'hero_name': 'Primal Beast'}, 'pos 4': {'hero_id': 114, 'hero_name': 'Monkey King'}, 'pos 5': {'hero_id': 65, 'hero_name': 'Batrider'}}
 # dire_heroes_and_pos = {'pos 1': {'hero_id': 72, 'hero_name': 'Gyrocopter'}, 'pos 2': {'hero_id': 34, 'hero_name': 'Tinker'}, 'pos 3': {'hero_id': 96, 'hero_name': 'Centaur Warrunner'}, 'pos 4': {'hero_id': 63, 'hero_name': 'Weaver'}, 'pos 5': {'hero_id': 85, 'hero_name': 'Undying'}}
 radiant_position_to_lane ={

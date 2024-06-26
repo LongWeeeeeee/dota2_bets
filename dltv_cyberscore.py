@@ -364,7 +364,7 @@ def send_message(message):
 def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, score, tier=None, antiplagiat_url=None, core_matchup=None, output_message='', egb=None, radiant_players_check=None, lane_report=None, dire_players_check=None, radiant_impactandplayers=None, impact_message=None, dire_impactandplayers=None, radiant_message_add=None, dire_message_add=None):
     print('dota2protracker')
     radiant_pos1_with_team, radiant_pos2_with_team, radiant_pos3_with_team, dire_pos1_with_team, dire_pos2_with_team, dire_pos3_with_team = [], [], [], [], [], []
-    radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team, radiant_pos4_with_pos5, dire_pos4_with_pos5 = [], [], [], [] ,[], [], [], [], [], None, None
+    radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, dire_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team, radiant_pos4_with_pos5, dire_pos4_with_pos5 = [], [], [], [] ,[], [], [], [], [], [], None, None
     for position in radiant_heroes_and_positions:
         if position != 'pos 5':
             hero_url = radiant_heroes_and_positions[position]['hero_name'].replace(' ', '%20')
@@ -421,7 +421,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                             radiant_pos4_with_pos5 = data_wr
     if radiant_pos4_with_pos5 is not None:
         radiant_wr_with += [radiant_pos4_with_pos5]
-    radiant_wr_with = radiant_pos3_with_team + radiant_pos2_with_team + radiant_pos1_with_team
+    radiant_wr_with += radiant_pos3_with_team + radiant_pos2_with_team + radiant_pos1_with_team
     for position in dire_heroes_and_positions:
         if position != 'pos 5':
             hero_url = dire_heroes_and_positions[position]['hero_name'].replace(' ', '%20')
@@ -477,7 +477,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                             dire_pos4_with_pos5 = data_wr
     if dire_pos4_with_pos5 is not None:
         dire_wr_with += [dire_pos4_with_pos5]
-    dire_wr_with = dire_pos3_with_team + dire_pos2_with_team + dire_pos1_with_team
+    dire_wr_with += dire_pos3_with_team + dire_pos2_with_team + dire_pos1_with_team
     for position in radiant_heroes_and_positions:
         hero_url = radiant_heroes_and_positions[position]['hero_name'].replace(' ', '%20')
         url = f'https://dota2protracker.com/hero/{hero_url}'
@@ -516,6 +516,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
                 elif 'pos 3' in data_pos and data_hero == dire_heroes_and_positions['pos 3']['hero_name'] and tracker_position == position:
                     dire_pos3_vs_team.append(100-data_wr)
     radiant_wr_against += radiant_pos3_vs_team + radiant_pos2_vs_team + radiant_pos1_vs_team
+    dire_wr_against += dire_pos3_vs_team + dire_pos2_vs_team + dire_pos1_vs_team
 
     if radiant_pos4_with_pos5 is not None and dire_pos4_with_pos5 is not None:
         sups = radiant_pos4_with_pos5 - dire_pos4_with_pos5
@@ -535,7 +536,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     if len(radiant_wr_with) > 0 and len(dire_wr_with) > 0:
         sinergy = (sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))
     if len(radiant_wr_against) > 0:
-        counterpick = sum(radiant_wr_against) / len(radiant_wr_against) - 50
+        counterpick = (sum(radiant_wr_against) / len(radiant_wr_against)) - (sum(dire_wr_against) / len(dire_wr_against))
     if len(radiant_pos1_vs_team) > 0 and len(dire_pos1_vs_team) > 0:
         pos1_vs_team = sum(radiant_pos1_vs_team) / len(radiant_pos1_vs_team) - sum(dire_pos1_vs_team) / len(
             dire_pos1_vs_team)

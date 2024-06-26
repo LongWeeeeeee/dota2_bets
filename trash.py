@@ -649,10 +649,10 @@ def analyze_players(my_team, enemy_team):
     return team_avg_lanes, team_over45_win
 # maps = get_maps()
 # pass
-# maps_data = research_maps(maps_to_explore=maps)
-# pass
+maps_data = research_maps(maps_to_explore=maps)
+pass
 # with open('output_file.txt', 'r+') as f:
 #     database = json.load(f)
 #     analyze_database(database)
 #     pass
-syngery_and_counterpick()
+# syngery_and_counterpick()

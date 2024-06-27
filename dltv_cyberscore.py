@@ -614,28 +614,28 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     output_message += f'\n{radiant_team_name} vs {dire_team_name}'
     output_message += '\n' + verdict
     output_message += f'\nSinergy: {sinergy}\nCounterpick: {counterpick}\nPos1_vs_team: {pos1_vs_team}\nPos2_vs_team: {pos2_vs_team}\nPos3_vs_team: {pos3_vs_team}\nCore matchup: {core_matchup}\nSups: {sups}'
-
-    if tier in [1, 2, 3]:
-        # if 'ОТЛИЧНАЯ СТАВКА' in output_message or 'ХОРОШАЯ СТАВКА' in output_message:
-        if not 'ПЛОХАЯ СТАВКА!!!' in output_message:
-            if egb:
-                if (radiant_impactandplayers and radiant_predict) or (radiant_players_check and radiant_predict) or (dire_impactandplayers and dire_predict) or (dire_players_check and dire_predict):
-                    send_message(output_message)
-            else:
-                send_message(output_message)
-        else:
-            if (lane_report is not None) and (lane_report >= 30 or lane_report <= -30):
-                send_message(output_message)
-            else:
-                print(output_message)
-    elif egb:
-        if not 'ПЛОХАЯ СТАВКА!!!' in output_message:
-            if (radiant_impactandplayers and radiant_predict) or (radiant_players_check and radiant_predict) or (dire_impactandplayers and dire_predict) or (dire_players_check and dire_predict):
-                send_message(output_message)
-            else:
-                print(output_message)
-        else:
-            print(output_message)
+    send_message(output_message)
+    # if tier in [1, 2, 3]:
+    #     # if 'ОТЛИЧНАЯ СТАВКА' in output_message or 'ХОРОШАЯ СТАВКА' in output_message:
+    #     if not 'ПЛОХАЯ СТАВКА!!!' in output_message:
+    #         if egb:
+    #             if (radiant_impactandplayers and radiant_predict) or (radiant_players_check and radiant_predict) or (dire_impactandplayers and dire_predict) or (dire_players_check and dire_predict):
+    #                 send_message(output_message)
+    #         else:
+    #             send_message(output_message)
+    #     else:
+    #         if (lane_report is not None) and (lane_report >= 30 or lane_report <= -30):
+    #             send_message(output_message)
+    #         else:
+    #             print(output_message)
+    # elif egb:
+    #     if not 'ПЛОХАЯ СТАВКА!!!' in output_message:
+    #         if (radiant_impactandplayers and radiant_predict) or (radiant_players_check and radiant_predict) or (dire_impactandplayers and dire_predict) or (dire_players_check and dire_predict):
+    #             send_message(output_message)
+    #         else:
+    #             print(output_message)
+    #     else:
+    #         print(output_message)
 
 
     if antiplagiat_url is not None:

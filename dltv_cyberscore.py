@@ -596,7 +596,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         else:
             if radiant_message_add is not None:
                 output_message += '\n' + radiant_message_add
-            elif radiant_text is not None:
+            elif radiant_text not in [None, '']:
                 output_message += radiant_text
     if dire_message_add not in ['Dire:'] or dire_text not in ['']:
         if None not in [dire_message_add, dire_text]:
@@ -604,7 +604,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         else:
             if dire_message_add is not None:
                 output_message += '\n' + dire_message_add
-            elif dire_text is not None:
+            elif dire_text not in [None, '']:
                 output_message += dire_text
     if impact_message is not None:
         output_message += '\n' + impact_message

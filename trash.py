@@ -594,9 +594,9 @@ def syngery_and_counterpick(radiant_heroes_and_positions, dire_heroes_and_positi
         verdict, radiant_predict, dire_predict = analyze_draft(sinergy, counterpick, pos1_vs_team, core_matchup,
                                                                pos2_vs_team, pos3_vs_team,
                                                                sups)
-        output_message += (f'My protracker: {verdict}\nSinergy: {sinergy}\nCounterpick: {counterpick}\nPos1_vs_team: {pos1_vs_team}\nPos2_vs_team: {pos2_vs_team}\nPos3_vs_team: {pos3_vs_team}\nCore matchup: {core_matchup}\nSups: {sups}\n')
+        output_message += (f'\nMy protracker: {verdict}\nSinergy: {sinergy}\nCounterpick: {counterpick}\nPos1_vs_team: {pos1_vs_team}\nPos2_vs_team: {pos2_vs_team}\nPos3_vs_team: {pos3_vs_team}\nCore matchup: {core_matchup}\nSups: {sups}\n')
 
-        pass
+    return output_message
 
 
 def analyze_players(my_team, enemy_team):

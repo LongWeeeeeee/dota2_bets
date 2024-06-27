@@ -594,9 +594,9 @@ def syngery_and_counterpick(radiant_heroes_and_positions, dire_heroes_and_positi
         verdict, radiant_predict, dire_predict = analyze_draft(sinergy, counterpick, pos1_vs_team, core_matchup,
                                                                pos2_vs_team, pos3_vs_team,
                                                                sups)
-        output_message += (f'My protracker: {verdict}\nSinergy: {sinergy}\nCounterpick: {counterpick}\nPos1_vs_team: {pos1_vs_team}\nPos2_vs_team: {pos2_vs_team}\nPos3_vs_team: {pos3_vs_team}\nCore matchup: {core_matchup}\nSups: {sups}\n')
+        output_message += (f'\nMy protracker: {verdict}\nSinergy: {sinergy}\nCounterpick: {counterpick}\nPos1_vs_team: {pos1_vs_team}\nPos2_vs_team: {pos2_vs_team}\nPos3_vs_team: {pos3_vs_team}\nCore matchup: {core_matchup}\nSups: {sups}\n')
 
-        pass
+    return output_message
 
 
 def analyze_players(my_team, enemy_team):
@@ -642,6 +642,7 @@ def analyze_players(my_team, enemy_team):
                     lane = team_mate_data.count(1) / (team_mate_data.count(1) + team_mate_data.count(0) + team_mate_data.count(2))
                     team_line_report.append(lane)
                 pass
+        over45 = clean_up(over45)
         team_over45_win = sum(over45) / len(over45)
         team_avg_lanes = sum(team_line_report) / len(team_line_report)
     return team_avg_lanes, team_over45_win

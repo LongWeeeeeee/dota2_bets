@@ -1,11 +1,11 @@
-from id_to_name import egb
+# from id_to_name import egb
 import requests
 from keys import api_token
-import json
-import time
+# import json
+# import time
 from dltv_cyberscore import analyze_draft, clean_up
 from id_to_name import translate, egb, pro_teams, top1000, top_600_asia_europe
-from database import maps, pro_maps
+# from database import maps, pro_maps
 import json
 import time
 # from aiolimiter import AsyncLimiter

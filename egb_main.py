@@ -7,7 +7,7 @@ import requests
 import id_to_name
 from dltv_cyberscore import dota2protracker
 from egb import get_players, get_picks_and_pos, get_exac_match, get_strats_graph_match, check_players_skill
-
+from trash import analyze_players, syngery_and_counterpick
 url = "https://egb.com/bets"
 params = {
     "active": "true",
@@ -44,16 +44,29 @@ while True:
                                 answer = get_picks_and_pos(match_id=exac_match['matchId'])
                                 if answer is not None:
                                     if answer != True:
-                                        radiant, dire, match_id, output_message, R_pos_strng, D_pos_strng = answer
-                                        output_message, impact_diff, R_pos_strng, D_pos_strng, radiant_players_check, dire_players_check, radiant_impactandplayers, dire_impactandplayers, radiant_message_add, dire_message_add, impact_message = check_players_skill(
-                                            radiant, dire, output_message, R_pos_strng, D_pos_strng)
+                                        radiant_heroes_and_pos, dire_heroes_and_pos, match_id, output_message = answer
+                                        output_message, impact_diff, radiant_players_check, dire_players_check, radiant_impactandplayers, dire_impactandplayers, radiant_message_add, dire_message_add, impact_message = check_players_skill(
+                                            radiant_heroes_and_pos, dire_heroes_and_pos, output_message)
+                                        radiant_lane_report, radiant_over45 = analyze_players(
+                                            my_team=radiant_heroes_and_pos, enemy_team=dire_heroes_and_pos)
+                                        dire_lane_report, dire_over45 = analyze_players(my_team=dire_heroes_and_pos,
+                                                                                        enemy_team=radiant_heroes_and_pos)
+                                        # avg_kills = round(((radaint_team_avg_kills + dire_team_avg_kills) / 2), 2)
+                                        # avg_time = round(((dire_team_avg_time + radiant_team_avg_time) / 2), 2)
+                                        diff = round(((radiant_over45 - dire_over45) * 100), 2)
+                                        lane_report = round(((radiant_lane_report - dire_lane_report) * 100), 2)
+                                        output_message += (
+                                            f'Радиант после 45 минуты сильнее на: {diff}%\nRadiant lanes до 10 минуты: {lane_report}')
+                                        output_message = syngery_and_counterpick(radiant_heroes_and_pos,
+                                                                                 dire_heroes_and_pos,
+                                                                                 output_message)
                                         output = ", ".join(
-                                            [f"'{pos}' : '{data['hero_name']}'" for pos, data in radiant.items()])
+                                            [f"'{pos}' : '{data['hero_name']}'" for pos, data in radiant_heroes_and_pos.items()])
                                         dire_output = ", ".join(
-                                            [f"'{pos}' : '{data['hero_name']}'" for pos, data in dire.items()])
+                                            [f"'{pos}' : '{data['hero_name']}'" for pos, data in dire_heroes_and_pos.items()])
                                         print(f'Radint pick: {output}\nDire pick: {dire_output}')
-                                        dota2protracker(radiant_heroes_and_positions=radiant,
-                                                        dire_heroes_and_positions=dire,
+                                        dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos,
+                                                        dire_heroes_and_positions=dire_heroes_and_pos,
                                                         radiant_team_name=dire_and_radiant['radiant'],
                                                         dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id,
                                                         score=[0, 0], egb=True, output_message=output_message,

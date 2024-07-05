@@ -2,9 +2,10 @@
 import requests
 from keys import api_token
 # import json
+from collections import defaultdict
 # import time
 from dltv_cyberscore import analyze_draft, clean_up
-from id_to_name import translate, egb, pro_teams, top1000, top_600_asia_europe
+from id_to_name import translate, egb, pro_teams, top_600_asia_europe
 # from database import maps, pro_maps
 import json
 import time
@@ -16,6 +17,10 @@ import time
 # rate_limit_per_day = AsyncLimiter(10000, 86400)  # 10000 requests per day
 # radiant_heroes_and_pos = {'pos 1': {'hero_id': 54, 'hero_name': 'Lifestealer'}, 'pos 2': {'hero_id': 11, 'hero_name': 'Shadow Fiend'}, 'pos 3': {'hero_id': 137, 'hero_name': 'Primal Beast'}, 'pos 4': {'hero_id': 114, 'hero_name': 'Monkey King'}, 'pos 5': {'hero_id': 65, 'hero_name': 'Batrider'}}
 # dire_heroes_and_pos = {'pos 1': {'hero_id': 72, 'hero_name': 'Gyrocopter'}, 'pos 2': {'hero_id': 34, 'hero_name': 'Tinker'}, 'pos 3': {'hero_id': 96, 'hero_name': 'Centaur Warrunner'}, 'pos 4': {'hero_id': 63, 'hero_name': 'Weaver'}, 'pos 5': {'hero_id': 85, 'hero_name': 'Undying'}}
+
+def nested_dict():
+    return defaultdict(nested_dict)
+
 radiant_position_to_lane ={
         'POSITION_1': 'bottomLaneOutcome',
         'POSITION_2': 'midLaneOutcome',
@@ -33,13 +38,14 @@ dire_position_to_lane ={
 
 def fill_the_player(match, radiant_position_to_lane, dire_position_to_lane, hero_id, position, player, radiant_win,
                     isradiant, heroes_data):
-    total_kills = sum(match['direKills']) + sum(match['radiantKills'])
+    if match['durationSeconds'] / 60 > 45:
+        if radiant_win:
+            if isradiant:
+                to_be_appended = 1
+            else:
+                to_be_appended = 0
+            heroes_data.setdefault(hero_id, {}).setdefault(position, {}).setdefault('over45', []).append(to_be_appended)
     outcome = match[radiant_position_to_lane[position]]
-
-    if 'total_kills' in heroes_data[hero_id][position]:
-        heroes_data[hero_id][position]['total_kills'].append(total_kills)
-    else:
-        heroes_data[hero_id][position]['total_kills'] = [total_kills]
     if player['isRadiant'] is True:
         if 'RADIANT' in outcome:
             to_be_appended = 1
@@ -55,73 +61,7 @@ def fill_the_player(match, radiant_position_to_lane, dire_position_to_lane, hero
             to_be_appended = 1
         else:
             to_be_appended = 2
-    if position != 'POSITION_2':
-        if 'lane_report' not in heroes_data[hero_id][position]:
-            heroes_data[hero_id][position]['lane_report'] = {'personal': [], 'with_hero': {}}
-    else:
-        if 'lane_report' not in heroes_data[hero_id][position]:
-            heroes_data[hero_id][position]['lane_report'] = {'personal': [], 'against_hero': {}}
-    heroes_data[hero_id][position]['lane_report']['personal'].append(to_be_appended)
-    # if ((position in ['POSITION_5', 'POSITION_1']) and (another_player_position in ['POSITION_1', 'POSITION_5']) or (position in ['POSITION_3', 'POSITION_4']) and (another_player_position in ['POSITION_3', 'POSITION_4'])) and (isradiant == another_isradiant) and (position != another_player_position):
-    #     if another_player_hero_id not in heroes_data[hero_id][position]['lane_report']['with_hero']:
-    #         heroes_data[hero_id][position]['lane_report']['with_hero'][another_player_hero_id] = {}
-    #     if another_player_position not in heroes_data[hero_id][position]['lane_report']['with_hero'][another_player_hero_id]:
-    #         heroes_data[hero_id][position]['lane_report']['with_hero'][another_player_hero_id][another_player_position] = []
-    #         heroes_data[hero_id][position]['lane_report']['with_hero'][another_player_hero_id][another_player_position].append(to_be_appended)
-    if 'total_time' in heroes_data[hero_id][position]:
-        heroes_data[hero_id][position]['total_time'].append(match['durationSeconds'])
-    else:
-        heroes_data[hero_id][position]['total_time'] = [match['durationSeconds']]
-    if match['durationSeconds'] / 60 > 35:
-        if radiant_win:
-            if isradiant:
-                to_be_appended = 1
-            else:
-                to_be_appended = 0
-            if 'over35' in heroes_data[hero_id][position]:
-                heroes_data[hero_id][position]['over35'].append(to_be_appended)
-            else:
-                heroes_data[hero_id][position]['over35'] = [to_be_appended]
-    if match['durationSeconds'] / 60 > 40:
-        if radiant_win:
-            if isradiant:
-                to_be_appended = 1
-            else:
-                to_be_appended = 0
-            if 'over40' in heroes_data[hero_id][position]:
-                heroes_data[hero_id][position]['over40'].append(to_be_appended)
-            else:
-                heroes_data[hero_id][position]['over40'] = [to_be_appended]
-    if match['durationSeconds'] / 60 > 45:
-        if radiant_win:
-            if isradiant:
-                to_be_appended = 1
-            else:
-                to_be_appended = 0
-            if 'over45' in heroes_data[hero_id][position]:
-                heroes_data[hero_id][position]['over45'].append(to_be_appended)
-            else:
-                heroes_data[hero_id][position]['over45'] = [to_be_appended]
-    if match['durationSeconds'] / 60 > 50:
-        if radiant_win:
-            if isradiant:
-                to_be_appended = 1
-            else:
-                to_be_appended = 0
-            if 'over50' in heroes_data[hero_id][position]:
-                heroes_data[hero_id][position]['over50'].append(to_be_appended)
-            else:
-                heroes_data[hero_id][position]['over50'] = [to_be_appended]
-    if match['durationSeconds'] / 60 > 55:
-        if radiant_win:
-            if isradiant:
-                to_be_appended = 1
-            else:
-                to_be_appended = 0
-            if 'over55' in heroes_data[hero_id][position]:
-                heroes_data[hero_id][position]['over55'].append(to_be_appended)
-            else:
-                heroes_data[hero_id][position]['over55'] = [to_be_appended]
+    heroes_data.setdefault(hero_id, {}).setdefault(position, {}).setdefault('lane_report', {}).setdefault('personal', []).append(to_be_appended)
     return heroes_data
 
 
@@ -277,23 +217,11 @@ def lane_with_hero(player, heroes_data, position, match, hero_id, another_player
             position in ['POSITION_3', 'POSITION_4']) and (
                 another_player_position in ['POSITION_3', 'POSITION_4'])) and (isradiant == another_isradiant) and (
             position != another_player_position):
-        if another_player_hero_id not in heroes_data[hero_id][position]['lane_report']['with_hero']:
-            heroes_data[hero_id][position]['lane_report']['with_hero'][another_player_hero_id] = {}
-        if another_player_position not in heroes_data[hero_id][position]['lane_report']['with_hero'][
-            another_player_hero_id]:
-            heroes_data[hero_id][position]['lane_report']['with_hero'][another_player_hero_id][
-                another_player_position] = []
-        heroes_data[hero_id][position]['lane_report']['with_hero'][another_player_hero_id][
-            another_player_position].append(to_be_appended)
+        heroes_data.setdefault(hero_id, {}).setdefault(position, {}).setdefault('lane_report', {}).setdefault('with_hero', {}).setdefault(another_player_hero_id, {}).setdefault(
+            another_player_position, []).append(to_be_appended)
     if (position == 'POSITION_2') and (another_player_position == 'POSITION_2') and (hero_id != another_player_hero_id):
-        if another_player_hero_id not in heroes_data[hero_id][position]['lane_report']['against_hero']:
-            heroes_data[hero_id][position]['lane_report']['against_hero'][another_player_hero_id] = {}
-        if another_player_position not in heroes_data[hero_id][position]['lane_report']['against_hero'][
-            another_player_hero_id]:
-            heroes_data[hero_id][position]['lane_report']['against_hero'][another_player_hero_id][
-                another_player_position] = []
-        heroes_data[hero_id][position]['lane_report']['against_hero'][another_player_hero_id][
-            another_player_position].append(to_be_appended)
+        heroes_data.setdefault(hero_id, {}).setdefault(position, {}).setdefault('lane_report', {}).setdefault('against_hero', {}).setdefault(another_player_hero_id, {}).setdefault(
+            another_player_position, []).append(to_be_appended)
     return heroes_data
 
 
@@ -320,67 +248,77 @@ def analyze_database(database, players_data, heroes_data):
         print(f'{count}/{total}')
         count += 1
         match = database[map_id]
-        if match['direKills'] != None and (match['durationSeconds']/60) > 20:
+        if map_id == '7814216133':
+            pass
+        if map_id not in heroes_data['used_maps'] and match['direKills'] != None and (match['durationSeconds']/60) > 20:
             if any(player['steamAccount']['id'] in top_600_asia_europe for player in match['players']):
-                try:
-                    # radiant_team_name = match['direTeam']['name'].lower()
-                    # dire_team_name = match['radiantTeam']['name'].lower()
-                    for player in match['players']:
-                        radiant_win = match['didRadiantWin']
-                        position = player['position']
-                        hero_id = str(player['hero']['id'])
-                        isradiant = player['isRadiant']
-                        steam_id = str(player['steamAccount']['id'])
-                        if map_id not in players_data['used_maps']:
-                            if (player['steamAccount']['isAnonymous']):
-                                players_data = player_add_structure(players_data, steam_id, hero_id, position)
-                                players_data[steam_id][hero_id][position].append(player['imp'])
-                                players_data['used_maps'].append(map_id)
-                        if map_id not in heroes_data['used_maps']:
-                            heroes_data = heroes_data_structure(heroes_data, hero_id, position)
-                            #time, kills, and other shit
-                            heroes_data = fill_the_player(match, radiant_position_to_lane, dire_position_to_lane, hero_id, position,
-                                            player, radiant_win,
-                                            isradiant, heroes_data)
-                            for another_player in match['players']:
-                                another_player_hero_id = another_player['hero']['id']
-                                another_player_position = another_player['position']
-                                another_isradiant = another_player['isRadiant']
-                                heroes_data = fix_for_another_player(another_player_hero_id, position, hero_id, another_player_position, heroes_data)
-                                heroes_data = lane_with_hero(player, heroes_data, position, match, hero_id, another_player_position, another_player_hero_id, isradiant, another_isradiant)
-                                #counterpick
-                                if isradiant != another_player['isRadiant']:
-                                    if isradiant:
-                                        if radiant_win:
-                                            to_be_appended = 1
-                                        else:
-                                            to_be_appended = 0
+                # radiant_team_name = match['direTeam']['name'].lower()
+                # dire_team_name = match['radiantTeam']['name'].lower()
+                for player in match['players']:
+                    radiant_win = match['didRadiantWin']
+                    position = player['position']
+                    hero_id = str(player['hero']['id'])
+                    isradiant = player['isRadiant']
+                    steam_id = str(player['steamAccount']['id'])
+                    if map_id not in players_data['used_maps']:
+                        if (player['steamAccount']['isAnonymous']):
+                            players_data.setdefault(steam_id, {}).setdefault(hero_id, {}).setdefault(position, []).append(player['imp'])
+                            players_data.setdefault('used_maps', []).append(map_id)
+                    if map_id not in heroes_data['used_maps']:
+                        #time, kills, and other shit
+                        heroes_data = fill_the_player(match, radiant_position_to_lane, dire_position_to_lane, hero_id, position,
+                                        player, radiant_win,
+                                        isradiant, heroes_data)
+                        for another_player in match['players']:
+                            another_player_hero_id = str(another_player['hero']['id'])
+                            another_player_position = another_player['position']
+                            another_isradiant = another_player['isRadiant']
+                            heroes_data = lane_with_hero(player, heroes_data, position, match, hero_id, another_player_position, another_player_hero_id, isradiant, another_isradiant)
+                            #counterpick
+                            if isradiant != another_player['isRadiant']:
+                                if isradiant:
+                                    if radiant_win:
+                                        to_be_appended = 1
                                     else:
-                                        if radiant_win:
-                                            to_be_appended = 0
-                                        else:
-                                            to_be_appended = 1
-                                    heroes_data[hero_id][position]['counterpick'][another_player_hero_id][
-                                        another_player_position].append(to_be_appended)
-                                #synergy
-                                if (isradiant == another_player['isRadiant']) and (hero_id != another_player_hero_id):
-                                    if isradiant:
-                                        if radiant_win:
-                                            to_be_appended = 1
-                                        else:
-                                            to_be_appended = 0
+                                        to_be_appended = 0
+                                else:
+                                    if radiant_win:
+                                        to_be_appended = 0
                                     else:
-                                        if radiant_win:
-                                            to_be_appended = 0
-                                        else:
-                                            to_be_appended = 1
-                                    heroes_data[hero_id][position]['synergy'][another_player_hero_id][
-                                        another_player_position].append(to_be_appended)
-                except:
-                    pass
+                                        to_be_appended = 1
+                                heroes_data.setdefault(hero_id, {}).setdefault(position, {}).setdefault('counterpick_duo', {}).setdefault(another_player_hero_id, {}).setdefault(
+                                    another_player_position, {}).setdefault('value', []).append(to_be_appended)
+                            #synergy
+                            if (isradiant == another_player['isRadiant']) and (hero_id != another_player_hero_id):
+                                if isradiant:
+                                    if radiant_win:
+                                        to_be_appended = 1
+                                    else:
+                                        to_be_appended = 0
+                                else:
+                                    if radiant_win:
+                                        to_be_appended = 0
+                                    else:
+                                        to_be_appended = 1
+                                total_kills = sum(match['direKills']) + sum(match['radiantKills'])
+                                heroes_data.setdefault(hero_id, {}).setdefault(position, {}).setdefault('synergy_duo', {}).setdefault(another_player_hero_id, {}).setdefault(
+                                    another_player_position, {}).setdefault('value', []).append(to_be_appended)
+                                heroes_data[hero_id][position].setdefault('total_kills_duo', {}).setdefault(another_player_hero_id, {}).setdefault(another_player_position,{}).setdefault('value', []).append(total_kills)
+                                heroes_data[hero_id][position].setdefault('total_time_duo', {}).setdefault(another_player_hero_id, {}).setdefault(another_player_position, {}).setdefault('value', []).append(match['durationSeconds'])
+                                for third_player in match['players']:
+                                    third_player_hero_id = str(third_player['hero']['id'])
+                                    third_player_position = third_player['position']
+                                    third_isradiant = third_player['isRadiant']
+
+                                    # Ensure the third player is on the same team and different from the other two heroes
+                                    if (isradiant == third_isradiant) and (third_player_hero_id not in [hero_id, another_player_hero_id]):
+                                        # Update synergy and total stats for the triple combination
+                                        heroes_data[hero_id][position]['synergy_duo'][another_player_hero_id][another_player_position].setdefault('syngergy_trio', {}).setdefault(third_player_hero_id, {}).setdefault(third_player_position, []).append(to_be_appended)
+                                        heroes_data[hero_id][position]['total_kills_duo'][another_player_hero_id][another_player_position].setdefault('total_kills_trio',{}).setdefault(third_player_hero_id, {}).setdefault(third_player_position,[]).append(total_kills)
+                                        heroes_data[hero_id][position]['total_time_duo'][another_player_hero_id][another_player_position].setdefault('total_time_trio', {}).setdefault(third_player_hero_id, {}).setdefault(third_player_position,[]).append(match['durationSeconds'])
         heroes_data['used_maps'].append(map_id)
 
-    with open('heroes_data.txt', 'r+') as f:
+    with open('heroes_data_pros.txt', 'r+') as f:
         f.truncate()
         f.seek(0)
         json.dump(heroes_data, f)
@@ -679,23 +617,121 @@ def analyze_players(my_team, enemy_team):
         team_over45_win = sum(over45) / len(over45)
         team_avg_lanes = sum(team_line_report) / len(team_line_report)
     return team_avg_lanes, team_over45_win
-def tm_kills(radiant_heroes_and_pos, dire_heroes_and_pos):
+def tm_kills(radiant_heroes_and_positions, dire_heroes_and_positions):
+    positions = ['1', '2', '3', '4']
+    radiant_pos1_with_team, radiant_pos2_with_team, radiant_pos3_with_team, dire_pos1_with_team, dire_pos2_with_team, dire_pos3_with_team = [], [], [], [], [], []
+    radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, dire_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team, radiant_pos4_with_pos5, dire_pos4_with_pos5 = [], [], [], [], [], [], [], [], [], [], None, None
+    avg_time_trio, avg_time_duo, avg_kills_duo, avg_kills_trio, radiant_time_unique_combinations, radiant_kills_unique_combinations, dire_kills_unique_combinations, dire_time_unique_combinations = [], [], [], [], set(), set(), set(), set()
     with open('heroes_data_pros.txt', 'r') as f:
-        heroes_data = json.load(f)
+        data = json.load(f)
         avg_kills, avg_time = [], []
-        copy_team_pos_and_heroes = {}
-        for my_team in [radiant_heroes_and_pos, dire_heroes_and_pos]:
-            copy_team_pos_and_heroes = dict()
-            for pos, data in my_team.items():
-                copy_team_pos_and_heroes[data['hero_id']] = pos
-            for hero_id in copy_team_pos_and_heroes:
-                pos = copy_team_pos_and_heroes[hero_id].replace('pos ', 'POSITION_')
-                data = heroes_data[str(hero_id)]
-                try:
-                    avg_time.append(sum(data[pos]['total_time']) / len(data[pos]['total_time']) / 60)
-                    avg_kills.append(sum(data[pos]['total_kills']) / len(data[pos]['total_kills']))
-                except:
-                    pass
-        avg_kills = sum(avg_kills) / len(avg_kills)
-        avg_time = sum(avg_time) / len(avg_time)
+        # radiant_synergy
+        for dig in positions:
+            try:
+                hero_id = str(radiant_heroes_and_positions['pos ' + dig]['hero_id'])
+                time_data = data[hero_id]['POSITION_' + dig]['total_time_duo']
+                kills_data = data[hero_id]['POSITION_' + dig]['total_kills_duo']
+                for hero_data in [time_data, kills_data]:
+                    for pos, item in radiant_heroes_and_positions.items():
+                        second_hero_id = str(item['hero_id'])
+                        try:
+                            if second_hero_id != hero_id:
+                                duo_data = hero_data[second_hero_id][pos.replace('pos ', 'POSITION_')]
+                                combo = tuple(sorted([hero_id, second_hero_id]))
+                                if hero_data == time_data:
+                                    if combo not in radiant_time_unique_combinations:
+                                        radiant_time_unique_combinations.add(combo)
+                                        avg_time_duo.append((sum(duo_data['value']) / len(duo_data['value'])) / 60)
+                                elif hero_data == kills_data:
+                                    if combo not in radiant_kills_unique_combinations:
+                                        radiant_kills_unique_combinations.add(combo)
+                                        avg_kills_duo.append(sum(duo_data['value']) / len(duo_data['value']))
+                                # Третий герой
+                                for pos3, item3 in radiant_heroes_and_positions.items():
+                                    third_hero_id = str(item3['hero_id'])
+                                    if third_hero_id not in [second_hero_id, hero_id]:
+                                        try:
+                                            # Создаём отсортированный кортеж идентификаторов героев для уникальности
+                                            combo = tuple(sorted([hero_id, second_hero_id, third_hero_id]))
+                                            if hero_data == time_data:
+                                                if combo not in radiant_time_unique_combinations:
+                                                    radiant_time_unique_combinations.add(combo)
+                                                    trio_data = duo_data['total_time_trio'][third_hero_id][
+                                                        pos3.replace('pos ', 'POSITION_')]
+                                                    avg_time_trio.append((sum(trio_data) / len(trio_data)) / 60)
+                                            elif hero_data == kills_data:
+                                                if combo not in radiant_kills_unique_combinations:
+                                                    radiant_kills_unique_combinations.add(combo)
+                                                    trio_data = duo_data['total_kills_trio'][third_hero_id][
+                                                        pos3.replace('pos ', 'POSITION_')]
+                                                    avg_kills_trio.append(sum(trio_data) / len(trio_data))
+                                        except:
+                                            pass
+                        except:
+                            pass
+            except:
+                pass
+            try:
+                hero_id = str(dire_heroes_and_positions['pos ' + dig]['hero_id'])
+                time_data = data[hero_id]['POSITION_' + dig][
+                    'total_time_duo']
+                kills_data = data[hero_id]['POSITION_' + dig][
+                    'total_kills_duo']
+                for hero_data in [time_data, kills_data]:
+                    for pos, item in dire_heroes_and_positions.items():
+                        second_hero_id = str(item['hero_id'])
+                        try:
+                            if second_hero_id != hero_id:
+                                duo_data = hero_data[second_hero_id][pos.replace('pos ', 'POSITION_')]
+                                combo = tuple(sorted([hero_id, second_hero_id]))
+                                if hero_data == time_data:
+                                    if combo not in dire_time_unique_combinations:
+                                        dire_time_unique_combinations.add(combo)
+                                        avg_time_duo.append((sum(duo_data['value']) / len(duo_data['value'])) / 60)
+                                elif hero_data == kills_data:
+                                    if combo not in dire_kills_unique_combinations:
+                                        dire_kills_unique_combinations.add(combo)
+                                        trio_data = duo_data['total_kills_trio'][third_hero_id][
+                                            pos3.replace('pos ', 'POSITION_')]
+                                        avg_kills_duo.append(sum(duo_data['value']) / len(duo_data['value']))
+                                # third_hero
+                                for pos3, item3 in dire_heroes_and_positions.items():
+                                    third_hero_id = str(item3['hero_id'])
+                                    if third_hero_id != hero_id:
+                                        try:
+                                            combo = tuple(sorted([hero_id, second_hero_id, third_hero_id]))
+                                            if hero_data == time_data:
+                                                if combo not in dire_time_unique_combinations:
+                                                    dire_time_unique_combinations.add(combo)
+                                                    trio_data = duo_data['total_time_trio'][third_hero_id][
+                                                        pos3.replace('pos ', 'POSITION_')]
+                                                    avg_time_trio.append((sum(trio_data) / len(trio_data)) / 60)
+                                            elif hero_data == kills_data:
+                                                if combo not in dire_kills_unique_combinations:
+                                                    dire_kills_unique_combinations.add(combo)
+                                                    trio_data = duo_data['total_kills_trio'][third_hero_id][
+                                                        pos3.replace('pos ', 'POSITION_')]
+                                                    avg_kills_trio.append(sum(trio_data) / len(trio_data))
+                                        except:
+                                            pass
+
+                        except:
+                            pass
+            except: pass
+    if len(avg_time_trio) != 0:
+        avg_time_trio = sum(avg_time_trio)/len(avg_time_trio)
+    if len(avg_kills_trio) != 0:
+        avg_kills_trio = sum(avg_kills_trio)/len(avg_kills_trio)
+    if len(avg_time_duo) != 0:
+        avg_time_duo = sum(avg_time_duo)/len(avg_time_duo)
+    if len(avg_kills_duo) != 0:
+        avg_kills_duo = sum(avg_kills_duo)/len(avg_kills_duo)
+    if type(avg_kills_trio) == float:
+        avg_kills = (avg_kills_trio + avg_kills_duo)/2
+    else:
+        avg_kills = avg_kills_duo
+    if type(avg_time_trio) != float:
+        avg_time = (avg_time_duo + avg_time_trio)/2
+    else:
+        avg_time = avg_time_duo
     return avg_kills, avg_time

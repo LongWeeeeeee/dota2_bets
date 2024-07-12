@@ -2,10 +2,7 @@ import time
 import requests
 import json
 from dltv_cyberscore import get_team_positions, dota2protracker,get_map_id
-from trash import analyze_players, syngery_and_counterpick, tm_kills, avg_over45
-
-with open('heroes_data.txt', 'r') as f:
-    heroes_data = json.load(f)
+from trash import lane_report_def, synergy_and_counterpick, tm_kills, avg_over45
 while True:
     url = 'https://api.cyberscore.live/api/v1/matches/?limit=20&type=liveOrUpcoming&locale=en'
     response = requests.get(url)
@@ -19,15 +16,15 @@ while True:
                 if result is not None:
                     radiant_heroes_and_pos, dire_heroes_and_pos = result
                     print(f'{radiant_team_name} VS {dire_team_name}')
-                    radiant_lane_report = analyze_players(my_team = radiant_heroes_and_pos, enemy_team = dire_heroes_and_pos, heroes_data =heroes_data)
-                    dire_lane_report = analyze_players(my_team = dire_heroes_and_pos, enemy_team = radiant_heroes_and_pos, heroes_data = heroes_data)
+                    radiant_lane_report = lane_report_def(my_team = radiant_heroes_and_pos, enemy_team = dire_heroes_and_pos)
+                    dire_lane_report = lane_report_def(my_team = dire_heroes_and_pos, enemy_team = radiant_heroes_and_pos)
                     lane_report = round(((radiant_lane_report - dire_lane_report) * 100), 2)
                     map_kills, map_time = tm_kills(radiant_heroes_and_pos, dire_heroes_and_pos)
-                    radiant_over45 = avg_over45(radiant_heroes_and_pos, heroes_data)
-                    dire_over45 = avg_over45(dire_heroes_and_pos, heroes_data)
+                    radiant_over45 = avg_over45(radiant_heroes_and_pos)
+                    dire_over45 = avg_over45(dire_heroes_and_pos)
                     over45 = (radiant_over45 - dire_over45)*100
                     output_message = (f'Radiant после 45 минуты сильнее на: {over45}\nRadiant lanes до 10 минуты: {lane_report}\n')
-                    output_message = syngery_and_counterpick(radiant_heroes_and_pos, dire_heroes_and_pos,
+                    output_message = synergy_and_counterpick(radiant_heroes_and_pos, dire_heroes_and_pos,
                                                              output_message)
                     output_message+=(f'\nСреднее кол-во убийств {map_kills}, Среднее время {map_time}\n')
                     dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos,

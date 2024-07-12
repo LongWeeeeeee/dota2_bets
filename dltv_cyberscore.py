@@ -108,15 +108,18 @@ def get_team_positions(url):
         dire_heroes_and_pos = {}
         for i in range(5):
             for id in id_to_name.translate:
-                if id_to_name.translate[id] == heroes[i]:
-                    hero_id = id
-                    radiant_heroes_and_pos[f'pos {i+1}'] = {'hero_id':hero_id, 'hero_name' : heroes[i]}
+                try:
+                    if id_to_name.translate[id] == heroes[i]:
+                        hero_id = id
+                        radiant_heroes_and_pos[f'pos{i+1}'] = {'hero_id':hero_id, 'hero_name' : heroes[i]}
+                except:
+                    pass
         c = 0
         for i in range(5, 10):
             for id in id_to_name.translate:
                 if id_to_name.translate[id] == heroes[i]:
                     hero_id = id
-                    dire_heroes_and_pos[f'pos {c+1}'] = {'hero_id':hero_id, 'hero_name' : heroes[i]}
+                    dire_heroes_and_pos[f'pos{c+1}'] = {'hero_id':hero_id, 'hero_name' : heroes[i]}
                     c+=1
 
         return radiant_heroes_and_pos, dire_heroes_and_pos
@@ -126,7 +129,7 @@ def get_team_positions(url):
 def analyze_draft(sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team,
                   sups):
     radiant_predict, dire_predict = False, False
-    values = {'sinergy':sinergy, 'counterpick':counterpick, 'pos1_vs_team':pos1_vs_team, 'core_matchup':core_matchup, 'pos2_vs_team':pos2_vs_team, 'pos3_vs_team':pos3_vs_team, 'sups':sups}
+    values = {'sinergy':sinergy, 'counterpick':counterpick, 'pos 1_vs_team':pos1_vs_team, 'core_matchup':core_matchup, 'pos 2_vs_team':pos2_vs_team, 'pos 3_vs_team':pos3_vs_team, 'sups':sups}
     other_values = {'sinergy':sinergy, 'counterpick':counterpick, 'core_matchup':core_matchup, 'sups':sups}
     values_nones = sum(1 for value in values.values() if value is None)
     other_values_nones = sum(1 for value in other_values.values() if value is None)
@@ -197,20 +200,20 @@ def fill_players_position(rows, players):
                 for player_name in players:
                     if are_similar(player_name, player_nick, threshold=50):
                         if player_position == 'Сапорт 5':
-                            players[player_name]['position'] = player_position
+                            players[player_name]['pos ition'] = player_position
                             lst.remove(player_position)
                             break
                         else:
-                            players[player_name]['position'] = player_position
+                            players[player_name]['pos ition'] = player_position
                             lst.remove(player_position)
     if len(lst) == 1:
         for player in players:
             if len(players[player]) == 1:
-                players[player]['position'] = lst[0]
+                players[player]['pos ition'] = lst[0]
 
     for player in players:
-        if 'position' in players[player]:
-            heroes_and_position[translate[players[player]['position']]] = players[player]['hero']
+        if 'pos ition' in players[player]:
+            heroes_and_position[translate[players[player]['pos ition']]] = players[player]['hero']
         else:
             print('Не удалось узнать позицию, скорее всего команда новая')
             return None
@@ -361,12 +364,16 @@ def send_message(message):
     requests.post(url, json=payload)
 
 
-def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, score, tier=None, antiplagiat_url=None, core_matchup=None, output_message='', egb=None, radiant_players_check=None, lane_report=None, dire_players_check=None, radiant_impactandplayers=None, impact_message=None, dire_impactandplayers=None, radiant_message_add=None, dire_message_add=None):
+def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, score,
+                    tier=None, antiplagiat_url=None, core_matchup=None, output_message='', egb=None,
+                    radiant_players_check=None, lane_report=None, dire_players_check=None,
+                    radiant_impactandplayers=None, impact_message=None, dire_impactandplayers=None,
+                    radiant_message_add=None, dire_message_add=None):
     print('dota2protracker')
     radiant_pos1_with_team, radiant_pos2_with_team, radiant_pos3_with_team, dire_pos1_with_team, dire_pos2_with_team, dire_pos3_with_team = [], [], [], [], [], []
-    radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, dire_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team, radiant_pos4_with_pos5, dire_pos4_with_pos5 = [], [], [], [] ,[], [], [], [], [], [], None, None
+    radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, dire_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team, radiant_pos4_with_pos5, dire_pos4_with_pos5 = [], [], [], [], [], [], [], [], [], [], None, None
     for position in radiant_heroes_and_positions:
-        if position != 'pos 5':
+        if position != 'pos5':
             hero_url = radiant_heroes_and_positions[position]['hero_name'].replace(' ', '%20')
             url = f'https://dota2protracker.com/hero/{hero_url}'
             response = requests.get(url)
@@ -379,51 +386,62 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             matchups, synergies = json.loads(str_to_json(matchups.group(1)).strip()), json.loads(
                 str_to_json(synergies.group(1)).strip())
             for synergy in synergies:
-                tracker_position = synergy['position']
-                data_pos = synergy['other_pos']
+                tracker_position = synergy['position'].replace('pos ', 'pos')
+                data_pos = synergy['other_pos'].replace('pos ', 'pos')
                 data_hero = synergy['other_hero']
                 data_wr = synergy['win_rate']
                 if synergy['num_matches'] >= 10:
                     # Extract the values of 'data-hero', 'data-wr', and 'data-pos' attributes
-                    if position == 'pos 1':
+                    if position == 'pos1':
                         if len(radiant_pos1_with_team) == 4:
                             break
-                        if 'pos 2' in data_pos and data_hero == radiant_heroes_and_positions['pos 2']['hero_name'] and tracker_position == position:
+                        if 'pos2' in data_pos and data_hero == radiant_heroes_and_positions['pos2'][
+                            'hero_name'] and tracker_position == position:
                             radiant_pos1_with_team.append(data_wr)
-                        elif 'pos 3' in data_pos and data_hero == radiant_heroes_and_positions['pos 3']['hero_name'] and tracker_position == position:
+                        elif 'pos3' in data_pos and data_hero == radiant_heroes_and_positions['pos3'][
+                            'hero_name'] and tracker_position == position:
                             radiant_pos1_with_team.append(data_wr)
-                        elif 'pos 4' in data_pos and data_hero == radiant_heroes_and_positions['pos 4']['hero_name'] and tracker_position == position:
+                        elif 'pos4' in data_pos and data_hero == radiant_heroes_and_positions['pos4'][
+                            'hero_name'] and tracker_position == position:
                             radiant_pos1_with_team.append(data_wr)
-                        elif 'pos 5' in data_pos and data_hero == radiant_heroes_and_positions['pos 5']['hero_name'] and tracker_position == position:
+                        elif 'pos5' in data_pos and data_hero == radiant_heroes_and_positions['pos5'][
+                            'hero_name'] and tracker_position == position:
                             radiant_pos1_with_team.append(data_wr)
 
-                    if position == 'pos 2':
+                    if position == 'pos2':
                         if len(radiant_pos2_with_team) == 3:
                             break
-                        if 'pos 3' in data_pos and data_hero == radiant_heroes_and_positions['pos 3']['hero_name'] and tracker_position == position:
+                        if 'pos3' in data_pos and data_hero == radiant_heroes_and_positions['pos3'][
+                            'hero_name'] and tracker_position == position:
                             radiant_pos2_with_team.append(data_wr)
-                        elif 'pos 4' in data_pos and data_hero == radiant_heroes_and_positions['pos 4']['hero_name'] and tracker_position == position:
+                        elif 'pos4' in data_pos and data_hero == radiant_heroes_and_positions['pos4'][
+                            'hero_name'] and tracker_position == position:
                             radiant_pos2_with_team.append(data_wr)
-                        elif 'pos 5' in data_pos and data_hero == radiant_heroes_and_positions['pos 5']['hero_name'] and tracker_position == position:
+                        elif 'pos5' in data_pos and data_hero == radiant_heroes_and_positions['pos5'][
+                            'hero_name'] and tracker_position == position:
                             radiant_pos2_with_team.append(data_wr)
 
-                    if position == 'pos 3':
+                    if position == 'pos3':
                         if len(radiant_pos3_with_team) == 2:
                             break
-                        if 'pos 4' in data_pos and data_hero == radiant_heroes_and_positions['pos 4']['hero_name'] and tracker_position == position:
+                        if 'pos4' in data_pos and data_hero == radiant_heroes_and_positions['pos4'][
+                            'hero_name'] and tracker_position == position:
                             radiant_pos3_with_team.append(data_wr)
-                        elif 'pos 5' in data_pos and data_hero == radiant_heroes_and_positions['pos 5']['hero_name'] and tracker_position == position:
+                        elif 'pos5' in data_pos and data_hero == radiant_heroes_and_positions['pos5'][
+                            'hero_name'] and tracker_position == position:
                             radiant_pos3_with_team.append(data_wr)
-                    if position == 'pos 4':
+                    if position == 'pos4':
                         if radiant_pos4_with_pos5 is not None:
                             break
-                        if 'pos 5' in data_pos and data_hero == radiant_heroes_and_positions['pos 5']['hero_name'] and tracker_position == position:
+                        if 'pos5' in data_pos and data_hero == radiant_heroes_and_positions['pos5'][
+                            'hero_name'] and tracker_position == position:
                             radiant_pos4_with_pos5 = data_wr
     if radiant_pos4_with_pos5 is not None:
         radiant_wr_with += [radiant_pos4_with_pos5]
     radiant_wr_with += radiant_pos3_with_team + radiant_pos2_with_team + radiant_pos1_with_team
     for position in dire_heroes_and_positions:
-        if position != 'pos 5':
+
+        if position != 'pos5':
             hero_url = dire_heroes_and_positions[position]['hero_name'].replace(' ', '%20')
             url = f'https://dota2protracker.com/hero/{hero_url}'
             response = requests.get(url)
@@ -436,49 +454,60 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             matchups, synergies = json.loads(str_to_json(matchups.group(1)).strip()), json.loads(
                 str_to_json(synergies.group(1)).strip())
             for synergy in synergies:
-                tracker_position = synergy['position']
-                data_pos = synergy['other_pos']
+                tracker_position = synergy['position'].replace('pos ', 'pos')
+                data_pos = synergy['other_pos'].replace('pos ', 'pos')
                 data_hero = synergy['other_hero']
                 data_wr = synergy['win_rate']
                 if synergy['num_matches'] >= 8:
-                    if position == 'pos 1':
+                    if position == 'pos1':
                         if len(dire_pos1_with_team) == 4:
                             break
-                        if 'pos 2' in data_pos and data_hero == dire_heroes_and_positions['pos 2']['hero_name'] and tracker_position == position:
+                        if 'pos2' in data_pos and data_hero == dire_heroes_and_positions['pos2'][
+                            'hero_name'] and tracker_position == position:
                             dire_pos1_with_team.append(data_wr)
-                        elif 'pos 3' in data_pos and data_hero == dire_heroes_and_positions['pos 3']['hero_name'] and tracker_position == position:
+                        elif 'pos3' in data_pos and data_hero == dire_heroes_and_positions['pos3'][
+                            'hero_name'] and tracker_position == position:
                             dire_pos1_with_team.append(data_wr)
-                        elif 'pos 4' in data_pos and data_hero == dire_heroes_and_positions['pos 4']['hero_name'] and tracker_position == position:
+                        elif 'pos4' in data_pos and data_hero == dire_heroes_and_positions['pos4'][
+                            'hero_name'] and tracker_position == position:
                             dire_pos1_with_team.append(data_wr)
-                        elif 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']['hero_name'] and tracker_position == position:
+                        elif 'pos5' in data_pos and data_hero == dire_heroes_and_positions['pos5'][
+                            'hero_name'] and tracker_position == position:
                             dire_pos1_with_team.append(data_wr)
 
-                    if position == 'pos 2':
+                    if position == 'pos2':
                         if len(dire_pos2_with_team) == 3:
                             break
-                        if 'pos 3' in data_pos and data_hero == dire_heroes_and_positions['pos 3']['hero_name'] and tracker_position == position:
+                        if 'pos3' in data_pos and data_hero == dire_heroes_and_positions['pos3'][
+                            'hero_name'] and tracker_position == position:
                             dire_pos2_with_team.append(data_wr)
-                        elif 'pos 4' in data_pos and data_hero == dire_heroes_and_positions['pos 4']['hero_name'] and tracker_position == position:
+                        elif 'pos4' in data_pos and data_hero == dire_heroes_and_positions['pos4'][
+                            'hero_name'] and tracker_position == position:
                             dire_pos2_with_team.append(data_wr)
-                        elif 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']['hero_name'] and tracker_position == position:
+                        elif 'pos5' in data_pos and data_hero == dire_heroes_and_positions['pos5'][
+                            'hero_name'] and tracker_position == position:
                             dire_pos2_with_team.append(data_wr)
 
-                    if position == 'pos 3':
+                    if position == 'pos3':
                         if len(dire_pos3_with_team) == 2:
                             break
-                        if 'pos 4' in data_pos and data_hero == dire_heroes_and_positions['pos 4']['hero_name'] and tracker_position == position:
+                        if 'pos4' in data_pos and data_hero == dire_heroes_and_positions['pos4'][
+                            'hero_name'] and tracker_position == position:
                             dire_pos3_with_team.append(data_wr)
-                        elif 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']['hero_name'] and tracker_position == position:
+                        elif 'pos5' in data_pos and data_hero == dire_heroes_and_positions['pos5'][
+                            'hero_name'] and tracker_position == position:
                             dire_pos3_with_team.append(data_wr)
-                    if position == 'pos 4':
+                    if position == 'pos4':
                         if dire_pos4_with_pos5 is not None:
                             break
-                        if 'pos 5' in data_pos and data_hero == dire_heroes_and_positions['pos 5']['hero_name'] and tracker_position == position:
+                        if 'pos5' in data_pos and data_hero == dire_heroes_and_positions['pos5'][
+                            'hero_name'] and tracker_position == position:
                             dire_pos4_with_pos5 = data_wr
     if dire_pos4_with_pos5 is not None:
         dire_wr_with += [dire_pos4_with_pos5]
     dire_wr_with += dire_pos3_with_team + dire_pos2_with_team + dire_pos1_with_team
     for position in radiant_heroes_and_positions:
+
         hero_url = radiant_heroes_and_positions[position]['hero_name'].replace(' ', '%20')
         url = f'https://dota2protracker.com/hero/{hero_url}'
         response = requests.get(url)
@@ -491,30 +520,38 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         matchups, synergies = json.loads(str_to_json(matchups.group(1)).strip()), json.loads(
             str_to_json(synergies.group(1)).strip())
         for matchup in matchups:
-            tracker_position = matchup['position']
-            data_pos = matchup['other_pos']
+            tracker_position = matchup['position'].replace('pos ', 'pos')
+            data_pos = matchup['other_pos'].replace('pos ', 'pos')
             data_hero = matchup['other_hero']
             data_wr = matchup['win_rate']
             if matchup['num_matches'] >= 8 and data_pos in radiant_heroes_and_positions:
-                if position == 'pos 1' and tracker_position == 'pos 1' and data_hero == dire_heroes_and_positions[data_pos]['hero_name']:
-                    if data_pos == 'pos 1':
+                if position == 'pos1' and tracker_position == 'pos1' and data_hero == \
+                        dire_heroes_and_positions[data_pos]['hero_name']:
+                    if data_pos == 'pos1':
                         core_matchup = data_wr
                     radiant_pos1_vs_team.append(data_wr)
-                elif position == 'pos 2' and tracker_position == 'pos 2' and data_hero == dire_heroes_and_positions[data_pos]['hero_name']:
+                elif position == 'pos2' and tracker_position == 'pos2' and data_hero == \
+                        dire_heroes_and_positions[data_pos]['hero_name']:
                     radiant_pos2_vs_team.append(data_wr)
-                elif position == 'pos 3' and tracker_position == 'pos 3' and data_hero == dire_heroes_and_positions[data_pos]['hero_name']:
+                elif position == 'pos3' and tracker_position == 'pos3' and data_hero == \
+                        dire_heroes_and_positions[data_pos]['hero_name']:
                     radiant_pos3_vs_team.append(data_wr)
-                elif position == 'pos 4' and tracker_position == 'pos 4' and data_hero == dire_heroes_and_positions[data_pos]['hero_name']:
+                elif position == 'pos4' and tracker_position == 'pos4' and data_hero == \
+                        dire_heroes_and_positions[data_pos]['hero_name']:
                     radiant_wr_against.append(data_wr)
-                elif position == 'pos 5' and tracker_position == 'pos 5' and data_hero == dire_heroes_and_positions[data_pos]['hero_name']:
+                elif position == 'pos5' and tracker_position == 'pos5' and data_hero == \
+                        dire_heroes_and_positions[data_pos]['hero_name']:
                     radiant_wr_against.append(data_wr)
 
-                if 'pos 1' in data_pos and data_hero == dire_heroes_and_positions['pos 1']['hero_name'] and tracker_position == position:
-                    dire_pos1_vs_team.append(100-data_wr)
-                elif 'pos 2' in data_pos and data_hero == dire_heroes_and_positions['pos 2']['hero_name'] and tracker_position == position:
-                    dire_pos2_vs_team.append(100-data_wr)
-                elif 'pos 3' in data_pos and data_hero == dire_heroes_and_positions['pos 3']['hero_name'] and tracker_position == position:
-                    dire_pos3_vs_team.append(100-data_wr)
+                if 'pos1' in data_pos and data_hero == dire_heroes_and_positions['pos1'][
+                    'hero_name'] and tracker_position == position:
+                    dire_pos1_vs_team.append(100 - data_wr)
+                elif 'pos2' in data_pos and data_hero == dire_heroes_and_positions['pos2'][
+                    'hero_name'] and tracker_position == position:
+                    dire_pos2_vs_team.append(100 - data_wr)
+                elif 'pos3' in data_pos and data_hero == dire_heroes_and_positions['pos3'][
+                    'hero_name'] and tracker_position == position:
+                    dire_pos3_vs_team.append(100 - data_wr)
     radiant_wr_against += radiant_pos3_vs_team + radiant_pos2_vs_team + radiant_pos1_vs_team
     dire_wr_against += dire_pos3_vs_team + dire_pos2_vs_team + dire_pos1_vs_team
 
@@ -531,12 +568,13 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     dire_pos2_vs_team = clean_up(dire_pos2_vs_team)
     radiant_pos3_vs_team = clean_up(radiant_pos3_vs_team)
     dire_pos3_vs_team = clean_up(dire_pos3_vs_team)
-    sinergy, counterpick ,pos1_vs_team, pos2_vs_team, pos3_vs_team  = None, None, None, None, None
+    sinergy, counterpick, pos1_vs_team, pos2_vs_team, pos3_vs_team = None, None, None, None, None
 
     if len(radiant_wr_with) > 0 and len(dire_wr_with) > 0:
         sinergy = (sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))
     if len(radiant_wr_against) > 0:
-        counterpick = (sum(radiant_wr_against) / len(radiant_wr_against)) - (sum(dire_wr_against) / len(dire_wr_against))
+        counterpick = (sum(radiant_wr_against) / len(radiant_wr_against)) - (
+                    sum(dire_wr_against) / len(dire_wr_against))
     if len(radiant_pos1_vs_team) > 0 and len(dire_pos1_vs_team) > 0:
         pos1_vs_team = sum(radiant_pos1_vs_team) / len(radiant_pos1_vs_team) - sum(dire_pos1_vs_team) / len(
             dire_pos1_vs_team)
@@ -548,8 +586,9 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
             dire_pos2_vs_team)
     if core_matchup is not None:
         core_matchup -= 50
-    verdict, radiant_predict, dire_predict = analyze_draft(sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team,
-                  sups)
+    verdict, radiant_predict, dire_predict = analyze_draft(sinergy, counterpick, pos1_vs_team, core_matchup,
+                                                           pos2_vs_team, pos3_vs_team,
+                                                           sups)
     # for hero in list(radiant_heroes_and_positions.values()):
     #     if hero in game_changer_list:
     #         output_message += f'\nАккуратно! У {radiant_team_name} есть {hero}, который может изменить исход боя'
@@ -564,28 +603,29 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         map_url = antiplagiat_url
     else:
         map_url = None
-    radiant_output = ", ".join([f"'{pos}' : '{data['hero_name']}'" for pos, data in radiant_heroes_and_positions.items()])
+    radiant_output = ", ".join(
+        [f"'{pos}' : '{data['hero_name']}'" for pos, data in radiant_heroes_and_positions.items()])
     dire_output = ", ".join([f"'{pos}' : '{data['hero_name']}'" for pos, data in dire_heroes_and_positions.items()])
     radiant_text = ''
     dire_text = ''
     if radiant_pos4_with_pos5 is None:
-        radiant_text += f'\npos 4 {radiant_heroes_and_positions["pos 4"]["hero_name"]} with pos 5 {radiant_heroes_and_positions["pos 5"]["hero_name"]} нету на protracker'
+        radiant_text += f'\npos 4 {radiant_heroes_and_positions["pos4"]["hero_name"]} with pos 5 {radiant_heroes_and_positions["pos5"]["hero_name"]} нету на protracker'
     if dire_pos4_with_pos5 is None:
-        dire_text += f'\npos 4 {dire_heroes_and_positions["pos 4"]["hero_name"]} with pos 5 {dire_heroes_and_positions["pos 5"]["hero_name"]} нету на protracker'
+        dire_text += f'\npos 4 {dire_heroes_and_positions["pos4"]["hero_name"]} with pos 5 {dire_heroes_and_positions["pos5"]["hero_name"]} нету на protracker'
     if len(radiant_pos3_vs_team) < 1:
-        radiant_text += f'\nНедостаточно данных pos 3 {radiant_heroes_and_positions["pos 3"]["hero_name"]} vs {dire_output}'
+        radiant_text += f'\nНедостаточно данных pos 3 {radiant_heroes_and_positions["pos3"]["hero_name"]} vs {dire_output}'
     if len(dire_pos3_vs_team) < 1:
-        dire_text += f'\nНедостаточно данных pos 3 {dire_heroes_and_positions["pos 3"]["hero_name"]} vs {radiant_output}'
+        dire_text += f'\nНедостаточно данных pos 3 {dire_heroes_and_positions["pos3"]["hero_name"]} vs {radiant_output}'
     if len(dire_pos2_vs_team) < 1:
-        dire_text += f'\nНедостаточно данных pos 2 {dire_heroes_and_positions["pos 2"]["hero_name"]} vs {radiant_output}'
+        dire_text += f'\nНедостаточно данных pos 2 {dire_heroes_and_positions["pos2"]["hero_name"]} vs {radiant_output}'
     if len(radiant_pos2_vs_team) < 1:
-        radiant_text += f'\nНедостаточно данных pos 2 {radiant_heroes_and_positions["pos 2"]["hero_name"]} vs {dire_output}'
+        radiant_text += f'\nНедостаточно данных pos 2 {radiant_heroes_and_positions["pos2"]["hero_name"]} vs {dire_output}'
     if len(radiant_pos1_vs_team) < 1:
-        radiant_text += f'\nНедостаточно данных pos 1 {radiant_heroes_and_positions["pos 1"]["hero_name"]} vs {dire_output}'
+        radiant_text += f'\nНедостаточно данных pos 1 {radiant_heroes_and_positions["pos1"]["hero_name"]} vs {dire_output}'
     if len(dire_pos1_vs_team) < 1:
-        dire_text += f'\nНедостаточно данных pos 1 {dire_heroes_and_positions["pos 1"]["hero_name"]} vs {radiant_output}'
+        dire_text += f'\nНедостаточно данных pos 1 {dire_heroes_and_positions["pos1"]["hero_name"]} vs {radiant_output}'
     if core_matchup is None:
-        output_message += f'\nCore matchup Radiant {radiant_heroes_and_positions["pos 1"]["hero_name"]} vs Dire {dire_heroes_and_positions["pos 1"]["hero_name"]} нету на dota2protracker'
+        output_message += f'\nCore matchup Radiant {radiant_heroes_and_positions["pos1"]["hero_name"]} vs Dire {dire_heroes_and_positions["pos1"]["hero_name"]} нету на dota2protracker'
     if len(dire_wr_with) < 1:
         dire_text += f'\nНедостаточная выборка винрейтов у {dire_team_name} между командой:\n{dire_output}'
     if len(radiant_wr_with) < 1:
@@ -636,7 +676,6 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     #             print(output_message)
     #     else:
     #         print(output_message)
-
 
     if antiplagiat_url is not None:
         add_url(antiplagiat_url)

@@ -3,7 +3,7 @@ import requests
 from keys import api_token
 # import time
 from dltv_cyberscore import analyze_draft, clean_up
-from id_to_name import top_500_asia_europe, non_anon_top_1000_europe_top_1000_asia, pro_teams
+from id_to_name import top_500_asia_europe, non_anon_top_1000_europe_top_1000_asia, pro_teams, translate
 import json
 import time
 
@@ -293,7 +293,7 @@ def proceed_map(match, map_id, players_imp_data, used_maps, lane_dict, synergy_a
     return lane_dict, players_imp_data, total_time_kills_dict, synergy_and_counterpick_dict, over45_dict
 
 
-def analyze_database(database, players_imp_data, used_maps, total_time_kills_dict, over45_dict, synergy_and_counterpick_dict, lane_dict):
+def analyze_database(database, players_imp_data, used_maps, total_time_kills_dict, over45_dict, synergy_and_counterpick_dict, lane_dict, start_date_time):
     total = len(database)
     count = 0
     for map_id in database:
@@ -301,7 +301,7 @@ def analyze_database(database, players_imp_data, used_maps, total_time_kills_dic
         count += 1
         match = database[map_id]
         if map_id not in used_maps and match['direKills'] != None and (match['durationSeconds']/60) > 20:
-            if any(player['steamAccount']['id'] in top_500_asia_europe for player in match['players']):
+            if any(player['steamAccount']['id'] in top_500_asia_europe for player in match['players']) and ('startDateTime' in match) and (match['startDateTime'] >= start_date_time):
                 if all(name in match and match[name] is not None for name in ['direTeam', 'radiantTeam']):
                     radiant_team_name = match['direTeam']['name'].lower()
                     dire_team_name = match['radiantTeam']['name'].lower()

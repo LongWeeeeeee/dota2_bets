@@ -77,68 +77,69 @@ def get_maps(game_mods, start_date_time, players_dict, maps_to_save):
         json.dump(file_data, f)
 
 
-def research_maps(maps_to_explore, previous_output, new_output = None):
+def research_maps(maps_to_explore, previous_output=None, new_output = None):
     with open(f'{maps_to_explore}.txt', 'r') as f2:
         maps_to_explore = set(json.load(f2))
-    with open(f'{previous_output}.txt', 'r+') as f:
-        file_data = json.load(f)
-        counter = 0
-        for map_id in maps_to_explore:
-            print(f'{counter}/{len(maps_to_explore)}')
-            counter += 1
-            if str(map_id) not in file_data:
-                if counter % 100 == 0:
-                    f.truncate()
-                    f.seek(0)
-                    json.dump(file_data, f)
-                try:
-                    query = '''
-                    {match(id:%s){
-                      startDateTime
-                      league{
-                        id
-                        tier
-                        region
-                        basePrizePool
-                        prizePool
-                        tournamentUrl
-                        displayName
-                      }
-                      direTeam{
-                        name
-                      }
-                      radiantTeam{
-                        name
-                      }
-                      id
-                      direKills
-                      radiantKills
-                      bottomLaneOutcome
-                      topLaneOutcome
-                      midLaneOutcome
-                      radiantNetworthLeads
-                      didRadiantWin
-                      durationSeconds
-                      players{
-                        steamAccount{
+    if previous_output is not None:
+        with open(f'{previous_output}.txt', 'r+') as f:
+            file_data = json.load(f)
+            counter = 0
+            for map_id in maps_to_explore:
+                print(f'{counter}/{len(maps_to_explore)}')
+                counter += 1
+                if str(map_id) not in file_data:
+                    if counter % 100 == 0:
+                        f.truncate()
+                        f.seek(0)
+                        json.dump(file_data, f)
+                    try:
+                        query = '''
+                        {match(id:%s){
+                          startDateTime
+                          league{
+                            id
+                            tier
+                            region
+                            basePrizePool
+                            prizePool
+                            tournamentUrl
+                            displayName
+                          }
+                          direTeam{
+                            name
+                          }
+                          radiantTeam{
+                            name
+                          }
                           id
-                          isAnonymous
+                          direKills
+                          radiantKills
+                          bottomLaneOutcome
+                          topLaneOutcome
+                          midLaneOutcome
+                          radiantNetworthLeads
+                          didRadiantWin
+                          durationSeconds
+                          players{
+                            steamAccount{
+                              id
+                              isAnonymous
+                            }
+                            imp
+                            position
+                            isRadiant
+                            hero{
+                              id
+                            }
+                          }
                         }
-                        imp
-                        position
-                        isRadiant
-                        hero{
-                          id
-                        }
-                      }
-                    }
-                    }''' % map_id
-                    headers = {"Authorization": f"Bearer {api_token}"}
-                    response = requests.post('https://api.stratz.com/graphql', json={"query": query}, headers=headers)
-                    data = json.loads(response.text)['data']['match']
-                    file_data[map_id] = data
-                except Exception as e:
-                    print(f"Error processing map ID {map_id}: {e}")
+                        }''' % map_id
+                        headers = {"Authorization": f"Bearer {api_token}"}
+                        response = requests.post('https://api.stratz.com/graphql', json={"query": query}, headers=headers)
+                        data = json.loads(response.text)['data']['match']
+                        file_data[map_id] = data
+                    except Exception as e:
+                        print(f"Error processing map ID {map_id}: {e}")
     if new_output is None:
         with open(f'{previous_output}.txt', 'w') as f:
             f.truncate()

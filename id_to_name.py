@@ -164,8 +164,7 @@ blacklist_players = {
      'rostislav_999',
     'ephey',
 }
-pro_teams = ['team falcons', 'entity', 'cuyes e-sports', 'noping esports', 'level up', 'dms', 'v1dar gaming', 'thunder awaken', 'infamous gaming', 'outcast', 'salvation gaming', 'winter bear', 'manta esports', 'virtus.pro', 'fantasy gaming', 'monte ', 'kalmychata', 'g2 x ig', 'justbetter', 'estar backs!', 'midas club', 'talon esports', 'xtreme gaming', 'wbg.xg', 'entity gaming', 'team spirit', 'betboom team', 'psg quest', 'beastcoast', 'dark horse', 'gaimin gladiators', 'team liquid', 'g2.invictus gaming', 'azure ray', 'g2.ig', 'tundra esports', 'aurora gaming', 'hydra', 'matreshka', 'og', 'lgd gaming', 'team  kev', 'talon', 'lgd gaiming', 'heroic', 'virtus pro', 'shopify rebelion', 'shopify rebellion', 'execration', 'hardbass team', 'south team', 'acatsuki', 'infamous', 'qhali', 'havu', 'blacklist rivalry ', 'tnc predator', 'team tough', 'team kev', 'bleed', 'apex genesis', 'cuyes e-sport', 'monte', 'leviatan', 'neon esports', 'team secret', 'nouns', 'l1ga team', 'natus vincere', 'navi junior', 'mouz', 'yellow submarine', 'team turtle', 'dandelions', 'psg.quest', 'grin esports', 'levelup.marsbahis', 'prism esports', 'dragon esports club', 'team hryvnia', 'team bald reborn', 'blacklist rivalry', 'lava esports', 'yangon galacticos', 'nextup', 'asakura', 'aurora.1xbet', 'team tea', 'ihc', 'b8', 'ihc esports', 'spiky gaming', 'bleed esports', 'night pulse', '1win', 'twisted minds', 'team bright', 'lava esports ', 'one move', 'hokori', 'infinity', 'justbetter', 'nemiga gaming', 'sibe team', '9pandas', 'boom esports', 'nigma galaxy', 'team zero']
-pass
+real_pro_teams = ['g2 x ig', 'entity', 'gaimin gladiators', 'blacklist rivalry', 'virtus pro', 'shopify rebelion', 'g2.invictus gaming', 'g2.ig', 'og', 'lgd gaiming',  'entity gaming', 'psg quest', 'wbg.xg', 'psg.quest', 'tundra esports', 'natus vincere', 'lgd gaming', 'mouz', 'aurora gaming', 'bleed', 'team secret', 'dms', 'azure ray', 'navi junior', 'talon', 'talon esports', 'nouns', 'tnc predator', 'team zero', 'yellow submarine', '9pandas', 'infinity', 'beastcoast', 'bb team', 'boom esports', 'night pulse', 'aurora.1xbet', 'blacklist international', '1win', 'team spirit', 'team liquid', 'virtus.pro', 'team  kev', 'nigma galaxy', 'heroic', 'fusion esports', 'midas club', 'xtreme gaming', 'team falcons', 'blacklist rivalry ', 'shopify rebellion', 'betboom team', 'team bald reborn', 'matreshka']
 def get_players(top, region, players_dict, skipAnon):
      count = 0
      skip = 0
@@ -195,10 +194,26 @@ def get_players(top, region, players_dict, skipAnon):
                       players_dict[player['steamAccount']['id']] = player['steamAccount']['name']
          skip += 100
      return players_dict
+
+
+with open('teams_stat_dict.txt', 'r') as f:
+    data = json.load(f)
+    data_copy = data.copy()
+    print(data.keys())
+    for team in data_copy:
+        odd = data[team]['kills']/data[team]['time']
+        data.setdefault(team, {}).setdefault('odd', odd)
+    sorted_data = dict(sorted(data.items(), key=lambda item: item[1]["odd"]))
+with open('teams_stat_dict.txt', 'w') as f:
+    json.dump(sorted_data, f, indent=4)
 if __name__ == "__main__":
-     players_dict = dict()
-     regions = [[1000, 'EUROPE'], [1000, 'SE_ASIA']]
-     for top, region in regions:
-         players_dict = get_players(top=top, region=region, players_dict=players_dict, skipAnon=True)
-     pass
- #SE_ASIA
+    pass
+     # players_dict = dict()
+     # regions = [[1000, 'EUROPE'], [1000, 'SE_ASIA']]
+     # for top, region in regions:
+     #     players_dict = get_players(top=top, region=region, players_dict=players_dict, skipAnon=True)
+     # pass
+ #     for name in pro_teams:
+ #         if name not in real_pro_teams:
+ #             print(name)
+ # #SE_ASIA

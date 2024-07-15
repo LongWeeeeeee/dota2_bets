@@ -77,79 +77,85 @@ def get_maps(game_mods, start_date_time, players_dict, maps_to_save):
         json.dump(file_data, f)
 
 
-def research_maps(maps_to_explore, previous_output=None, new_output = None):
+def research_map_proceed(maps_to_explore, f, file_data, counter = 0):
+    for map_id in maps_to_explore:
+        print(f'{counter}/{len(maps_to_explore)}')
+        counter += 1
+        if str(map_id) not in file_data:
+            if counter % 100 == 0:
+                f.truncate()
+                f.seek(0)
+                json.dump(file_data, f)
+            try:
+                query = '''
+                {match(id:%s){
+                  startDateTime
+                  league{
+                    id
+                    tier
+                    region
+                    basePrizePool
+                    prizePool
+                    tournamentUrl
+                    displayName
+                  }
+                  direTeam{
+                    id
+                    name
+                  }
+                  radiantTeam{
+                    id
+                    name
+                  }
+                  id
+                  direKills
+                  radiantKills
+                  bottomLaneOutcome
+                  topLaneOutcome
+                  midLaneOutcome
+                  radiantNetworthLeads
+                  didRadiantWin
+                  durationSeconds
+                  players{
+                    steamAccount{
+                      id
+                      isAnonymous
+                    }
+                    imp
+                    position
+                    isRadiant
+                    hero{
+                      id
+                    }
+                  }
+                }
+                }''' % map_id
+                headers = {"Authorization": f"Bearer {api_token}"}
+                response = requests.post('https://api.stratz.com/graphql', json={"query": query}, headers=headers)
+                data = json.loads(response.text)['data']['match']
+                file_data[map_id] = data
+            except Exception as e:
+                print(f"Error processing map ID {map_id}: {e}")
+    f.truncate()
+    f.seek(0)
+    json.dump(file_data, f)
+
+
+
+def research_maps(maps_to_explore, output):
     with open(f'{maps_to_explore}.txt', 'r') as f2:
         maps_to_explore = set(json.load(f2))
-    if previous_output is not None:
-        with open(f'{previous_output}.txt', 'r+') as f:
+    try:
+        with open(f'{output}.txt', 'r+') as f:
             file_data = json.load(f)
-            counter = 0
-            for map_id in maps_to_explore:
-                print(f'{counter}/{len(maps_to_explore)}')
-                counter += 1
-                if str(map_id) not in file_data:
-                    if counter % 100 == 0:
-                        f.truncate()
-                        f.seek(0)
-                        json.dump(file_data, f)
-                    try:
-                        query = '''
-                        {match(id:%s){
-                          startDateTime
-                          league{
-                            id
-                            tier
-                            region
-                            basePrizePool
-                            prizePool
-                            tournamentUrl
-                            displayName
-                          }
-                          direTeam{
-                            name
-                          }
-                          radiantTeam{
-                            name
-                          }
-                          id
-                          direKills
-                          radiantKills
-                          bottomLaneOutcome
-                          topLaneOutcome
-                          midLaneOutcome
-                          radiantNetworthLeads
-                          didRadiantWin
-                          durationSeconds
-                          players{
-                            steamAccount{
-                              id
-                              isAnonymous
-                            }
-                            imp
-                            position
-                            isRadiant
-                            hero{
-                              id
-                            }
-                          }
-                        }
-                        }''' % map_id
-                        headers = {"Authorization": f"Bearer {api_token}"}
-                        response = requests.post('https://api.stratz.com/graphql', json={"query": query}, headers=headers)
-                        data = json.loads(response.text)['data']['match']
-                        file_data[map_id] = data
-                    except Exception as e:
-                        print(f"Error processing map ID {map_id}: {e}")
-    if new_output is None:
-        with open(f'{previous_output}.txt', 'w') as f:
-            f.truncate()
-            f.seek(0)
-            json.dump(file_data, f)
-    else:
-        with open(f'{new_output}.txt', 'w') as f:
-            f.truncate()
-            f.seek(0)
-            json.dump(file_data, f)
+            research_map_proceed(maps_to_explore, f, file_data)
+    except (FileExistsError, FileNotFoundError):
+        with open(f'{output}.txt', 'w') as f:
+            file_data = {}
+            research_map_proceed(maps_to_explore, f, file_data)
+
+
+
 
 
 
@@ -297,6 +303,7 @@ def proceed_map(match, map_id, players_imp_data, used_maps, lane_dict, synergy_a
 def analyze_database(database, players_imp_data, used_maps, total_time_kills_dict, over45_dict, synergy_and_counterpick_dict, lane_dict, start_date_time):
     total = len(database)
     count = 0
+    team_stat_dict = dict()
     for map_id in database:
         print(f'{count}/{total}')
         count += 1
@@ -308,12 +315,19 @@ def analyze_database(database, players_imp_data, used_maps, total_time_kills_dic
                     dire_team_name = match['radiantTeam']['name'].lower()
                     if radiant_team_name in pro_teams and dire_team_name in pro_teams:
                         lane_dict, players_imp_data, total_time_kills_dict, synergy_and_counterpick_dict, over45_dict = proceed_map(match, map_id, players_imp_data, used_maps, lane_dict, synergy_and_counterpick_dict, total_time_kills_dict, over45_dict)
+                    # for team_name in [radiant_team_name, dire_team_name]:
+                    #     team_stat_dict.setdefault(team_name, {}).setdefault('kills', []).append(sum(match['direKills']) + sum(match['radiantKills']))
+                    #     team_stat_dict.setdefault(team_name, {}).setdefault('time', []).append(match['durationSeconds']/60)
                 else:
                     lane_dict, players_imp_data, total_time_kills_dict, synergy_and_counterpick_dict, over45_dict = proceed_map(match, map_id, players_imp_data, used_maps, lane_dict, synergy_and_counterpick_dict, total_time_kills_dict, over45_dict)
 
                 if map_id not in used_maps:
                     used_maps.append(map_id)
-
+    # for team in team_stat_dict:
+    #     team_stat_dict[team]['time'] = sum(team_stat_dict[team]['time'])/len(team_stat_dict[team]['time'])
+    #     team_stat_dict[team]['kills'] = sum(team_stat_dict[team]['kills']) / len(team_stat_dict[team]['kills'])
+    # with open('teams_stat_dict.txt', 'w') as f:
+    #     json.dump(team_stat_dict, f)
     return used_maps, players_imp_data, total_time_kills_dict, over45_dict, synergy_and_counterpick_dict
 
 

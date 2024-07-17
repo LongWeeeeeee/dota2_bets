@@ -105,5 +105,5 @@ def past_matches(match_list):
                             dire_team_name='dire_team_name', score=[0,0], antiplagiat_url=url, tier=1,
                             output_message=output_message, lane_report=lane_report)
 if __name__ == "__main__":
-    # main_try()
-    past_matches(['https://cyberscore.live/en/matches/103298/', 'https://cyberscore.live/en/matches/102760/', 'https://cyberscore.live/en/matches/103297/', 'https://cyberscore.live/en/matches/102761/', 'https://cyberscore.live/en/matches/103291/', 'https://cyberscore.live/en/matches/102755/', 'https://cyberscore.live/en/matches/103290/', 'https://cyberscore.live/en/matches/102756/', 'https://cyberscore.live/en/matches/103289/', 'https://cyberscore.live/en/matches/102753/', 'https://cyberscore.live/en/matches/103288/', 'https://cyberscore.live/en/matches/102757/', 'https://cyberscore.live/en/matches/103283/', 'https://cyberscore.live/en/matches/102750/', 'https://cyberscore.live/en/matches/103282/', 'https://cyberscore.live/en/matches/102752/', 'https://cyberscore.live/en/matches/103281/', 'https://cyberscore.live/en/matches/102749/', 'https://cyberscore.live/en/matches/103280/', 'https://cyberscore.live/en/matches/102751/', 'https://cyberscore.live/en/matches/103219/', 'https://cyberscore.live/en/matches/102746/'])
+    main_try()
+    # past_matches(['https://cyberscore.live/en/matches/103622/'])

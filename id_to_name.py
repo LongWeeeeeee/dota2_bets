@@ -164,7 +164,7 @@ blacklist_players = {
      'rostislav_999',
     'ephey',
 }
-real_pro_teams = ['g2 x ig', 'entity', 'gaimin gladiators', 'blacklist rivalry', 'virtus pro', 'shopify rebelion', 'g2.invictus gaming', 'g2.ig', 'og', 'lgd gaiming',  'entity gaming', 'psg quest', 'wbg.xg', 'psg.quest', 'tundra esports', 'natus vincere', 'lgd gaming', 'mouz', 'aurora gaming', 'bleed', 'team secret', 'dms', 'azure ray', 'navi junior', 'talon', 'talon esports', 'nouns', 'tnc predator', 'team zero', 'yellow submarine', '9pandas', 'infinity', 'beastcoast', 'bb team', 'boom esports', 'night pulse', 'aurora.1xbet', 'blacklist international', '1win', 'team spirit', 'team liquid', 'virtus.pro', 'team  kev', 'nigma galaxy', 'heroic', 'fusion esports', 'midas club', 'xtreme gaming', 'team falcons', 'blacklist rivalry ', 'shopify rebellion', 'betboom team', 'team bald reborn', 'matreshka']
+pro_teams = ['g2 x ig', 'entity', 'gaimin gladiators', 'blacklist rivalry', 'virtus pro', 'shopify rebelion', 'g2.invictus gaming', 'g2.ig', 'og', 'lgd gaiming',  'entity gaming', 'psg quest', 'wbg.xg', 'psg.quest', 'tundra esports', 'natus vincere', 'lgd gaming', 'mouz', 'aurora gaming', 'bleed', 'team secret', 'dms', 'azure ray', 'navi junior', 'talon', 'talon esports', 'nouns', 'tnc predator', 'team zero', 'yellow submarine', '9pandas', 'beastcoast', 'bb team', 'boom esports', 'night pulse', 'aurora.1xbet', 'blacklist international', '1win', 'team spirit', 'team liquid', 'virtus.pro', 'team  kev', 'nigma galaxy', 'heroic', 'fusion esports', 'xtreme gaming', 'team falcons', 'blacklist rivalry ', 'shopify rebellion', 'betboom team']
 def get_players(top, region, players_dict, skipAnon):
      count = 0
      skip = 0
@@ -195,17 +195,16 @@ def get_players(top, region, players_dict, skipAnon):
          skip += 100
      return players_dict
 
-
-with open('teams_stat_dict.txt', 'r') as f:
-    data = json.load(f)
-    data_copy = data.copy()
-    print(data.keys())
-    for team in data_copy:
-        odd = data[team]['kills']/data[team]['time']
-        data.setdefault(team, {}).setdefault('odd', odd)
-    sorted_data = dict(sorted(data.items(), key=lambda item: item[1]["odd"]))
-with open('teams_stat_dict.txt', 'w') as f:
-    json.dump(sorted_data, f, indent=4)
+def some_func():
+    with open('teams_stat_dict.txt', 'r') as f:
+        data = json.load(f)
+        data_copy = data.copy()
+        for team in data_copy:
+            odd = data[team]['kills']/data[team]['time']
+            data.setdefault(team, {}).setdefault('odd', odd)
+        sorted_data = dict(sorted(data.items(), key=lambda item: item[1]["odd"]))
+    with open('teams_stat_dict.txt', 'w') as f:
+        json.dump(sorted_data, f, indent=4)
 if __name__ == "__main__":
     pass
      # players_dict = dict()

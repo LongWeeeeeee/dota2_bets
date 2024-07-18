@@ -195,6 +195,8 @@ def get_players(top, region, players_dict, skipAnon):
          skip += 100
      return players_dict
 
+output_data = {'dire_kills_duo': [], 'dire_kills_trio': [], 'dire_time_duo': [], 'dire_time_trio': [], 'radiant_kills_duo': [], 'radiant_kills_trio': [], 'radiant_time_duo': [], 'radiant_time_trio': []}
+
 def some_func():
     with open('teams_stat_dict.txt', 'r') as f:
         data = json.load(f)

@@ -11,7 +11,7 @@ def proceed_map(url, radiant_team_name, dire_team_name, score, tier):
         radiant_lane_report = lane_report_def(my_team=radiant_heroes_and_pos, enemy_team=dire_heroes_and_pos)
         dire_lane_report = lane_report_def(my_team=dire_heroes_and_pos, enemy_team=radiant_heroes_and_pos)
         lane_report = round(((radiant_lane_report - dire_lane_report) * 100), 2)
-        avg_kills, avg_time, cores_avg_time, cores_avg_kills = tm_kills(radiant_heroes_and_pos, dire_heroes_and_pos)
+        avg_kills, avg_time = tm_kills(radiant_heroes_and_pos, dire_heroes_and_pos)
         radiant_over45 = avg_over45(radiant_heroes_and_pos)
         dire_over45 = avg_over45(dire_heroes_and_pos)
         over45 = (radiant_over45 - dire_over45) * 100
@@ -19,7 +19,7 @@ def proceed_map(url, radiant_team_name, dire_team_name, score, tier):
         output_message = synergy_and_counterpick(radiant_heroes_and_pos, dire_heroes_and_pos,
                                                  output_message)
         output_message += (
-            f'\nСреднее кол-во убийств {avg_kills}\n Среднее время {avg_time}\nСреднее кол-во убийств cores {cores_avg_kills}\nСреднее время cores {cores_avg_time}\n')
+            f'\nСреднее кол-во убийств {avg_kills}\n Среднее время {avg_time}\n')
         dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos,
                         dire_heroes_and_positions=dire_heroes_and_pos,
                         radiant_team_name=radiant_team_name,
@@ -47,11 +47,12 @@ def main(match_list=None):
 
 if __name__ == "__main__":
     # main(['https://cyberscore.live/en/matches/102314/'])
-    while True:
-        try:
-            main()
-            print('Сплю 2 минуты')
-            time.sleep(120)
-        except:
-            print('Сплю 2 минуты')
-            time.sleep(120)
+    main()
+    # while True:
+    #     try:
+    #         main()
+    #         print('Сплю 2 минуты')
+    #         time.sleep(120)
+    #     except:
+    #         print('Сплю 2 минуты')
+    #         time.sleep(120)

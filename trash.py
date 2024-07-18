@@ -555,21 +555,22 @@ def synergy_and_counterpick(radiant_heroes_and_positions, dire_heroes_and_positi
         dire_pos3_vs_team = clean_up(dire_pos3_vs_team)
 
         if len(radiant_wr_with) > 0 and len(dire_wr_with) > 0:
-            sinergy = (sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))
+            sinergy = round(((sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))), 2)
         if len(radiant_wr_against) > 0 and len(dire_wr_against) > 0:
-            counterpick = (sum(radiant_wr_against) / len(radiant_wr_against)) - (
-                        sum(dire_wr_against) / len(dire_wr_against))
+            counterpick = round((sum(radiant_wr_against) / len(radiant_wr_against)) - (
+                        sum(dire_wr_against) / len(dire_wr_against)), 2)
         if len(radiant_pos1_vs_team) > 0 and len(dire_pos1_vs_team) > 0:
-            pos1_vs_team = (sum(radiant_pos1_vs_team) / len(radiant_pos1_vs_team)) - (sum(dire_pos1_vs_team) / len(
-                dire_pos1_vs_team))
+            pos1_vs_team = round((sum(radiant_pos1_vs_team) / len(radiant_pos1_vs_team)) - (sum(dire_pos1_vs_team) / len(
+                dire_pos1_vs_team)), 2)
         if len(radiant_pos3_vs_team) > 0 and len(dire_pos3_vs_team) > 0:
-            pos3_vs_team = (sum(radiant_pos3_vs_team) / len(radiant_pos3_vs_team)) - (sum(dire_pos3_vs_team) / len(
-                dire_pos3_vs_team))
+            pos3_vs_team = round((sum(radiant_pos3_vs_team) / len(radiant_pos3_vs_team)) - (sum(dire_pos3_vs_team) / len(
+                dire_pos3_vs_team)), 2)
         if len(radiant_pos2_vs_team) > 0 and len(dire_pos2_vs_team) > 0:
-            pos2_vs_team = (sum(radiant_pos2_vs_team) / len(radiant_pos2_vs_team)) - (sum(dire_pos2_vs_team) / len(
-                dire_pos2_vs_team))
+            pos2_vs_team = round((sum(radiant_pos2_vs_team) / len(radiant_pos2_vs_team)) - (sum(dire_pos2_vs_team) / len(
+                dire_pos2_vs_team)), 2)
         if core_matchup is not None:
             core_matchup -= 50
+            core_matchup = round(core_matchup, 2)
         verdict, radiant_predict, dire_predict = analyze_draft(sinergy, counterpick, pos1_vs_team, core_matchup,
                                                                pos2_vs_team, pos3_vs_team,
                                                                sups)
@@ -585,7 +586,7 @@ def avg_over45(heroes_and_positions):
     print('avg_over45')
     over45_duo, over45_trio, time_duo, kills_duo, kills_trio, time_trio, radiant_lane_report_unique_combinations, dire_lane_report_unique_combinations = [], [], [], [], [], [], [], []
     over45_unique_combinations = set()
-    positions = ['1', '2', '3', '4']
+    positions = ['1', '2', '3', '4', '5']
     for dig in positions:
         try:
             hero_id = str(heroes_and_positions['pos' + dig]['hero_id'])
@@ -598,7 +599,8 @@ def avg_over45(heroes_and_positions):
                         combo = tuple(sorted([hero_id, second_hero_id]))
                         if combo not in over45_unique_combinations:
                             over45_unique_combinations.add(combo)
-                            over45_duo.append(sum(duo_data['value']) / len(duo_data['value']))
+                            if len(duo_data['value']) >=4:
+                                over45_duo.append(sum(duo_data['value']) / len(duo_data['value']))
                         # Третий герой
                         for pos3, item3 in heroes_and_positions.items():
                             third_hero_id = str(item3['hero_id'])
@@ -660,11 +662,12 @@ def lane_report_def(my_team, enemy_team):
                 team_line_report.append(lane)
             pass
     team_avg_lanes = sum(team_line_report) / len(team_line_report)
-    return team_avg_lanes
+    return round(team_avg_lanes, 2)
 def tm_kills(radiant_heroes_and_positions, dire_heroes_and_positions):
     print('tm_kills')
     positions = ['1', '2', '3', '4', '5']
-    radiant_over45_duo, dire_over45_duo, radiant_over45_trio, dire_over45_trio, radiant_time_duo, dire_time_duo, radiant_kills_duo, dire_kills_duo, radiant_kills_trio, dire_kills_trio, radiant_time_trio, dire_time_trio = [], [], [], [], [], [], [], [], [], [], [], []
+    output_data = {}
+    radiant_over45_duo, dire_over45_duo, radiant_over45_trio, dire_over45_trio, radiant_time_duo, dire_time_duo, radiant_kills_duo, dire_kills_duo, radiant_kills_trio, dire_kills_trio, radiant_time_trio, dire_time_trio, output_data['radiant_cores_time_trio'], output_data['dire_cores_time_trio'], output_data['radiant_cores_kills_trio'], output_data['dire_cores_kills_trio'] = [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []
     avg_time_trio, avg_time_duo, avg_kills_duo, avg_kills_trio, radiant_time_unique_combinations, radiant_kills_unique_combinations, dire_kills_unique_combinations, dire_time_unique_combinations, radiant_over45_unique_combinations, dire_over45_unique_combinations = [], [], [], [], set(), set(), set(), set(), set(), set()
     with open('./pro_heroes_data/total_time_kills_dict.txt', 'r') as f:
         data = json.load(f)
@@ -685,11 +688,17 @@ def tm_kills(radiant_heroes_and_positions, dire_heroes_and_positions):
                             if hero_data == time_data:
                                 if combo not in radiant_time_unique_combinations:
                                     radiant_time_unique_combinations.add(combo)
-                                    radiant_time_duo.append((sum(duo_data['value']) / len(duo_data['value'])) / 60)
+                                    value = (sum(duo_data['value']) / len(duo_data['value'])) / 60
+                                    radiant_time_duo.append(value)
+                                    if dig in ['1', '2', '3'] and pos in ['pos1', 'pos2', 'pos3']:
+                                        output_data.setdefault('radiant_cores_time_duo', []).append(value)
                             elif hero_data == kills_data:
                                 if combo not in radiant_kills_unique_combinations:
                                     radiant_kills_unique_combinations.add(combo)
-                                    radiant_kills_duo.append(sum(duo_data['value']) / len(duo_data['value']))
+                                    value = sum(duo_data['value']) / len(duo_data['value'])
+                                    radiant_kills_duo.append(value)
+                                    if dig in ['1', '2', '3'] and pos in ['pos1', 'pos2', 'pos3']:
+                                        output_data.setdefault('radiant_cores_kills_duo', []).append(value)
                             # Третий герой
                             for pos3, item3 in radiant_heroes_and_positions.items():
                                 third_hero_id = str(item3['hero_id'])
@@ -701,12 +710,18 @@ def tm_kills(radiant_heroes_and_positions, dire_heroes_and_positions):
                                             if combo not in radiant_time_unique_combinations:
                                                 radiant_time_unique_combinations.add(combo)
                                                 trio_data = duo_data['total_time_trio'][third_hero_id][pos3]['value']
-                                                radiant_time_trio.append((sum(trio_data) / len(trio_data)) / 60)
+                                                value = (sum(trio_data) / len(trio_data)) / 60
+                                                if dig in ['1', '2', '3'] and pos in ['pos1', 'pos2', 'pos3'] and pos3 in ['pos1', 'pos2', 'pos3']:
+                                                    output_data.setdefault('radiant_cores_time_trio', []).append(value)
+                                                radiant_time_trio.append(value)
                                         elif hero_data == kills_data:
                                             if combo not in radiant_kills_unique_combinations:
                                                 radiant_kills_unique_combinations.add(combo)
                                                 trio_data = duo_data['total_kills_trio'][third_hero_id][pos3]['value']
-                                                radiant_kills_trio.append(sum(trio_data) / len(trio_data))
+                                                value = sum(trio_data) / len(trio_data)
+                                                if dig in ['1', '2', '3'] and pos in ['pos1', 'pos2', 'pos3'] and pos3 in ['pos1', 'pos2', 'pos3']:
+                                                    output_data.setdefault('radiant_cores_kills_trio', []).append(value)
+                                                radiant_kills_trio.append(value)
 
                                     except:
                                         pass
@@ -730,28 +745,39 @@ def tm_kills(radiant_heroes_and_positions, dire_heroes_and_positions):
                             if hero_data == time_data:
                                 if combo not in dire_time_unique_combinations:
                                     dire_time_unique_combinations.add(combo)
-                                    dire_time_duo.append((sum(duo_data['value']) / len(duo_data['value'])) / 60)
+                                    value = (sum(duo_data['value']) / len(duo_data['value'])) / 60
+                                    dire_time_duo.append(value)
+                                    if dig in ['1', '2', '3'] and pos in ['pos1', 'pos2', 'pos3']:
+                                        output_data.setdefault('dire_cores_time_duo', []).append(value)
                             elif hero_data == kills_data:
                                 if combo not in dire_kills_unique_combinations:
                                     dire_kills_unique_combinations.add(combo)
-                                    dire_kills_duo.append(sum(duo_data['value']) / len(duo_data['value']))
-
+                                    value = sum(duo_data['value']) / len(duo_data['value'])
+                                    dire_kills_duo.append(value)
+                                    if dig in ['1', '2', '3'] and pos in ['pos1', 'pos2', 'pos3']:
+                                        output_data.setdefault('dire_cores_kills_duo', []).append(value)
                             # third_hero
                             for pos3, item3 in dire_heroes_and_positions.items():
                                 third_hero_id = str(item3['hero_id'])
-                                if third_hero_id != hero_id:
+                                if third_hero_id not in [second_hero_id, hero_id]:
                                     try:
                                         combo = tuple(sorted([hero_id, second_hero_id, third_hero_id]))
                                         if hero_data == time_data:
                                             if combo not in dire_time_unique_combinations:
                                                 dire_time_unique_combinations.add(combo)
                                                 trio_data = duo_data['total_time_trio'][third_hero_id][pos3]['value']
-                                                dire_time_trio.append((sum(trio_data) / len(trio_data)) / 60)
+                                                value = (sum(trio_data) / len(trio_data)) / 60
+                                                if dig in ['1', '2', '3'] and pos in ['pos1', 'pos2', 'pos3'] and pos3 in ['pos1', 'pos2', 'pos3']:
+                                                    output_data.setdefault('dire_cores_time_trio', []).append(value)
+                                                dire_time_trio.append(value)
                                         elif hero_data == kills_data:
                                             if combo not in dire_kills_unique_combinations:
                                                 dire_kills_unique_combinations.add(combo)
                                                 trio_data = duo_data['total_kills_trio'][third_hero_id][pos3]['value']
-                                                dire_kills_trio.append(sum(trio_data) / len(trio_data))
+                                                value = sum(trio_data) / len(trio_data)
+                                                if dig in ['1', '2', '3'] and pos in ['pos1', 'pos2', 'pos3'] and pos3 in ['pos1', 'pos2', 'pos3']:
+                                                    output_data.setdefault('dire_cores_kills_trio', []).append(value)
+                                                dire_kills_trio.append(value)
 
                                     except:
                                         pass
@@ -763,6 +789,11 @@ def tm_kills(radiant_heroes_and_positions, dire_heroes_and_positions):
     def calculate_average(values):
         return sum(values) / len(values) if values else 0
 
+    cores_avg_time_trio = calculate_average(output_data['radiant_cores_time_trio'] + output_data['dire_cores_time_trio'])
+    cores_avg_kills_trio = calculate_average(output_data['radiant_cores_kills_trio'] + output_data['dire_cores_kills_trio'])
+    cores_avg_time_duo = calculate_average(output_data['radiant_cores_time_duo'] + output_data['dire_cores_time_duo'])
+    cores_avg_kills_duo = calculate_average(output_data['radiant_cores_kills_duo'] + output_data['dire_cores_kills_duo'])
+
     avg_time_trio = calculate_average(radiant_time_trio + dire_time_trio)
     avg_kills_trio = calculate_average(radiant_kills_trio + dire_kills_trio)
     avg_time_duo = calculate_average(radiant_time_duo + dire_time_duo)
@@ -771,4 +802,7 @@ def tm_kills(radiant_heroes_and_positions, dire_heroes_and_positions):
     avg_kills = (avg_kills_trio + avg_kills_duo) / 2 if avg_kills_trio and avg_kills_duo else avg_kills_duo
     avg_time = (avg_time_duo + avg_time_trio) / 2 if avg_time_trio and avg_time_duo else avg_time_duo
 
-    return avg_kills, avg_time
+    cores_avg_kills = (cores_avg_kills_trio + cores_avg_kills_duo) / 2 if cores_avg_kills_trio and cores_avg_kills_duo else cores_avg_kills_duo
+    cores_avg_time = (cores_avg_time_duo + cores_avg_time_trio) / 2 if cores_avg_time_trio and cores_avg_time_duo else cores_avg_time_duo
+
+    return round(avg_kills, 2), round(avg_time, 2), round(cores_avg_time, 2), round(cores_avg_kills, 2)

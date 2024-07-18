@@ -3,107 +3,55 @@ import requests
 import json
 from dltv_cyberscore import get_team_positions, dota2protracker,get_map_id
 from trash import lane_report_def, synergy_and_counterpick, tm_kills, avg_over45
-def main_try():
-    while True:
-        try:
-            url = 'https://api.cyberscore.live/api/v1/matches/?limit=20&type=liveOrUpcoming&locale=en'
-            response = requests.get(url)
-            if response.status_code == 200:
-                data = json.loads(response.text)
-                for match in data['rows']:
-                    result = get_map_id(match)
-                    if result is not None:
-                        url, radiant_team_name, dire_team_name, score, tier = result
-                        result = get_team_positions(url)
-                        if result is not None:
-                            radiant_heroes_and_pos, dire_heroes_and_pos = result
-                            print(f'{radiant_team_name} VS {dire_team_name}')
-                            radiant_lane_report = lane_report_def(my_team = radiant_heroes_and_pos, enemy_team = dire_heroes_and_pos)
-                            dire_lane_report = lane_report_def(my_team = dire_heroes_and_pos, enemy_team = radiant_heroes_and_pos)
-                            lane_report = round(((radiant_lane_report - dire_lane_report) * 100), 2)
-                            map_kills, map_time = tm_kills(radiant_heroes_and_pos, dire_heroes_and_pos)
-                            radiant_over45 = avg_over45(radiant_heroes_and_pos)
-                            dire_over45 = avg_over45(dire_heroes_and_pos)
-                            over45 = (radiant_over45 - dire_over45)*100
-                            output_message = (f'Radiant после 45 минуты сильнее на: {over45}\nRadiant lanes до 10 минуты: {lane_report}\n')
-                            output_message = synergy_and_counterpick(radiant_heroes_and_pos, dire_heroes_and_pos,
-                                                                     output_message)
-                            output_message+=(f'\nСреднее кол-во убийств {map_kills}, Среднее время {map_time}\n')
-                            dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos,
-                                            dire_heroes_and_positions=dire_heroes_and_pos,
-                                            radiant_team_name=radiant_team_name,
-                                                dire_team_name=dire_team_name, score=score, antiplagiat_url=url, tier=tier, output_message=output_message, lane_report=lane_report)
-            else:
-                print(response.status_code)
+def proceed_map(url, radiant_team_name, dire_team_name, score, tier):
+    result = get_team_positions(url)
+    if result is not None:
+        radiant_heroes_and_pos, dire_heroes_and_pos = result
+        print(f'{radiant_team_name} VS {dire_team_name}')
+        radiant_lane_report = lane_report_def(my_team=radiant_heroes_and_pos, enemy_team=dire_heroes_and_pos)
+        dire_lane_report = lane_report_def(my_team=dire_heroes_and_pos, enemy_team=radiant_heroes_and_pos)
+        lane_report = round(((radiant_lane_report - dire_lane_report) * 100), 2)
+        avg_kills, avg_time, cores_avg_time, cores_avg_kills = tm_kills(radiant_heroes_and_pos, dire_heroes_and_pos)
+        radiant_over45 = avg_over45(radiant_heroes_and_pos)
+        dire_over45 = avg_over45(dire_heroes_and_pos)
+        over45 = (radiant_over45 - dire_over45) * 100
+        output_message = (f'Radiant после 45 минуты сильнее на: {over45}\nRadiant lanes до 10 минуты: {lane_report}\n')
+        output_message = synergy_and_counterpick(radiant_heroes_and_pos, dire_heroes_and_pos,
+                                                 output_message)
+        output_message += (
+            f'\nСреднее кол-во убийств {avg_kills}\n Среднее время {avg_time}\nСреднее кол-во убийств cores {cores_avg_kills}\nСреднее время cores {cores_avg_time}\n')
+        dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos,
+                        dire_heroes_and_positions=dire_heroes_and_pos,
+                        radiant_team_name=radiant_team_name,
+                        dire_team_name=dire_team_name, score=score, antiplagiat_url=url, tier=tier,
+                        output_message=output_message, lane_report=lane_report)
+def main(match_list=None):
+    if match_list is None:
+        url = 'https://api.cyberscore.live/api/v1/matches/?limit=20&type=liveOrUpcoming&locale=en'
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = json.loads(response.text)
+            for match in data['rows']:
+                result = get_map_id(match)
+                if result is not None:
+                    url, radiant_team_name, dire_team_name, score, tier = result
+                    proceed_map(url, radiant_team_name, dire_team_name, score, tier)
+        else:
+            print(response.status_code)
+    else:
+        for url in match_list:
+            proceed_map(url, 'radiant', 'dire', [0, 0], 1)
 
-        except Exception as e:
-            print(e)
-        print('Сплю 2 минуты')
-        time.sleep(120)
 
 
-def main_no_try():
-    while True:
-        try:
-            url = 'https://api.cyberscore.live/api/v1/matches/?limit=20&type=liveOrUpcoming&locale=en'
-            response = requests.get(url)
-            if response.status_code == 200:
-                data = json.loads(response.text)
-                for match in data['rows']:
-                    result = get_map_id(match)
-                    if result is not None:
-                        url, radiant_team_name, dire_team_name, score, tier = result
-                        result = get_team_positions(url)
-                        if result is not None:
-                            radiant_heroes_and_pos, dire_heroes_and_pos = result
-                            print(f'{radiant_team_name} VS {dire_team_name}')
-                            radiant_lane_report = lane_report_def(my_team=radiant_heroes_and_pos,
-                                                                  enemy_team=dire_heroes_and_pos)
-                            dire_lane_report = lane_report_def(my_team=dire_heroes_and_pos,
-                                                               enemy_team=radiant_heroes_and_pos)
-                            lane_report = round(((radiant_lane_report - dire_lane_report) * 100), 2)
-                            map_kills, map_time = tm_kills(radiant_heroes_and_pos, dire_heroes_and_pos)
-                            radiant_over45 = avg_over45(radiant_heroes_and_pos)
-                            dire_over45 = avg_over45(dire_heroes_and_pos)
-                            over45 = (radiant_over45 - dire_over45) * 100
-                            output_message = (
-                                f'Radiant после 45 минуты сильнее на: {over45}\nRadiant lanes до 10 минуты: {lane_report}\n')
-                            output_message = synergy_and_counterpick(radiant_heroes_and_pos, dire_heroes_and_pos,
-                                                                     output_message)
-                            output_message += (f'\nСреднее кол-во убийств {map_kills}, Среднее время {map_time}\n')
-                            dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos,
-                                            dire_heroes_and_positions=dire_heroes_and_pos,
-                                            radiant_team_name=radiant_team_name,
-                                            dire_team_name=dire_team_name, score=score, antiplagiat_url=url, tier=tier,
-                                            output_message=output_message, lane_report=lane_report)
-            else:
-                print(response.status_code)
 
-        except Exception as e:
-            print(e)
-        print('Сплю 2 минуты')
-        time.sleep(120)
-def past_matches(match_list):
-    for url in match_list:
-        result = get_team_positions(url)
-        if result is not None:
-            radiant_heroes_and_pos, dire_heroes_and_pos = result
-            radiant_lane_report = lane_report_def(my_team=radiant_heroes_and_pos, enemy_team=dire_heroes_and_pos)
-            dire_lane_report = lane_report_def(my_team=dire_heroes_and_pos, enemy_team=radiant_heroes_and_pos)
-            lane_report = round(((radiant_lane_report - dire_lane_report) * 100), 2)
-            map_kills, map_time = tm_kills(radiant_heroes_and_pos, dire_heroes_and_pos)
-            radiant_over45 = avg_over45(radiant_heroes_and_pos)
-            dire_over45 = avg_over45(dire_heroes_and_pos)
-            over45 = (radiant_over45 - dire_over45) * 100
-            output_message = (f'Radiant после 45 минуты сильнее на: {over45}\nRadiant lanes до 10 минуты: {lane_report}\n')
-            output_message = synergy_and_counterpick(radiant_heroes_and_pos, dire_heroes_and_pos,
-                                                     output_message)
-            output_message += (f'\nСреднее кол-во убийств {map_kills}, Среднее время {map_time}\n')
-            dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos,
-                            dire_heroes_and_positions=dire_heroes_and_pos,
-                            radiant_team_name='radiant_team_name',
-                            dire_team_name='dire_team_name', score=[0,0], antiplagiat_url=url, tier=1,
-                            output_message=output_message, lane_report=lane_report)
 if __name__ == "__main__":
-    main_try()
-    # past_matches(['https://cyberscore.live/en/matches/103622/'])
+    # main(['https://cyberscore.live/en/matches/102314/'])
+    while True:
+        try:
+            main()
+            print('Сплю 2 минуты')
+            time.sleep(120)
+        except:
+            print('Сплю 2 минуты')
+            time.sleep(120)

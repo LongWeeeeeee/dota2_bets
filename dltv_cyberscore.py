@@ -571,21 +571,22 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     sinergy, counterpick, pos1_vs_team, pos2_vs_team, pos3_vs_team = None, None, None, None, None
 
     if len(radiant_wr_with) > 0 and len(dire_wr_with) > 0:
-        sinergy = (sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))
+        sinergy = round((sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with)), 2)
     if len(radiant_wr_against) > 0:
-        counterpick = (sum(radiant_wr_against) / len(radiant_wr_against)) - (
-                    sum(dire_wr_against) / len(dire_wr_against))
+        counterpick = round((sum(radiant_wr_against) / len(radiant_wr_against)) - (
+                    sum(dire_wr_against) / len(dire_wr_against)), 2)
     if len(radiant_pos1_vs_team) > 0 and len(dire_pos1_vs_team) > 0:
-        pos1_vs_team = sum(radiant_pos1_vs_team) / len(radiant_pos1_vs_team) - sum(dire_pos1_vs_team) / len(
-            dire_pos1_vs_team)
+        pos1_vs_team = round(sum(radiant_pos1_vs_team) / len(radiant_pos1_vs_team) - sum(dire_pos1_vs_team) / len(
+            dire_pos1_vs_team), 2)
     if len(radiant_pos3_vs_team) > 0 and len(dire_pos3_vs_team) > 0:
-        pos3_vs_team = sum(radiant_pos3_vs_team) / len(radiant_pos3_vs_team) - sum(dire_pos3_vs_team) / len(
-            dire_pos3_vs_team)
+        pos3_vs_team = round(sum(radiant_pos3_vs_team) / len(radiant_pos3_vs_team) - sum(dire_pos3_vs_team) / len(
+            dire_pos3_vs_team), 2)
     if len(radiant_pos2_vs_team) > 0 and len(dire_pos2_vs_team) > 0:
-        pos2_vs_team = sum(radiant_pos2_vs_team) / len(radiant_pos2_vs_team) - sum(dire_pos2_vs_team) / len(
-            dire_pos2_vs_team)
+        pos2_vs_team = round(sum(radiant_pos2_vs_team) / len(radiant_pos2_vs_team) - sum(dire_pos2_vs_team) / len(
+            dire_pos2_vs_team), 2)
     if core_matchup is not None:
         core_matchup -= 50
+        core_matchup = round(core_matchup, 2)
     verdict, radiant_predict, dire_predict = analyze_draft(sinergy, counterpick, pos1_vs_team, core_matchup,
                                                            pos2_vs_team, pos3_vs_team,
                                                            sups)

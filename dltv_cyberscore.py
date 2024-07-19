@@ -264,7 +264,7 @@ def get_map_id(match):
             tier = 1
         else:
             tier = match['tournament']['tier']
-        if tier in [1, 2, 3]:
+        if tier in [1, 2, 3, 4]:
             for karta in match['related_matches']:
                 if karta['status'] == 'online':
                     map_id = karta['id']

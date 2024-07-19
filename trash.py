@@ -1,6 +1,6 @@
 # from id_to_name import egb
 import requests
-from keys import api_token
+from keys import api_token, api_token_2
 # import time
 from dltv_cyberscore import analyze_draft, clean_up
 from id_to_name import top_500_asia_europe, non_anon_top_1000_europe_top_1000_asia, pro_teams, translate, output_data
@@ -77,15 +77,23 @@ def get_maps(game_mods, start_date_time, players_dict, maps_to_save):
         json.dump(file_data, f)
 
 
-def research_map_proceed(maps_to_explore, f, file_data, counter = 0):
+def research_map_proceed(maps_to_explore, file_data, output, counter =0, error_counter=0):
+    token = api_token
     for map_id in maps_to_explore:
+        if error_counter > 20:
+            if token != api_token_2:
+                token = api_token_2
+            else:
+                token = api_token
+            error_counter = 0
         print(f'{counter}/{len(maps_to_explore)}')
         counter += 1
         if str(map_id) not in file_data:
-            if counter % 100 == 0:
-                f.truncate()
-                f.seek(0)
-                json.dump(file_data, f)
+            if counter % 300 == 0:
+                with open(f'{output}.txt', 'r+') as f:
+                    f.truncate()
+                    f.seek(0)
+                    json.dump(file_data, f)
             try:
                 query = '''
                 {match(id:%s){
@@ -130,11 +138,12 @@ def research_map_proceed(maps_to_explore, f, file_data, counter = 0):
                   }
                 }
                 }''' % map_id
-                headers = {"Authorization": f"Bearer {api_token}"}
+                headers = {"Authorization": f"Bearer {token}"}
                 response = requests.post('https://api.stratz.com/graphql', json={"query": query}, headers=headers)
                 data = json.loads(response.text)['data']['match']
                 file_data[map_id] = data
             except Exception as e:
+                error_counter += 1
                 print(f"Error processing map ID {map_id}: {e}")
     f.truncate()
     f.seek(0)
@@ -148,11 +157,11 @@ def research_maps(maps_to_explore, output):
     try:
         with open(f'{output}.txt', 'r+') as f:
             file_data = json.load(f)
-            research_map_proceed(maps_to_explore, f, file_data)
+        research_map_proceed(maps_to_explore, file_data, output)
     except (FileExistsError, FileNotFoundError):
         with open(f'{output}.txt', 'w') as f:
             file_data = {}
-            research_map_proceed(maps_to_explore, f, file_data)
+        research_map_proceed(maps_to_explore, file_data, output)
 
 
 

@@ -47,12 +47,12 @@ def main(match_list=None):
 
 if __name__ == "__main__":
     # main(['https://cyberscore.live/en/matches/102314/'])
-    main()
-    # while True:
-    #     try:
-    #         main()
-    #         print('Сплю 2 минуты')
-    #         time.sleep(120)
-    #     except:
-    #         print('Сплю 2 минуты')
-    #         time.sleep(120)
+    # main()
+    while True:
+        try:
+            main()
+            print('Сплю 2 минуты')
+            time.sleep(120)
+        except:
+            print('Сплю 2 минуты')
+            time.sleep(120)

@@ -127,10 +127,10 @@ def get_team_positions(url):
         print('нету live матчей')
 
 def analyze_draft(sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team,
-                  sups):
+                  sups, over45):
     radiant_predict, dire_predict = False, False
-    values = {'sinergy':sinergy, 'counterpick':counterpick, 'pos 1_vs_team':pos1_vs_team, 'core_matchup':core_matchup, 'pos 2_vs_team':pos2_vs_team, 'pos 3_vs_team':pos3_vs_team, 'sups':sups}
-    other_values = {'sinergy':sinergy, 'counterpick':counterpick, 'core_matchup':core_matchup, 'sups':sups}
+    values = {'sinergy':sinergy, 'counterpick':counterpick, 'pos 1_vs_team':pos1_vs_team, 'pos 2_vs_team':pos2_vs_team, 'pos 3_vs_team':pos3_vs_team, 'sups':sups, 'over45': over45}
+    other_values = {'sinergy':sinergy, 'counterpick':counterpick, 'sups':sups, 'over45':over45}
     values_nones = sum(1 for value in values.values() if value is None)
     other_values_nones = sum(1 for value in other_values.values() if value is None)
     nones = (values_nones <= 2) * (other_values_nones <= 1)
@@ -138,7 +138,7 @@ def analyze_draft(sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team
         # values, other_values = [value for value in values if value is not None], [value for value in other_values if value is not None]
         all_positive_or_negative = all(value >= 0 for value in values.values() if value is not None) + all(value <= 0 for value in values.values() if value is not None)
         other_values_check = all(value >= 0 for value in other_values.values() if value is not None) + all(value <= 0 for value in other_values.values() if value is not None)
-        singery_or_counterpick = all(value >= 0 for value in [counterpick, sinergy] if value is not None) + all(
+        singery_or_counterpick = all(value >= 0 for value in [counterpick, sinergy, values['over45']] if value is not None) + all(
             value <= 0 for value in [counterpick, sinergy] if value is not None)
         both_over9 = all(value <= -9 for value in [counterpick, sinergy] if value is not None) + all(
             value >= 9 for value in [counterpick, sinergy] if value is not None)
@@ -364,12 +364,12 @@ def send_message(message):
     requests.post(url, json=payload)
 
 
-def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, score,
+def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, score, over45,
                     tier=None, antiplagiat_url=None, core_matchup=None, output_message='', egb=None,
                     radiant_players_check=None, lane_report=None, dire_players_check=None,
                     radiant_impactandplayers=None, impact_message=None, dire_impactandplayers=None,
                     radiant_message_add=None, dire_message_add=None):
-    print('dota2protracker')
+    # print('dota2protracker')
     radiant_pos1_with_team, radiant_pos2_with_team, radiant_pos3_with_team, dire_pos1_with_team, dire_pos2_with_team, dire_pos3_with_team = [], [], [], [], [], []
     radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, dire_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team, radiant_pos4_with_pos5, dire_pos4_with_pos5 = [], [], [], [], [], [], [], [], [], [], None, None
     for position in radiant_heroes_and_positions:
@@ -589,7 +589,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         core_matchup = round(core_matchup, 2)
     verdict, radiant_predict, dire_predict = analyze_draft(sinergy, counterpick, pos1_vs_team, core_matchup,
                                                            pos2_vs_team, pos3_vs_team,
-                                                           sups)
+                                                           sups, over45)
     # for hero in list(radiant_heroes_and_positions.values()):
     #     if hero in game_changer_list:
     #         output_message += f'\nАккуратно! У {radiant_team_name} есть {hero}, который может изменить исход боя'
@@ -655,7 +655,6 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     output_message += f'\n{radiant_team_name} vs {dire_team_name}'
     output_message += '\n' + verdict
     output_message += f'\nSinergy: {sinergy}\nCounterpick: {counterpick}\nPos1_vs_team: {pos1_vs_team}\nPos2_vs_team: {pos2_vs_team}\nPos3_vs_team: {pos3_vs_team}\nCore matchup: {core_matchup}\nSups: {sups}'
-    send_message(output_message)
     # if tier in [1, 2, 3]:
     #     # if 'ОТЛИЧНАЯ СТАВКА' in output_message or 'ХОРОШАЯ СТАВКА' in output_message:
     #     if not 'ПЛОХАЯ СТАВКА!!!' in output_message:
@@ -680,6 +679,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
 
     if antiplagiat_url is not None:
         add_url(antiplagiat_url)
+    send_message(output_message)
 
 # radiant_heroes_and_positions={'pos 1':{'hero_name':'Weaver'}, 'pos 5':{'hero_name':'Io'}, 'pos 2':{'hero_name':'Leshrac'}, 'pos 3':{'hero_name':'Axe'}, 'pos 4':{'hero_name':'Dark Willow'}}
 #

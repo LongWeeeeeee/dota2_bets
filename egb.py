@@ -479,7 +479,7 @@ def check_players_skill(radiant, dire, output_message):
                     radiant_hidden += 1
                 else:
                     dire_hidden += 1
-                with open('players_imp_data.txt', 'r') as f3:
+                with open('egb/players_imp_data.txt', 'r') as f3:
                     players_data = json.load(f3)
                     try:
                         player_data = players_data[str(steam_account_id)][str(hero_id)][pos.replace('pos ', 'POSITION_')]

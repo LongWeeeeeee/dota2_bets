@@ -720,7 +720,7 @@ def avg_over45(heroes_and_positions):
                         combo = tuple(sorted([hero_id, second_hero_id]))
                         if combo not in over45_unique_combinations:
                             over45_unique_combinations.add(combo)
-                            if len(duo_data['value']) >=6:
+                            if len(duo_data['value']) >=4:
                                 over45_duo.append(sum(duo_data['value']) / len(duo_data['value']))
                         # Третий герой
                         for pos3, item3 in heroes_and_positions.items():
@@ -789,7 +789,8 @@ def tm_kills(radiant_heroes_and_positions, dire_heroes_and_positions):
     positions = ['1', '2', '3', '4', '5']
     radiant_time_unique_combinations, radiant_kills_unique_combinations, dire_kills_unique_combinations, dire_time_unique_combinations = set(), set(), set(), set()
     with open('./pro_heroes_data/total_time_kills_dict.txt', 'r') as f:
-        data = json.load(f)['value']
+        data = json.load(f)
+        data = data['value']
     # radiant_synergy
     for pos in positions:
         try:

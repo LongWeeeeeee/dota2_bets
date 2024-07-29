@@ -492,7 +492,7 @@ def synergy_and_counterpick_copy(radiant_heroes_and_positions, dire_heroes_and_p
                         try:
                             position_name = id_pos[another_hero_id]
                             values = hero_data[another_hero_id][position_name]['value']
-                            if len(values) >= 4:
+                            if len(values) > 5:
                                 wr = (values.count(1) / (values.count(1) + values.count(0)))*100
                                 radiant_pos1_with_team.append(wr)
                         except: pass
@@ -501,7 +501,7 @@ def synergy_and_counterpick_copy(radiant_heroes_and_positions, dire_heroes_and_p
                             position_name = id_pos[another_hero_id]
                             if position_name.replace('pos', '') in ['3', '4', '5']:
                                 values = hero_data[another_hero_id][position_name]['value']
-                                if len(values) >= 4:
+                                if len(values) > 5:
                                     wr = (values.count(1) / (values.count(1) + values.count(0)))*100
                                     radiant_pos2_with_team.append(wr)
                         except: pass
@@ -510,7 +510,7 @@ def synergy_and_counterpick_copy(radiant_heroes_and_positions, dire_heroes_and_p
                             position_name = id_pos[another_hero_id]
                             if position_name.replace('pos', '') in ['4', '5']:
                                 values = hero_data[another_hero_id][position_name]['value']
-                                if len(values) >= 4:
+                                if len(values) > 5:
                                     wr = (values.count(1) / (values.count(1) + values.count(0)))*100
                                     radiant_pos3_with_team.append(wr)
                         except: pass
@@ -519,7 +519,7 @@ def synergy_and_counterpick_copy(radiant_heroes_and_positions, dire_heroes_and_p
                                 position_name = id_pos[another_hero_id]
                                 if position_name.replace('pos', '') == '5':
                                     values = hero_data[another_hero_id][position_name]['value']
-                                    if len(values) >= 4:
+                                    if len(values) > 5:
                                         wr = (values.count(1) / (values.count(1) + values.count(0)))*100
                                         radiant_pos4_with_pos5 = wr
                             except: pass
@@ -537,48 +537,40 @@ def synergy_and_counterpick_copy(radiant_heroes_and_positions, dire_heroes_and_p
 
                 for another_hero_id in hero_data:
                     if pos == 'pos1':
-                        if len(dire_pos1_with_team) == 4:
-                            break
                         try:
                             position_name = id_pos[another_hero_id]
                             values = hero_data[another_hero_id][position_name]['value']
-                            if len(values) >= 4:
+                            if len(values) > 5:
                                 wr = (values.count(1) / (values.count(1) + values.count(0)))*100
                                 dire_pos1_with_team.append(wr)
                         except:
                             pass
                     elif pos == 'pos2':
-                        if len(dire_pos2_with_team) == 4:
-                            break
                         try:
                             position_name = id_pos[another_hero_id]
                             if position_name.replace('pos', '') in ['3', '4', '5']:
                                 values = hero_data[another_hero_id][position_name]['value']
-                                if len(values) >= 4:
+                                if len(values) > 5:
                                     wr = (values.count(1) / (values.count(1) + values.count(0)))*100
                                     dire_pos2_with_team.append(wr)
                         except:
                             pass
                     elif pos == 'pos3':
-                        if len(dire_pos3_with_team) == 4:
-                            break
                         try:
                             position_name = id_pos[another_hero_id]
                             if position_name.replace('pos', '') in ['4', '5']:
                                 values = hero_data[another_hero_id][position_name]['value']
-                                if len(values) >= 4:
+                                if len(values) > 5:
                                     wr = (values.count(1) / (values.count(1) + values.count(0)))*100
                                     dire_pos3_with_team.append(wr)
                         except:
                             pass
                     elif pos == 'pos4':
-                        if len(dire_pos3_with_team) == 4:
-                            break
                         try:
                             position_name = id_pos[another_hero_id]
                             if position_name.replace('pos', '') == '5':
                                 values = hero_data[another_hero_id][position_name]['value']
-                                if len(values) >= 4:
+                                if len(values) > 5:
                                     wr = (values.count(1) / (values.count(1) + values.count(0)))*100
                                     dire_pos4_with_pos5 = wr
                         except:
@@ -599,7 +591,7 @@ def synergy_and_counterpick_copy(radiant_heroes_and_positions, dire_heroes_and_p
                         try:
                             position_name = id_pos[another_hero_id]
                             values = hero_data[another_hero_id][position_name]['value']
-                            if len(values) >= 4:
+                            if len(values) > 5:
                                 wr = (values.count(1) / (values.count(1) + values.count(0)))*100
                                 if position_name == 'pos1':
                                     core_matchup = wr
@@ -609,7 +601,7 @@ def synergy_and_counterpick_copy(radiant_heroes_and_positions, dire_heroes_and_p
                         try:
                             position_name = id_pos[another_hero_id]
                             values = hero_data[another_hero_id][position_name]['value']
-                            if len(values) >= 4:
+                            if len(values) > 5:
                                 wr = (values.count(1) / (values.count(1) + values.count(0)))*100
                                 radiant_pos2_vs_team.append(wr)
                         except:
@@ -618,7 +610,7 @@ def synergy_and_counterpick_copy(radiant_heroes_and_positions, dire_heroes_and_p
                         try:
                             position_name = id_pos[another_hero_id]
                             values = hero_data[another_hero_id][position_name]['value']
-                            if len(values) >= 4:
+                            if len(values) > 5:
                                 wr = (values.count(1) / (values.count(1) + values.count(0)))*100
                                 radiant_pos3_vs_team.append(wr)
                         except:
@@ -635,7 +627,7 @@ def synergy_and_counterpick_copy(radiant_heroes_and_positions, dire_heroes_and_p
                         try:
                             position_name = id_pos[another_hero_id]
                             values = hero_data[another_hero_id][position_name]['value']
-                            if len(values) >= 4:
+                            if len(values) > 5:
                                 wr = (values.count(1) / (values.count(1) + values.count(0)))*100
                                 dire_pos1_vs_team.append(wr)
                         except:
@@ -644,7 +636,7 @@ def synergy_and_counterpick_copy(radiant_heroes_and_positions, dire_heroes_and_p
                         try:
                             position_name = id_pos[another_hero_id]
                             values = hero_data[another_hero_id][position_name]['value']
-                            if len(values) >= 4:
+                            if len(values) > 5:
                                 wr = (values.count(1) / (values.count(1) + values.count(0)))*100
                                 dire_pos2_vs_team.append(wr)
                         except:
@@ -653,7 +645,7 @@ def synergy_and_counterpick_copy(radiant_heroes_and_positions, dire_heroes_and_p
                         try:
                             position_name = id_pos[another_hero_id]
                             values = hero_data[another_hero_id][position_name]['value']
-                            if len(values) >= 4:
+                            if len(values) > 5:
                                 wr = (values.count(1) / (values.count(1) + values.count(0)))*100
                                 dire_pos3_vs_team.append(wr)
                         except:

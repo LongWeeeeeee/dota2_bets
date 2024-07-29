@@ -46,7 +46,7 @@ def main(match_list=None):
 
 
 if __name__ == "__main__":
-    # main(['https://cyberscore.live/en/matches/104504/'])
+    # main(['https://cyberscore.live/en/matches/104486/'])
     # main()
     while True:
         try:

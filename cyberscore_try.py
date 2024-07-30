@@ -2,7 +2,7 @@ import time
 import requests
 import json
 from dltv_cyberscore import get_team_positions, dota2protracker,get_map_id
-from trash import lane_report_def, synergy_and_counterpick_copy, tm_kills, avg_over45
+from trash import lane_report_def, synergy_and_counterpick_copy, tm_kills, avg_over45, tm_kills_teams
 def proceed_map(url, radiant_team_name, dire_team_name, score, tier, output_message = ''):
     result = get_team_positions(url)
     if result is not None:
@@ -15,11 +15,12 @@ def proceed_map(url, radiant_team_name, dire_team_name, score, tier, output_mess
         dire_over45 = avg_over45(dire_heroes_and_pos)
         over45 = (radiant_over45 - dire_over45) * 100
         avg_kills, avg_time = tm_kills(radiant_heroes_and_pos, dire_heroes_and_pos)
+        avg_kills_teams, avg_time_teams = tm_kills_teams(radiant_heroes_and_pos, dire_heroes_and_pos, radiant_team_name, dire_team_name)
         output_message += (f'Radiant после 45 минуты сильнее на: {over45}\nRadiant lanes до 10 минуты: {lane_report}\n')
         output_message  = synergy_and_counterpick_copy(radiant_heroes_and_pos, dire_heroes_and_pos,
                                                  output_message, over45)
         output_message += (
-            f'\nСреднее кол-во убийств {avg_kills}\nСреднее время {avg_time}\n')
+            f'\nСреднее кол-во убийств {avg_kills}\nСреднее время {avg_time}\nСреднее кол-во убийств командное: {avg_kills_teams}\nСреднее время: {avg_time_teams}\n')
         dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos,
                         dire_heroes_and_positions=dire_heroes_and_pos,
                         radiant_team_name=radiant_team_name,
@@ -46,7 +47,7 @@ def main(match_list=None):
 
 
 if __name__ == "__main__":
-    # main(['https://cyberscore.live/en/matches/104486/'])
+    # main(['https://cyberscore.live/en/matches/104843/'])
     # main()
     while True:
         try:

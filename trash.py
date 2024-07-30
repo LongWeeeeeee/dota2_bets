@@ -959,7 +959,8 @@ def tm_kills(radiant_heroes_and_positions, dire_heroes_and_positions):
 def tm_kills_teams(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name):
     # print('tm_kills')
     translate_teams = {
-        'g2.invictus gaming': 'g2 x ig'
+        'g2.invictus gaming': 'g2 x ig',
+        'talon esports': 'talon',
     }
     radiant_team_name = (translate_teams[radiant_team_name] if radiant_team_name in translate_teams else radiant_team_name)
     dire_team_name = (translate_teams[dire_team_name] if dire_team_name in translate_teams else dire_team_name)

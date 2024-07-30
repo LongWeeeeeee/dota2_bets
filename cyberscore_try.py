@@ -1,7 +1,7 @@
 import time
 import requests
 import json
-from dltv_cyberscore import get_team_positions, dota2protracker,get_map_id
+from dltv_cyberscore import get_team_positions, dota2protracker,get_map_id, send_message
 from trash import lane_report_def, synergy_and_counterpick_copy, tm_kills, avg_over45, tm_kills_teams
 def proceed_map(url, radiant_team_name, dire_team_name, score, tier, output_message = ''):
     result = get_team_positions(url)
@@ -54,6 +54,7 @@ if __name__ == "__main__":
             main()
             print('Сплю 2 минуты')
             time.sleep(120)
-        except:
+        except Exception as e:
+            send_message(e)
             print('Сплю 2 минуты')
             time.sleep(120)

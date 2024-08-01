@@ -166,6 +166,11 @@ blacklist_players = {
     'ephey',
 }
 pro_teams = {
+    "execration": {
+        "kills": 48.21052631578947,
+        "time": 36.6140350877193,
+        "id": 8254145
+    },
     "betboom team": {
         "kills": 39.3,
         "time": 42.73166666666667,

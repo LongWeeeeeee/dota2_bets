@@ -83,13 +83,17 @@ def proceed_get_maps(ids_to_graph, start_date_time, game_mods, file_data, count,
 
 
 
-def get_maps(game_mods, start_date_time, players_dict, maps_to_save):
+def get_maps(game_mods, start_date_time, maps_to_save, players_dict=None, update= None):
     file_data = []
     ids_to_graph, total_map_ids = [], []
     count = 0
     if game_mods == [2]:
         unique = set()
-        for team_name in pro_teams:
+        if update:
+            some_data = update
+        else:
+            some_data = pro_teams
+        for team_name in some_data:
             count+=1
             print(f'{count}/{len(pro_teams)}')
             steam_id = pro_teams[team_name]['id']
@@ -97,7 +101,7 @@ def get_maps(game_mods, start_date_time, players_dict, maps_to_save):
                 if steam_id not in unique:
                     ids_to_graph.append(steam_id)
                 unique.add(steam_id)
-            else:
+            elif len(ids_to_graph) == 5 or count == len(some_data):
                 pro_query = '''
                             {teams(teamIds: %s){
                               matches(request:{startDateTime:%s, take:100, skip: 0}){
@@ -476,20 +480,26 @@ def proceed_map(match, map_id, players_imp_data, used_maps, lane_dict, synergy_a
 
 def analyze_database(database, start_date_time, players_imp_data, to_be_saved, total_time_kills_dict=None, pro=False, over45_dict=None, synergy_and_counterpick_dict=None, lane_dict=None, count = 0):
     total = len(database)
-    team_stat_dict = dict()
     used_maps = to_be_saved[0]['used_maps']
+    if pro:
+        team_stat_dict = dict()
     for map_id in database:
-        print(f'{count}/{total}')
         count += 1
+        print(f'{count}/{total}')
         match = database[map_id]
-        if map_id not in used_maps and match['direKills'] != None and (match['durationSeconds']/60) > 20:
-            if any(player['steamAccount']['id'] in top_500_asia_europe for player in match['players']) and ('startDateTime' in match) and (match['startDateTime'] >= start_date_time):
+        if map_id not in used_maps and match['direKills'] != None:
+            if ('startDateTime' in match) and (match['startDateTime'] >= start_date_time):
                 if pro:
                     if all(name in match and match[name] is not None for name in ['direTeam', 'radiantTeam']):
-                        radiant_team_name = match['direTeam']['name'].lower()
-                        dire_team_name = match['radiantTeam']['name'].lower()
+                        dire_team_name = match['direTeam']['name'].lower()
+                        radiant_team_name = match['radiantTeam']['name'].lower()
                         if radiant_team_name in pro_teams and dire_team_name in pro_teams:
-                            lane_dict, players_imp_data, total_time_kills_dict, synergy_and_counterpick_dict, over45_dict = proceed_map(match, map_id, players_imp_data, used_maps, lane_dict, synergy_and_counterpick_dict, total_time_kills_dict, over45_dict, radiant_team_name, dire_team_name)
+                            result = proceed_map(match=match, map_id=map_id, players_imp_data=players_imp_data,
+                                                 used_maps=used_maps, lane_dict=lane_dict,
+                                                 synergy_and_counterpick_dict=synergy_and_counterpick_dict,
+                                                 total_time_kills_dict=total_time_kills_dict, over45_dict=over45_dict,
+                                                 radiant_team_name=radiant_team_name, dire_team_name=dire_team_name)
+                            lane_dict, players_imp_data, total_time_kills_dict, synergy_and_counterpick_dict, over45_dict = result
                         for team_name in [radiant_team_name, dire_team_name]:
                             team_stat_dict.setdefault(team_name, {}).setdefault('kills', []).append(sum(match['direKills']) + sum(match['radiantKills']))
                             team_stat_dict.setdefault(team_name, {}).setdefault('time', []).append(match['durationSeconds']/60)
@@ -498,15 +508,20 @@ def analyze_database(database, start_date_time, players_imp_data, to_be_saved, t
                             else:
                                 team_stat_dict.setdefault(team_name, {}).setdefault('id', match['direTeam']['id'])
                 else:
-                    lane_dict, players_imp_data, total_time_kills_dict, synergy_and_counterpick_dict, over45_dict = proceed_map(match, map_id, players_imp_data, used_maps, lane_dict, synergy_and_counterpick_dict, total_time_kills_dict, over45_dict)
-
+                    if any(player['steamAccount']['id'] in top_500_asia_europe for player in match['players']) and (match['durationSeconds'] / 60) > 20:
+                        result = proceed_map(match=match, map_id=map_id, players_imp_data=players_imp_data,
+                                             used_maps=used_maps, lane_dict=lane_dict,
+                                             synergy_and_counterpick_dict=synergy_and_counterpick_dict,
+                                             total_time_kills_dict=total_time_kills_dict, over45_dict=over45_dict)
+                        lane_dict, players_imp_data, total_time_kills_dict, synergy_and_counterpick_dict, over45_dict = result
                 if map_id not in used_maps:
                     used_maps.append(map_id)
-    for team in team_stat_dict:
-        team_stat_dict[team]['time'] = sum(team_stat_dict[team]['time'])/len(team_stat_dict[team]['time'])
-        team_stat_dict[team]['kills'] = sum(team_stat_dict[team]['kills']) / len(team_stat_dict[team]['kills'])
-    with open('teams_stat_dict.txt', 'w') as f:
-        json.dump(team_stat_dict, f)
+    if pro:
+        for team in team_stat_dict:
+            team_stat_dict[team]['time'] = sum(team_stat_dict[team]['time'])/len(team_stat_dict[team]['time'])
+            team_stat_dict[team]['kills'] = sum(team_stat_dict[team]['kills']) / len(team_stat_dict[team]['kills'])
+        with open('teams_stat_dict.txt', 'w') as f:
+            json.dump(team_stat_dict, f, indent=4)
     total_time_kills_dict['used_maps'], over45_dict['used_maps'], synergy_and_counterpick_dict['used_maps'], lane_dict['used_maps'] = used_maps, used_maps, used_maps, used_maps
     # for hero in synergy_and_counterpick_dict['value']:
     #     for pos in synergy_and_counterpick_dict['value'][hero]:
@@ -525,20 +540,20 @@ def calculate_average(values):
 
 
 
-def synergy_and_counterpick_copy(radiant_heroes_and_positions, dire_heroes_and_positions, output_message, over45):
+def synergy_and_counterpick_copy(radiant_heroes_and_pos, dire_heroes_and_pos, output_message, over45):
     # print('my_protracker')
     sinergy, counterpick, pos1_vs_team, pos2_vs_team, pos3_vs_team, core_matchup = None, None, None, None, None, None
 
     # radiant_heroes_and_positions = {'pos 1': {'hero_id': 95, 'hero_name': 'Troll Warlord'}, 'pos 2': {'hero_id': 11, 'hero_name': 'Shadow Fiend'}, 'pos 3': {'hero_id': 33, 'hero_name': 'Enigma'}, 'pos 4': {'hero_id': 136, 'hero_name': 'Marci'}, 'pos 5': {'hero_id': 87, 'hero_name': 'Disruptor'}}
     # dire_heroes_and_positions = {'pos 1': {'hero_id': 99, 'hero_name': 'Bristleback'}, 'pos 2': {'hero_id': 52, 'hero_name': 'Leshrac'}, 'pos 3': {'hero_id': 20, 'hero_name': 'Vengeful Spirit'}, 'pos 4': {'hero_id': 51, 'hero_name': 'Clockwerk'}, 'pos 5': {'hero_id': 91, 'hero_name': 'Io'}}
-    with open('./25_june_top600_heroes_data/synergy_and_counterpick_dict.txt', 'r+') as f:
+    with open('./heroes_data/synergy_and_counterpick_dict.txt', 'r+') as f:
         data = json.load(f)['value']
         radiant_pos1_with_team, radiant_pos2_with_team, radiant_pos3_with_team, dire_pos1_with_team, dire_pos2_with_team, dire_pos3_with_team = [], [], [], [], [], []
         radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, dire_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team, radiant_pos4_with_pos5, dire_pos4_with_pos5 = [], [], [], [], [], [], [], [], [], [], None, None
         #radiant_synergy
-        for pos in radiant_heroes_and_positions:
-            hero_id = str(radiant_heroes_and_positions[pos]['hero_id'])
-            id_pos = {str(item['hero_id']): position_name for position_name, item in radiant_heroes_and_positions.items() if position_name != pos}
+        for pos in radiant_heroes_and_pos:
+            hero_id = str(radiant_heroes_and_pos[pos]['hero_id'])
+            id_pos = {str(item['hero_id']): position_name for position_name, item in radiant_heroes_and_pos.items() if position_name != pos}
             try:
                 hero_data = data[hero_id][pos]['synergy_duo']
                 for another_hero_id in hero_data:
@@ -583,12 +598,12 @@ def synergy_and_counterpick_copy(radiant_heroes_and_positions, dire_heroes_and_p
             radiant_wr_with += [radiant_pos4_with_pos5]
         radiant_wr_with += radiant_pos3_with_team + radiant_pos2_with_team + radiant_pos1_with_team
         #dire_synergy
-        for pos in dire_heroes_and_positions:
+        for pos in dire_heroes_and_pos:
             try:
-                hero_id = str(dire_heroes_and_positions[pos]['hero_id'])
+                hero_id = str(dire_heroes_and_pos[pos]['hero_id'])
                 hero_data = data[hero_id][pos]['synergy_duo']
                 id_pos = {str(item['hero_id']): position_name for position_name, item in
-                          dire_heroes_and_positions.items() if position_name != pos}
+                          dire_heroes_and_pos.items() if position_name != pos}
 
                 for another_hero_id in hero_data:
                     if pos == 'pos1':
@@ -635,11 +650,11 @@ def synergy_and_counterpick_copy(radiant_heroes_and_positions, dire_heroes_and_p
             dire_wr_with += [dire_pos4_with_pos5]
         dire_wr_with += dire_pos3_with_team + dire_pos2_with_team + dire_pos1_with_team
         #against
-        for pos in radiant_heroes_and_positions:
+        for pos in radiant_heroes_and_pos:
             try:
-                hero_id = str(radiant_heroes_and_positions[pos]['hero_id'])
+                hero_id = str(radiant_heroes_and_pos[pos]['hero_id'])
                 id_pos = {str(item['hero_id']): position_name for position_name, item in
-                          dire_heroes_and_positions.items()}
+                          dire_heroes_and_pos.items()}
                 hero_data = data[hero_id][pos]['counterpick_duo']
                 for another_hero_id in hero_data:
                     if pos == 'pos1':
@@ -673,10 +688,10 @@ def synergy_and_counterpick_copy(radiant_heroes_and_positions, dire_heroes_and_p
             except: pass
             #dire
             try:
-                hero_id = str(dire_heroes_and_positions[pos]['hero_id'])
+                hero_id = str(dire_heroes_and_pos[pos]['hero_id'])
                 hero_data = data[hero_id][pos]['counterpick_duo']
                 id_pos = {str(item['hero_id']): position_name for position_name, item in
-                          radiant_heroes_and_positions.items()}
+                          radiant_heroes_and_pos.items()}
                 for another_hero_id in hero_data:
                     if pos == 'pos1':
                         try:
@@ -956,11 +971,12 @@ def tm_kills(radiant_heroes_and_positions, dire_heroes_and_positions):
     return round(avg_kills, 2), round(avg_time, 2)
 
 
-def tm_kills_teams(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name):
+def tm_kills_teams(radiant_heroes_and_pos, dire_heroes_and_pos, radiant_team_name, dire_team_name):
     # print('tm_kills')
     translate_teams = {
         'g2.invictus gaming': 'g2 x ig',
         'talon esports': 'talon',
+        'wbg.xg': 'xtreme gaming'
     }
     radiant_team_name = (translate_teams[radiant_team_name] if radiant_team_name in translate_teams else radiant_team_name)
     dire_team_name = (translate_teams[dire_team_name] if dire_team_name in translate_teams else dire_team_name)
@@ -968,16 +984,16 @@ def tm_kills_teams(radiant_heroes_and_positions, dire_heroes_and_positions, radi
     radiant_time_unique_combinations, radiant_kills_unique_combinations, dire_kills_unique_combinations, dire_time_unique_combinations = set(), set(), set(), set()
     with open('./pro_heroes_data/total_time_kills_dict.txt', 'r') as f:
         data = json.load(f)
-    work_data = data['teams'][radiant_team_name]
+        work_data = data['teams'][radiant_team_name]
     for pos in positions:
         # radiant_synergy
 
         try:
-            hero_id = str(radiant_heroes_and_positions['pos' + pos]['hero_id'])
+            hero_id = str(radiant_heroes_and_pos['pos' + pos]['hero_id'])
             time_data = work_data[hero_id]['pos' + pos]['total_time_duo']
             kills_data = work_data[hero_id]['pos' + pos]['total_kills_duo']
             for hero_data in [time_data, kills_data]:
-                for pos, item in radiant_heroes_and_positions.items():
+                for pos, item in radiant_heroes_and_pos.items():
                     second_hero_id = str(item['hero_id'])
                     try:
                         if second_hero_id != hero_id:
@@ -994,7 +1010,7 @@ def tm_kills_teams(radiant_heroes_and_positions, dire_heroes_and_positions, radi
                                     value = sum(duo_data['value']) / len(duo_data['value'])
                                     output_data['radiant_kills_duo'].append(value)
                             # Третий герой
-                            for pos3, item3 in radiant_heroes_and_positions.items():
+                            for pos3, item3 in radiant_heroes_and_pos.items():
                                 third_hero_id = str(item3['hero_id'])
                                 if third_hero_id not in [second_hero_id, hero_id]:
                                     try:
@@ -1024,13 +1040,13 @@ def tm_kills_teams(radiant_heroes_and_positions, dire_heroes_and_positions, radi
     work_data = data['teams'][dire_team_name]
     for pos in positions:
         try:
-            hero_id = str(dire_heroes_and_positions['pos' + pos]['hero_id'])
+            hero_id = str(dire_heroes_and_pos['pos' + pos]['hero_id'])
             time_data = work_data[hero_id]['pos' + pos][
                 'total_time_duo']
             kills_data = work_data[hero_id]['pos' + pos][
                 'total_kills_duo']
             for hero_data in [time_data, kills_data]:
-                for pos, item in dire_heroes_and_positions.items():
+                for pos, item in dire_heroes_and_pos.items():
                     second_hero_id = str(item['hero_id'])
                     try:
                         if second_hero_id != hero_id:
@@ -1047,7 +1063,7 @@ def tm_kills_teams(radiant_heroes_and_positions, dire_heroes_and_positions, radi
                                     value = sum(duo_data['value']) / len(duo_data['value'])
                                     output_data['dire_kills_duo'].append(value)
                             # third_hero
-                            for pos3, item3 in dire_heroes_and_positions.items():
+                            for pos3, item3 in dire_heroes_and_pos.items():
                                 third_hero_id = str(item3['hero_id'])
                                 if third_hero_id not in [second_hero_id, hero_id]:
                                     try:

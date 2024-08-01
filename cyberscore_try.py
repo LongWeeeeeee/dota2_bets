@@ -1,8 +1,8 @@
 import time
 import requests
 import json
-from test import get_maps, research_maps, explore_database
-from id_to_name import pro_teams
+#from test import get_maps, research_maps, explore_database
+#from id_to_name import pro_teams
 from dltv_cyberscore import get_team_positions, dota2protracker,get_map_id, send_message, add_url
 from trash import lane_report_def, synergy_and_counterpick_copy, tm_kills, avg_over45, tm_kills_teams
 def proceed_map(url, radiant_team_name, dire_team_name, score, tier, output_message = ''):
@@ -64,15 +64,15 @@ def general(match_list=None):
 
 
 
-def main(team_list):
-    if len(team_list) > 0:
-        team_list = [pro_teams[team]["id"] for team in team_list]
-        get_maps(maps_to_save='./pro_heroes_data/pro_maps', game_mods=[2], start_date_time=1716508800,
-                 update=team_list)
-        research_maps(maps_to_explore='pro_maps', output='pro_output', prefix='pro_heroes_data')
-        explore_database(prefix='pro_heroes_data', output='pro_output', start_date_time=1716508800,
-                         pro=True)
-    return general()
+# def main(team_list):
+#     if len(team_list) > 0:
+#         team_list = [pro_teams[team]["id"] for team in team_list]
+#         get_maps(maps_to_save='./pro_heroes_data/pro_maps', game_mods=[2], start_date_time=1716508800,
+#                  update=team_list)
+#         research_maps(maps_to_explore='pro_maps', output='pro_output', prefix='pro_heroes_data')
+#         explore_database(prefix='pro_heroes_data', output='pro_output', start_date_time=1716508800,
+#                          pro=True)
+#     return general()
 
 if __name__ == "__main__":
     # general()

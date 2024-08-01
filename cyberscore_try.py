@@ -23,17 +23,17 @@ def proceed_map(url, radiant_team_name, dire_team_name, score, tier, output_mess
                                                          dire_team_name=dire_team_name)
         output_message += (f'Radiant после 45 минуты сильнее на: {over45}\n'
                            f'Radiant lanes до 10 минуты: {lane_report}\n')
-        # output_message  = synergy_and_counterpick_copy(radiant_heroes_and_pos=radiant_heroes_and_pos,
-        #                                                dire_heroes_and_pos=dire_heroes_and_pos,
-        #                                          output_message=output_message, over45=over45)
+        output_message  = synergy_and_counterpick_copy(radiant_heroes_and_pos=radiant_heroes_and_pos,
+                                                       dire_heroes_and_pos=dire_heroes_and_pos,
+                                                 output_message=output_message, over45=over45)
         output_message += (
             f'\nСреднее кол-во убийств {avg_kills}\nСреднее время {avg_time}\n'
             f'Среднее кол-во убийств командное: {avg_kills_teams}\nСреднее время: {avg_time_teams}\n')
-        dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos,
-                        dire_heroes_and_positions=dire_heroes_and_pos,
-                        radiant_team_name=radiant_team_name,
-                        dire_team_name=dire_team_name, score=score, antiplagiat_url=url, tier=tier,
-                        output_message=output_message, lane_report=lane_report, over45=over45)
+        # dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos,
+        #                 dire_heroes_and_positions=dire_heroes_and_pos,
+        #                 radiant_team_name=radiant_team_name,
+        #                 dire_team_name=dire_team_name, score=score, antiplagiat_url=url, tier=tier,
+        #                 output_message=output_message, lane_report=lane_report, over45=over45)
         add_url(url)
         send_message(output_message)
         return radiant_team_name

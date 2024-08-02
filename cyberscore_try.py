@@ -29,12 +29,11 @@ def proceed_map(url, radiant_team_name, dire_team_name, score, tier, output_mess
         output_message += (
             f'\nСреднее кол-во убийств {avg_kills}\nСреднее время {avg_time}\n'
             f'Среднее кол-во убийств командное: {avg_kills_teams}\nСреднее время: {avg_time_teams}\n')
-        # dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos,
-        #                 dire_heroes_and_positions=dire_heroes_and_pos,
-        #                 radiant_team_name=radiant_team_name,
-        #                 dire_team_name=dire_team_name, score=score, antiplagiat_url=url, tier=tier,
-        #                 output_message=output_message, lane_report=lane_report, over45=over45)
-        add_url(url)
+        dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos,
+                        dire_heroes_and_positions=dire_heroes_and_pos,
+                        radiant_team_name=radiant_team_name,
+                        dire_team_name=dire_team_name, score=score, antiplagiat_url=url, tier=tier,
+                        output_message=output_message, lane_report=lane_report, over45=over45)
         send_message(output_message)
         return radiant_team_name
 def general(match_list=None):
@@ -52,9 +51,6 @@ def general(match_list=None):
                                             dire_team_name=dire_team_name, score=score, tier=tier)
                     team_list.append(team_name)
             return team_list
-
-
-
 
         else:
             print(response.status_code)
@@ -86,13 +82,12 @@ if __name__ == "__main__":
     #         send_message(e)
     #         print('Сплю 2 минуты')
     #         time.sleep(120)
-    while True:
-        try:
-            general()
-            print('Сплю 2 минуты')
-            time.sleep(120)
-        except Exception as e:
-            send_message(e)
-            print('Сплю 2 минуты')
-            time.sleep(120)
-
+    # while True:
+    #     try:
+    #         general()
+    #         print('Сплю 2 минуты')
+    #         time.sleep(120)
+    #     except Exception as e:
+    #         send_message(e)
+    #         print('Сплю 2 минуты')
+    #         time.sleep(120)

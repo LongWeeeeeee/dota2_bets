@@ -13,28 +13,30 @@ def proceed_map(url, radiant_team_name, dire_team_name, score, tier, output_mess
         radiant_lane_report = lane_report_def(my_team=radiant_heroes_and_pos, enemy_team=dire_heroes_and_pos)
         dire_lane_report = lane_report_def(my_team=dire_heroes_and_pos, enemy_team=radiant_heroes_and_pos)
         lane_report = round(((radiant_lane_report - dire_lane_report) * 100), 2)
-        radiant_over45 = avg_over45(radiant_heroes_and_pos)
-        dire_over45 = avg_over45(dire_heroes_and_pos)
-        over45 = (radiant_over45 - dire_over45) * 100
+        # radiant_over45 = avg_over45(radiant_heroes_and_pos)
+        # dire_over45 = avg_over45(dire_heroes_and_pos)
+        # over45 = (radiant_over45 - dire_over45) * 100
         avg_kills, avg_time = tm_kills(radiant_heroes_and_pos, dire_heroes_and_pos)
         avg_kills_teams, avg_time_teams = tm_kills_teams(radiant_heroes_and_pos=radiant_heroes_and_pos,
                                                          dire_heroes_and_pos=dire_heroes_and_pos,
                                                          radiant_team_name=radiant_team_name,
                                                          dire_team_name=dire_team_name)
+        output_message += f'{radiant_team_name} vs {dire_team_name}\nСчет: {score}\n'
         output_message += (f'Radiant после 45 минуты сильнее на: {over45}\n'
                            f'Radiant lanes до 10 минуты: {lane_report}\n')
-        output_message  = synergy_and_counterpick_copy(radiant_heroes_and_pos=radiant_heroes_and_pos,
-                                                       dire_heroes_and_pos=dire_heroes_and_pos,
-                                                 output_message=output_message, over45=over45)
+        # output_message  = synergy_and_counterpick_copy(radiant_heroes_and_pos=radiant_heroes_and_pos,
+        #                                                dire_heroes_and_pos=dire_heroes_and_pos,
+        #                                          output_message=output_message, over45=over45)
         output_message += (
             f'\nСреднее кол-во убийств {avg_kills}\nСреднее время {avg_time}\n'
             f'Среднее кол-во убийств командное: {avg_kills_teams}\nСреднее время: {avg_time_teams}\n')
-        dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos,
-                        dire_heroes_and_positions=dire_heroes_and_pos,
-                        radiant_team_name=radiant_team_name,
-                        dire_team_name=dire_team_name, score=score, antiplagiat_url=url, tier=tier,
-                        output_message=output_message, lane_report=lane_report, over45=over45)
+        # dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos,
+        #                 dire_heroes_and_positions=dire_heroes_and_pos,
+        #                 radiant_team_name=radiant_team_name,
+        #                 dire_team_name=dire_team_name, score=score, antiplagiat_url=url, tier=tier,
+        #                 output_message=output_message, lane_report=lane_report, over45=over45)
         send_message(output_message)
+        add_url(url)
         return radiant_team_name
 def general(match_list=None):
     team_list = list()

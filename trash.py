@@ -508,7 +508,7 @@ def analyze_database(database, start_date_time, players_imp_data, to_be_saved, t
                             else:
                                 team_stat_dict.setdefault(team_name, {}).setdefault('id', match['direTeam']['id'])
                 else:
-                    if any(player['steamAccount']['id'] in top_500_asia_europe for player in match['players']) and (match['durationSeconds'] / 60) > 20:
+                    if any(player['steamAccount']['id'] in top_500_asia_europe for player in match['players']) and (match['durationSeconds'] / 60) > 21:
                         result = proceed_map(match=match, map_id=map_id, players_imp_data=players_imp_data,
                                              used_maps=used_maps, lane_dict=lane_dict,
                                              synergy_and_counterpick_dict=synergy_and_counterpick_dict,

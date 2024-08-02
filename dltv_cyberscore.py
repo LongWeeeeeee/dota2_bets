@@ -677,10 +677,6 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
     #     else:
     #         print(output_message)
 
-    if antiplagiat_url is not None:
-        add_url(antiplagiat_url)
-    send_message(output_message)
-
 # radiant_heroes_and_positions={'pos 1':{'hero_name':'Weaver'}, 'pos 5':{'hero_name':'Io'}, 'pos 2':{'hero_name':'Leshrac'}, 'pos 3':{'hero_name':'Axe'}, 'pos 4':{'hero_name':'Dark Willow'}}
 #
 # dire_heroes_and_positions={'pos 1':{'hero_name':'Alchemist'}, 'pos 5':{'hero_name':'Warlock'}, 'pos 3':{'hero_name':'Doom'}, 'pos 4':{'hero_name':'Techies'}, 'pos 2':{'hero_name':'Queen of Pain'}}

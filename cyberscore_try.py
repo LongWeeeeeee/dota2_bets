@@ -22,8 +22,8 @@ def proceed_map(url, radiant_team_name, dire_team_name, score, tier, output_mess
                                                          radiant_team_name=radiant_team_name,
                                                          dire_team_name=dire_team_name)
         output_message += f'{radiant_team_name} vs {dire_team_name}\nСчет: {score}\n'
-        output_message += (f'Radiant после 45 минуты сильнее на: {over45}\n'
-                           f'Radiant lanes до 10 минуты: {lane_report}\n')
+        # output_message += (f'Radiant после 45 минуты сильнее на: {over45}\n)
+        output_message += (f'Radiant lanes до 10 минуты: {lane_report}\n')
         # output_message  = synergy_and_counterpick_copy(radiant_heroes_and_pos=radiant_heroes_and_pos,
         #                                                dire_heroes_and_pos=dire_heroes_and_pos,
         #                                          output_message=output_message, over45=over45)

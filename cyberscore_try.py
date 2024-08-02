@@ -82,12 +82,12 @@ if __name__ == "__main__":
     #         send_message(e)
     #         print('Сплю 2 минуты')
     #         time.sleep(120)
-    # while True:
-    #     try:
-    #         general()
-    #         print('Сплю 2 минуты')
-    #         time.sleep(120)
-    #     except Exception as e:
-    #         send_message(e)
-    #         print('Сплю 2 минуты')
-    #         time.sleep(120)
+    while True:
+        try:
+            general()
+            print('Сплю 2 минуты')
+            time.sleep(120)
+        except Exception as e:
+            send_message(e)
+            print('Сплю 2 минуты')
+            time.sleep(120)

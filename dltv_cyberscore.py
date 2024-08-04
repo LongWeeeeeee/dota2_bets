@@ -14,10 +14,9 @@ from bs4 import BeautifulSoup
 
 import id_to_name
 import keys
-from id_to_name import game_changer_list
 
 
-def get_urls(url, target_datetime = 0):
+def get_urls(url, target_datetime=0):
     headers = {
         'Host': 'dltv.org',
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/115.0',
@@ -49,11 +48,14 @@ def get_urls(url, target_datetime = 0):
             upcoming_matches = soup.find('div', class_="upcoming__matches-item")
             if upcoming_matches:
                 target_datetime_str = upcoming_matches['data-matches-odd']
-                target_datetime = datetime.datetime.strptime(target_datetime_str, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(hours=2, minutes=54)
+                target_datetime = datetime.datetime.strptime(target_datetime_str,
+                                                             '%Y-%m-%d %H:%M:%S') + datetime.timedelta(hours=2,
+                                                                                                       minutes=54)
         if not len(live_matches_urls):
             live_matches_urls = None
         return live_matches_urls, target_datetime
-    else: print(f'{response.status_code}')
+    else:
+        print(f'{response.status_code}')
 
 
 def get_team_names(soup):
@@ -92,7 +94,6 @@ def get_player_names_and_heroes(soup):
             return radiant_players, dire_players
 
 
-
 def get_team_positions(url):
     response = requests.get(url)
     if response.status_code == 200:
@@ -111,7 +112,7 @@ def get_team_positions(url):
                 try:
                     if id_to_name.translate[id] == heroes[i]:
                         hero_id = id
-                        radiant_heroes_and_pos[f'pos{i+1}'] = {'hero_id':hero_id, 'hero_name' : heroes[i]}
+                        radiant_heroes_and_pos[f'pos{i + 1}'] = {'hero_id': hero_id, 'hero_name': heroes[i]}
                 except:
                     pass
         c = 0
@@ -119,38 +120,44 @@ def get_team_positions(url):
             for id in id_to_name.translate:
                 if id_to_name.translate[id] == heroes[i]:
                     hero_id = id
-                    dire_heroes_and_pos[f'pos{c+1}'] = {'hero_id':hero_id, 'hero_name' : heroes[i]}
-                    c+=1
+                    dire_heroes_and_pos[f'pos{c + 1}'] = {'hero_id': hero_id, 'hero_name': heroes[i]}
+                    c += 1
 
         return radiant_heroes_and_pos, dire_heroes_and_pos
     else:
         print('нету live матчей')
 
+
 def analyze_draft(sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team, pos3_vs_team,
                   sups, over45):
     radiant_predict, dire_predict = False, False
-    values = {'sinergy':sinergy, 'counterpick':counterpick, 'pos 1_vs_team':pos1_vs_team, 'pos 2_vs_team':pos2_vs_team, 'pos 3_vs_team':pos3_vs_team, 'sups':sups, 'over45': over45}
-    other_values = {'sinergy':sinergy, 'counterpick':counterpick, 'sups':sups, 'over45':over45}
+    values = {'sinergy': sinergy, 'counterpick': counterpick, 'pos 1_vs_team': pos1_vs_team,
+              'pos 2_vs_team': pos2_vs_team, 'pos 3_vs_team': pos3_vs_team, 'sups': sups, 'over45': over45}
+    other_values = {'sinergy': sinergy, 'counterpick': counterpick, 'sups': sups, 'over45': over45}
     values_nones = sum(1 for value in values.values() if value is None)
     other_values_nones = sum(1 for value in other_values.values() if value is None)
     nones = (values_nones <= 2) * (other_values_nones <= 1)
     if nones:
         # values, other_values = [value for value in values if value is not None], [value for value in other_values if value is not None]
-        all_positive_or_negative = all(value >= 0 for value in values.values() if value is not None) + all(value <= 0 for value in values.values() if value is not None)
-        other_values_check = all(value >= 0 for value in other_values.values() if value is not None) + all(value <= 0 for value in other_values.values() if value is not None)
-        singery_or_counterpick = all(value >= 0 for value in [counterpick, sinergy, values['over45']] if value is not None) + all(
+        all_positive_or_negative = all(value >= 0 for value in values.values() if value is not None) + all(
+            value <= 0 for value in values.values() if value is not None)
+        other_values_check = all(value >= 0 for value in other_values.values() if value is not None) + all(
+            value <= 0 for value in other_values.values() if value is not None)
+        singery_or_counterpick = all(
+            value >= 0 for value in [counterpick, sinergy, values['over45']] if value is not None) + all(
             value <= 0 for value in [counterpick, sinergy] if value is not None)
         both_over9 = all(value <= -9 for value in [counterpick, sinergy] if value is not None) + all(
             value >= 9 for value in [counterpick, sinergy] if value is not None)
         both_over5 = all(value <= -5 for value in [counterpick, sinergy] if value is not None) + all(
             value >= 5 for value in [counterpick, sinergy] if value is not None)
-        any_over20 = (all(value > 0 for value in [counterpick, sinergy] if value is not None ) * any(
-            value >= 20 for value in [counterpick, sinergy] if value is not None)) + (all(value < 0 for value in [counterpick, sinergy] if value is not None) * any(
-            value <= -20 for value in [counterpick, sinergy] if value is not None))
+        any_over20 = (all(value > 0 for value in [counterpick, sinergy] if value is not None) * any(
+            value >= 20 for value in [counterpick, sinergy] if value is not None)) + (
+                                 all(value < 0 for value in [counterpick, sinergy] if value is not None) * any(
+                             value <= -20 for value in [counterpick, sinergy] if value is not None))
         any_over8 = (all(value > 0 for value in [counterpick, sinergy] if value is not None) * any(
             value >= 8 for value in [counterpick, sinergy] if value is not None)) + (
-                                 all(value < 0 for value in [counterpick, sinergy] if value is not None) * any(
-                             value <= -8 for value in [counterpick, sinergy] if value is not None))
+                            all(value < 0 for value in [counterpick, sinergy] if value is not None) * any(
+                        value <= -8 for value in [counterpick, sinergy] if value is not None))
         if counterpick is not None:
             counterpick_over8 = (counterpick >= 8) + (counterpick <= -8)
         else:
@@ -167,7 +174,8 @@ def analyze_draft(sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team
             elif counterpick < 0:
                 dire_predict = True
             verdict = f'ХОРОШАЯ СТАВКА 1 ФЛЕТ'
-        elif (singery_or_counterpick and both_over5) or all_positive_or_negative or other_values_check or counterpick_over8:
+        elif (
+                singery_or_counterpick and both_over5) or all_positive_or_negative or other_values_check or counterpick_over8:
             if counterpick > 0:
                 radiant_predict = True
             elif counterpick < 0:
@@ -178,9 +186,6 @@ def analyze_draft(sinergy, counterpick, pos1_vs_team, core_matchup, pos2_vs_team
     else:
         verdict = f'ПЛОХАЯ СТАВКА!!!'
     return verdict, radiant_predict, dire_predict
-
-
-
 
 
 def fill_players_position(rows, players):
@@ -250,12 +255,9 @@ def are_similar(s1, s2, threshold=70):
     return similarity_percentage(s1, s2) >= threshold
 
 
-
-
-
-
 def get_map_id(match):
-    if match['team_dire'] is not None and match['team_radiant'] is not None and 'Kobold' not in match['tournament']['name']:
+    if match['team_dire'] is not None and match['team_radiant'] is not None and 'Kobold' not in match['tournament'][
+        'name']:
         radiant_team_name = match['team_radiant']['name'].lower()
         dire_team_name = match['team_dire']['name'].lower()
         score = match['best_of_score']
@@ -327,7 +329,7 @@ def clean_up(inp, lenght=0):
     if len(inp) > lenght:
         copy = inp.copy()
         for i in inp:
-            if i >=47 and i <=53:
+            if i >= 47 and i <= 53:
                 copy.remove(i)
         if len(copy) < 3:
             return inp
@@ -344,10 +346,12 @@ def str_to_json(input_data):
     data = re.sub(r'\.(\d{2})(\d{1})', r'\1.\2', data, flags=re.MULTILINE)
     data = re.sub(r':0(?=[0-9])', ':', data)
     data = re.sub(r'[\x00-\x1F]+', '', data)
+
     def multiply_by_10(match):
         number = int(match.group(1))
         output = ':' + str(number * 10) + ','
         return output
+
     data = re.sub(r':\.(\d{1}),', multiply_by_10, data).replace(':.', ':')
     data = re.sub(r':(0)([0-9])', r':\2', data, flags=re.MULTILINE)
     return data
@@ -364,7 +368,8 @@ def send_message(message):
     requests.post(url, json=payload)
 
 
-def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, score, over45,
+def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, radiant_team_name, dire_team_name, score,
+                    over45,
                     tier=None, antiplagiat_url=None, core_matchup=None, output_message='', egb=None,
                     radiant_players_check=None, lane_report=None, dire_players_check=None,
                     radiant_impactandplayers=None, impact_message=None, dire_impactandplayers=None,
@@ -574,7 +579,7 @@ def dota2protracker(radiant_heroes_and_positions, dire_heroes_and_positions, rad
         sinergy = round((sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with)), 2)
     if len(radiant_wr_against) > 0:
         counterpick = round((sum(radiant_wr_against) / len(radiant_wr_against)) - (
-                    sum(dire_wr_against) / len(dire_wr_against)), 2)
+                sum(dire_wr_against) / len(dire_wr_against)), 2)
     if len(radiant_pos1_vs_team) > 0 and len(dire_pos1_vs_team) > 0:
         pos1_vs_team = round(sum(radiant_pos1_vs_team) / len(radiant_pos1_vs_team) - sum(dire_pos1_vs_team) / len(
             dire_pos1_vs_team), 2)

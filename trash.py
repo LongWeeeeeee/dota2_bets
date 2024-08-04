@@ -1,22 +1,24 @@
 # from id_to_name import egb
-import requests
-from keys import api_token, api_token_2
-# import time
-from dltv_cyberscore import analyze_draft, clean_up
-from id_to_name import top_500_asia_europe, non_anon_top_1000_europe_top_1000_asia, pro_teams, translate, output_data
 import json
 import os
-import time
 import shutil
+import time
 
-radiant_position_to_lane ={
-        'pos1': 'bottomLaneOutcome',
-        'pos2': 'midLaneOutcome',
-        'pos3': 'topLaneOutcome',
-        'pos4': 'topLaneOutcome',
-        'pos5': 'bottomLaneOutcome'
-    }
-dire_position_to_lane ={
+import requests
+
+# import time
+from dltv_cyberscore import analyze_draft, clean_up
+from id_to_name import top_500_asia_europe, pro_teams
+from keys import api_token, api_token_2
+
+radiant_position_to_lane = {
+    'pos1': 'bottomLaneOutcome',
+    'pos2': 'midLaneOutcome',
+    'pos3': 'topLaneOutcome',
+    'pos4': 'topLaneOutcome',
+    'pos5': 'bottomLaneOutcome'
+}
+dire_position_to_lane = {
     'pos1': 'topLaneOutcome',
     'pos2': 'midLaneOutcome',
     'pos3': 'bottomLaneOutcome',
@@ -28,7 +30,8 @@ dire_position_to_lane ={
 def distribute_heroes_data(hero_id, position, to_be_appended, path, heroes_data, team_name=None):
     # Определяем индекс массива на основе hero_id
     if team_name is not None:
-        current_dict = heroes_data.setdefault('teams', {}).setdefault(team_name, {}).setdefault(hero_id, {}).setdefault(position, {})
+        current_dict = heroes_data.setdefault('teams', {}).setdefault(team_name, {}).setdefault(hero_id, {}).setdefault(
+            position, {})
     else:
         current_dict = heroes_data.setdefault('value', {}).setdefault(hero_id, {}).setdefault(position, {})
     for key in path[:-1]:
@@ -38,7 +41,7 @@ def distribute_heroes_data(hero_id, position, to_be_appended, path, heroes_data,
     return heroes_data
 
 
-def proceed_get_maps(ids_to_graph, start_date_time, game_mods, file_data, count, pro_query=None, check=True, skip= 0):
+def proceed_get_maps(ids_to_graph, start_date_time, game_mods, file_data, count, pro_query=None, check=True, skip=0):
     try:
         while check:
             if pro_query is None:
@@ -82,8 +85,7 @@ def proceed_get_maps(ids_to_graph, start_date_time, game_mods, file_data, count,
     return file_data
 
 
-
-def get_maps(game_mods, start_date_time, maps_to_save, players_dict=None, update= None):
+def get_maps(game_mods, start_date_time, maps_to_save, players_dict=None, update=None):
     file_data = []
     ids_to_graph, total_map_ids = [], []
     count = 0
@@ -94,7 +96,7 @@ def get_maps(game_mods, start_date_time, maps_to_save, players_dict=None, update
         else:
             some_data = pro_teams
         for team_name in some_data:
-            count+=1
+            count += 1
             print(f'{count}/{len(pro_teams)}')
             steam_id = pro_teams[team_name]['id']
             if len(ids_to_graph) != 5:
@@ -146,7 +148,8 @@ def eat_temp_files(prefix, file_data, output):
                     for map in data:
                         if map not in file_data:
                             file_data[map] = data[map]
-        except:pass
+        except:
+            pass
         with open(f'./{prefix}/{output}.txt', 'w') as f:
             f.truncate()
             f.seek(0)
@@ -154,8 +157,7 @@ def eat_temp_files(prefix, file_data, output):
         shutil.rmtree(f'./{prefix}/temp_files')
 
 
-
-def research_map_proceed(maps_to_explore, file_data, output, prefix, counter =0, another_counter = 0, error_counter=0):
+def research_map_proceed(maps_to_explore, file_data, output, prefix, counter=0, another_counter=0, error_counter=0):
     token = api_token_2
     eat_temp_files(prefix, file_data, output)
     for map_id in maps_to_explore:
@@ -168,7 +170,7 @@ def research_map_proceed(maps_to_explore, file_data, output, prefix, counter =0,
                 token = api_token
             error_counter = 0
         if str(map_id) not in file_data:
-            another_counter +=1
+            another_counter += 1
             if another_counter % 300 == 0:
                 if not os.path.isdir(f"./{prefix}/temp_files"):
                     os.mkdir(f"./{prefix}/temp_files")
@@ -239,7 +241,6 @@ def research_map_proceed(maps_to_explore, file_data, output, prefix, counter =0,
         json.dump(file_data, f)
 
 
-
 def research_maps(maps_to_explore, output, prefix):
     path = f'./{prefix}/{maps_to_explore}.txt'
     with open(path, 'r+') as f:
@@ -253,22 +254,13 @@ def research_maps(maps_to_explore, output, prefix):
 
     research_map_proceed(maps_to_explore, file_data, output, prefix)
     # except (FileExistsError, FileNotFoundError):
-        # with open(f'./{prefix}/{output}.txt', 'w') as f:
-        #     file_data = {}
+    # with open(f'./{prefix}/{output}.txt', 'w') as f:
+    #     file_data = {}
     research_map_proceed(maps_to_explore, file_data, output, prefix)
 
 
-
-
-
-
-
-def lane_with_hero(player, position, match, hero_id, another_player_position, another_player_hero_id, isradiant, another_isradiant, lane_dict):
-
-    return lane_dict
-
-
-def proceed_map(match, map_id, players_imp_data, used_maps, lane_dict, synergy_and_counterpick_dict, total_time_kills_dict, over45_dict, radiant_team_name=None, dire_team_name=None):
+def proceed_map(match, map_id, players_imp_data, used_maps, lane_dict, synergy_and_counterpick_dict,
+                total_time_kills_dict, over45_dict, over35_dict, radiant_team_name=None, dire_team_name=None):
     for player in match['players']:
         radiant_win = match['didRadiantWin']
         position = player['position'].replace('POSITION_', 'pos')
@@ -277,7 +269,8 @@ def proceed_map(match, map_id, players_imp_data, used_maps, lane_dict, synergy_a
         steam_id = str(player['steamAccount']['id'])
         if map_id not in players_imp_data['used_maps']:
             if (player['steamAccount']['isAnonymous']):
-                players_imp_data.setdefault('value', {}).setdefault(steam_id, {}).setdefault(hero_id, {}).setdefault(position, []).append(
+                players_imp_data.setdefault('value', {}).setdefault(steam_id, {}).setdefault(hero_id, {}).setdefault(
+                    position, []).append(
                     player['imp'])
                 players_imp_data.setdefault('used_maps', []).append(map_id)
         if map_id not in used_maps:
@@ -291,7 +284,9 @@ def proceed_map(match, map_id, players_imp_data, used_maps, lane_dict, synergy_a
                     to_be_appended = 0
                 else:
                     to_be_appended = 1
-            synergy_and_counterpick_dict.setdefault('value', {}).setdefault(hero_id, {}).setdefault(position, {}).setdefault('winrate', []).append(to_be_appended)
+            synergy_and_counterpick_dict.setdefault('value', {}).setdefault(hero_id, {}).setdefault(position,
+                                                                                                    {}).setdefault(
+                'winrate', []).append(to_be_appended)
             # time, kills, and other shit
 
             if player['isRadiant'] is True:
@@ -301,7 +296,7 @@ def proceed_map(match, map_id, players_imp_data, used_maps, lane_dict, synergy_a
                 elif 'DIRE' in outcome:
                     to_be_appended = 0
                 else:
-                    #ничья
+                    # ничья
                     to_be_appended = 2
             else:
                 outcome = match[dire_position_to_lane[position]]
@@ -310,7 +305,7 @@ def proceed_map(match, map_id, players_imp_data, used_maps, lane_dict, synergy_a
                 elif 'DIRE' in outcome:
                     to_be_appended = 1
                 else:
-                    #ничья
+                    # ничья
                     to_be_appended = 2
             lane_dict = distribute_heroes_data(hero_id, position, to_be_appended,
                                                ['lane_report', 'solo', 'value'],
@@ -321,7 +316,7 @@ def proceed_map(match, map_id, players_imp_data, used_maps, lane_dict, synergy_a
                 if another_player_hero_id != hero_id:
                     another_player_position = another_player['position'].replace('POSITION_', 'pos')
                     another_isradiant = another_player['isRadiant']
-                    #lane
+                    # lane
                     if player['isRadiant'] is True:
                         if 'RADIANT' in outcome:
                             to_be_appended = 1
@@ -362,43 +357,51 @@ def proceed_map(match, map_id, players_imp_data, used_maps, lane_dict, synergy_a
                             to_be_appended = 1
                     if isradiant != another_player['isRadiant']:
                         synergy_and_counterpick_dict = distribute_heroes_data(hero_id, position, to_be_appended,
-                                                                               ['counterpick_duo',
-                                                                                another_player_hero_id,
-                                                                                another_player_position, 'value'],
-                                                                               synergy_and_counterpick_dict)
+                                                                              ['counterpick_duo',
+                                                                               another_player_hero_id,
+                                                                               another_player_position, 'value'],
+                                                                              synergy_and_counterpick_dict)
                     # synergy
                     if (isradiant == another_player['isRadiant']) and (hero_id != another_player_hero_id):
                         synergy_and_counterpick_dict = distribute_heroes_data(hero_id, position,
-                                                                               to_be_appended,
-                                                                               ['synergy_duo',
-                                                                                another_player_hero_id,
-                                                                                another_player_position,
-                                                                                'value'],
-                                                                               synergy_and_counterpick_dict)
+                                                                              to_be_appended,
+                                                                              ['synergy_duo',
+                                                                               another_player_hero_id,
+                                                                               another_player_position,
+                                                                               'value'],
+                                                                              synergy_and_counterpick_dict)
 
                         total_kills = sum(match['direKills']) + sum(match['radiantKills'])
-                        if match['durationSeconds'] / 60 > 45:
+                        if match['durationSeconds'] / 60 >= 35:
+                            over35_dict = distribute_heroes_data(hero_id, position, to_be_appended,
+                                                   ['over35_duo', another_player_hero_id,
+                                                    another_player_position, 'value'], over35_dict)
+                        if match['durationSeconds'] / 60 >= 45:
                             over45_dict = distribute_heroes_data(hero_id, position, to_be_appended,
                                                                  ['over45_duo', another_player_hero_id,
                                                                   another_player_position, 'value'], over45_dict)
                         if isradiant:
                             total_time_kills_dict = distribute_heroes_data(hero_id, position, total_kills,
-                                                                       ['total_kills_duo', another_player_hero_id,
-                                                                        another_player_position, 'value'],
-                                                                       total_time_kills_dict, team_name=radiant_team_name)
+                                                                           ['total_kills_duo', another_player_hero_id,
+                                                                            another_player_position, 'value'],
+                                                                           total_time_kills_dict,
+                                                                           team_name=radiant_team_name)
                             total_time_kills_dict = distribute_heroes_data(hero_id, position, match['durationSeconds'],
-                                                                       ['total_time_duo', another_player_hero_id,
-                                                                        another_player_position, 'value'],
-                                                                       total_time_kills_dict, team_name=radiant_team_name)
+                                                                           ['total_time_duo', another_player_hero_id,
+                                                                            another_player_position, 'value'],
+                                                                           total_time_kills_dict,
+                                                                           team_name=radiant_team_name)
                         else:
                             total_time_kills_dict = distribute_heroes_data(hero_id, position, total_kills,
-                                                                       ['total_kills_duo', another_player_hero_id,
-                                                                        another_player_position, 'value'],
-                                                                       total_time_kills_dict, team_name=dire_team_name)
+                                                                           ['total_kills_duo', another_player_hero_id,
+                                                                            another_player_position, 'value'],
+                                                                           total_time_kills_dict,
+                                                                           team_name=dire_team_name)
                             total_time_kills_dict = distribute_heroes_data(hero_id, position, match['durationSeconds'],
-                                                                       ['total_time_duo', another_player_hero_id,
-                                                                        another_player_position, 'value'],
-                                                                       total_time_kills_dict, team_name=dire_team_name)
+                                                                           ['total_time_duo', another_player_hero_id,
+                                                                            another_player_position, 'value'],
+                                                                           total_time_kills_dict,
+                                                                           team_name=dire_team_name)
                         total_time_kills_dict = distribute_heroes_data(hero_id, position, total_kills,
                                                                        ['total_kills_duo', another_player_hero_id,
                                                                         another_player_position, 'value'],
@@ -413,7 +416,7 @@ def proceed_map(match, map_id, players_imp_data, used_maps, lane_dict, synergy_a
                             third_player_hero_id = str(third_player['hero']['id'])
                             third_player_position = third_player['position'].replace('POSITION_', 'pos')
                             third_isradiant = third_player['isRadiant']
-                            if (isradiant == third_isradiant) and (
+                            if (isradiant == third_isradiant and third_isradiant == another_isradiant) and (
                                     third_player_hero_id not in [hero_id, another_player_hero_id]):
                                 if match['durationSeconds'] / 60 > 45:
                                     over45_dict = distribute_heroes_data(hero_id, position, to_be_appended,
@@ -422,63 +425,93 @@ def proceed_map(match, map_id, players_imp_data, used_maps, lane_dict, synergy_a
                                                                           third_player_hero_id, third_player_position,
                                                                           'value'], over45_dict)
                                 synergy_and_counterpick_dict = distribute_heroes_data(hero_id, position,
-                                                                                       to_be_appended,
-                                                                                       ['synergy_duo',
-                                                                                        another_player_hero_id,
-                                                                                        another_player_position,
-                                                                                        'synergy_trio',
-                                                                                        third_player_hero_id,
-                                                                                        third_player_position, 'value'],
-                                                                                       synergy_and_counterpick_dict)
+                                                                                      to_be_appended,
+                                                                                      ['synergy_duo',
+                                                                                       another_player_hero_id,
+                                                                                       another_player_position,
+                                                                                       'synergy_trio',
+                                                                                       third_player_hero_id,
+                                                                                       third_player_position, 'value'],
+                                                                                      synergy_and_counterpick_dict)
                                 if isradiant:
                                     total_time_kills_dict = distribute_heroes_data(hero_id, position, total_kills,
-                                                                               ['total_kills_duo', another_player_hero_id,
-                                                                                another_player_position, 'total_kills_trio',
-                                                                                third_player_hero_id, third_player_position,
-                                                                                'value'], total_time_kills_dict, team_name=radiant_team_name)
-                                    total_time_kills_dict = distribute_heroes_data(hero_id, position, match['durationSeconds'],
-                                                                               ['total_time_duo', another_player_hero_id,
-                                                                                another_player_position, 'total_time_trio',
-                                                                                third_player_hero_id, third_player_position,
-                                                                                'value'], total_time_kills_dict, team_name=radiant_team_name)
+                                                                                   ['total_kills_duo',
+                                                                                    another_player_hero_id,
+                                                                                    another_player_position,
+                                                                                    'total_kills_trio',
+                                                                                    third_player_hero_id,
+                                                                                    third_player_position,
+                                                                                    'value'], total_time_kills_dict,
+                                                                                   team_name=radiant_team_name)
+                                    total_time_kills_dict = distribute_heroes_data(hero_id, position,
+                                                                                   match['durationSeconds'],
+                                                                                   ['total_time_duo',
+                                                                                    another_player_hero_id,
+                                                                                    another_player_position,
+                                                                                    'total_time_trio',
+                                                                                    third_player_hero_id,
+                                                                                    third_player_position,
+                                                                                    'value'], total_time_kills_dict,
+                                                                                   team_name=radiant_team_name)
                                 else:
                                     total_time_kills_dict = distribute_heroes_data(hero_id, position,
-                                                                                                      total_kills,
-                                                                                                      [
-                                                                                                          'total_kills_duo',
-                                                                                                          another_player_hero_id,
-                                                                                                          another_player_position,
-                                                                                                          'total_kills_trio',
-                                                                                                          third_player_hero_id,
-                                                                                                          third_player_position,
-                                                                                                          'value'],
-                                                                                                      total_time_kills_dict, team_name=dire_team_name)
+                                                                                   total_kills,
+                                                                                   [
+                                                                                       'total_kills_duo',
+                                                                                       another_player_hero_id,
+                                                                                       another_player_position,
+                                                                                       'total_kills_trio',
+                                                                                       third_player_hero_id,
+                                                                                       third_player_position,
+                                                                                       'value'],
+                                                                                   total_time_kills_dict,
+                                                                                   team_name=dire_team_name)
                                     total_time_kills_dict = distribute_heroes_data(hero_id, position,
-                                                                                                      match[
-                                                                                                          'durationSeconds'],
-                                                                                                      ['total_time_duo',
-                                                                                                       another_player_hero_id,
-                                                                                                       another_player_position,
-                                                                                                       'total_time_trio',
-                                                                                                       third_player_hero_id,
-                                                                                                       third_player_position,
-                                                                                                       'value'],
-                                                                                                      total_time_kills_dict, team_name=dire_team_name)
+                                                                                   match[
+                                                                                       'durationSeconds'],
+                                                                                   ['total_time_duo',
+                                                                                    another_player_hero_id,
+                                                                                    another_player_position,
+                                                                                    'total_time_trio',
+                                                                                    third_player_hero_id,
+                                                                                    third_player_position,
+                                                                                    'value'],
+                                                                                   total_time_kills_dict,
+                                                                                   team_name=dire_team_name)
                                 total_time_kills_dict = distribute_heroes_data(hero_id, position, total_kills,
-                                                                               ['total_kills_duo', another_player_hero_id,
-                                                                                another_player_position, 'total_kills_trio',
-                                                                                third_player_hero_id, third_player_position,
+                                                                               ['total_kills_duo',
+                                                                                another_player_hero_id,
+                                                                                another_player_position,
+                                                                                'total_kills_trio',
+                                                                                third_player_hero_id,
+                                                                                third_player_position,
                                                                                 'value'], total_time_kills_dict)
 
-                                total_time_kills_dict = distribute_heroes_data(hero_id, position, match['durationSeconds'],
-                                                                               ['total_time_duo', another_player_hero_id,
-                                                                                another_player_position, 'total_time_trio',
-                                                                                third_player_hero_id, third_player_position,
+                                total_time_kills_dict = distribute_heroes_data(hero_id, position,
+                                                                               match['durationSeconds'],
+                                                                               ['total_time_duo',
+                                                                                another_player_hero_id,
+                                                                                another_player_position,
+                                                                                'total_time_trio',
+                                                                                third_player_hero_id,
+                                                                                third_player_position,
                                                                                 'value'], total_time_kills_dict)
+                            elif third_isradiant != isradiant and third_isradiant != another_isradiant:
+                                path = ['synergy_duo',another_player_hero_id, another_player_position,
+                                        '2vs1', third_player_hero_id, third_player_position, 'value']
+                                if isradiant:
+                                    to_be_appended = 1
+                                else:
+                                    to_be_appended = 0
+                                synergy_and_counterpick_dict = distribute_heroes_data(hero_id, position,
+                                                                                      to_be_appended,
+                                                                                      path,
+                                                                                      synergy_and_counterpick_dict)
     return lane_dict, players_imp_data, total_time_kills_dict, synergy_and_counterpick_dict, over45_dict
 
 
-def analyze_database(database, start_date_time, players_imp_data, to_be_saved, total_time_kills_dict=None, pro=False, over45_dict=None, synergy_and_counterpick_dict=None, lane_dict=None, count = 0):
+def analyze_database(database, start_date_time, players_imp_data, over35_dict, to_be_saved=None, total_time_kills_dict=None, pro=False,
+                     over45_dict=None, synergy_and_counterpick_dict=None, lane_dict=None, count=0):
     total = len(database)
     used_maps = to_be_saved[0]['used_maps']
     if pro:
@@ -498,37 +531,41 @@ def analyze_database(database, start_date_time, players_imp_data, to_be_saved, t
                                                  used_maps=used_maps, lane_dict=lane_dict,
                                                  synergy_and_counterpick_dict=synergy_and_counterpick_dict,
                                                  total_time_kills_dict=total_time_kills_dict, over45_dict=over45_dict,
-                                                 radiant_team_name=radiant_team_name, dire_team_name=dire_team_name)
+                                                 radiant_team_name=radiant_team_name, dire_team_name=dire_team_name, over35_dict=over35_dict)
                             lane_dict, players_imp_data, total_time_kills_dict, synergy_and_counterpick_dict, over45_dict = result
                         for team_name in [radiant_team_name, dire_team_name]:
-                            team_stat_dict.setdefault(team_name, {}).setdefault('kills', []).append(sum(match['direKills']) + sum(match['radiantKills']))
-                            team_stat_dict.setdefault(team_name, {}).setdefault('time', []).append(match['durationSeconds']/60)
+                            team_stat_dict.setdefault(team_name, {}).setdefault('kills', []).append(
+                                sum(match['direKills']) + sum(match['radiantKills']))
+                            team_stat_dict.setdefault(team_name, {}).setdefault('time', []).append(
+                                match['durationSeconds'] / 60)
                             if match['radiantTeam']['name'].lower() == team_name:
                                 team_stat_dict.setdefault(team_name, {}).setdefault('id', match['radiantTeam']['id'])
                             else:
                                 team_stat_dict.setdefault(team_name, {}).setdefault('id', match['direTeam']['id'])
                 else:
-                    if any(player['steamAccount']['id'] in top_500_asia_europe for player in match['players']) and (match['durationSeconds'] / 60) > 21:
+                    if any(player['steamAccount']['id'] in top_500_asia_europe for player in match['players']) and (
+                            match['durationSeconds'] / 60) > 21:
                         result = proceed_map(match=match, map_id=map_id, players_imp_data=players_imp_data,
                                              used_maps=used_maps, lane_dict=lane_dict,
                                              synergy_and_counterpick_dict=synergy_and_counterpick_dict,
-                                             total_time_kills_dict=total_time_kills_dict, over45_dict=over45_dict)
+                                             total_time_kills_dict=total_time_kills_dict, over45_dict=over45_dict, over35_dict=over35_dict)
                         lane_dict, players_imp_data, total_time_kills_dict, synergy_and_counterpick_dict, over45_dict = result
                 if map_id not in used_maps:
                     used_maps.append(map_id)
     if pro:
         for team in team_stat_dict:
-            team_stat_dict[team]['time'] = sum(team_stat_dict[team]['time'])/len(team_stat_dict[team]['time'])
+            team_stat_dict[team]['time'] = sum(team_stat_dict[team]['time']) / len(team_stat_dict[team]['time'])
             team_stat_dict[team]['kills'] = sum(team_stat_dict[team]['kills']) / len(team_stat_dict[team]['kills'])
         with open('teams_stat_dict.txt', 'w') as f:
             json.dump(team_stat_dict, f, indent=4)
-    total_time_kills_dict['used_maps'], over45_dict['used_maps'], synergy_and_counterpick_dict['used_maps'], lane_dict['used_maps'] = used_maps, used_maps, used_maps, used_maps
+    total_time_kills_dict['used_maps'], over45_dict['used_maps'], synergy_and_counterpick_dict['used_maps'], lane_dict[
+        'used_maps'] = used_maps, used_maps, used_maps, used_maps
     # for hero in synergy_and_counterpick_dict['value']:
     #     for pos in synergy_and_counterpick_dict['value'][hero]:
     #         winrate = synergy_and_counterpick_dict['value'][hero][pos]['winrate']
     #         synergy_and_counterpick_dict['value'][hero][pos]['winrate'] = {'value': (sum(winrate, 1) / (sum(winrate, 1) + sum(winrate, 0))) * 100, 'total_matches': len(winrate)}
 
-    return players_imp_data, total_time_kills_dict, over45_dict, synergy_and_counterpick_dict, lane_dict
+    return players_imp_data, total_time_kills_dict, over45_dict, over35_dict, synergy_and_counterpick_dict, lane_dict
     # return ''.join(to_be_saved)
 
 
@@ -537,10 +574,111 @@ def calculate_average(values):
     return sum(new_values) / len(new_values) if new_values else None
 
 
+def synergy_team(heroes_and_pos, enemy_heroes_and_pos, output, prefix, data):
+    unique_combinations = set()
+    for pos in heroes_and_pos:
+        try:
+            hero_id = str(heroes_and_pos[pos]['hero_id'])
+            hero_data = data[hero_id][pos]['synergy_duo']
+            for second_pos in heroes_and_pos:
+                if pos != second_pos:
+                    second_hero_id = str(heroes_and_pos[second_pos]['hero_id'])
+                    duo_data = hero_data[second_hero_id][second_pos]
+                    if len(duo_data['value']) > 4:
+                        combo = tuple(sorted([hero_id, second_hero_id]))
+                        if combo not in unique_combinations:
+                            unique_combinations.add(combo)
+                            value = duo_data['value'].count(1) / (
+                                    duo_data['value'].count(1) + duo_data['value'].count(0))
+                            output[f'{prefix}_duo'].append(value)
+                        for third_pos in heroes_and_pos:
+                            if third_pos not in [pos, second_pos]:
+                                third_hero_id = str(heroes_and_pos[third_pos]['hero_id'])
+                                trio_data = duo_data['synergy_trio'][third_hero_id][third_pos]
+                                if len(trio_data['value']) > 2:
+                                    combo = tuple(sorted([hero_id, second_hero_id, third_hero_id]))
+                                    if combo not in unique_combinations:
+                                        unique_combinations.add(combo)
+                                        value = trio_data['value'].count(1) / (
+                                                trio_data['value'].count(1) + trio_data['value'].count(0))
+                                        output[f'{prefix}_trio'].append(value)
+                        for enemy_third_pos in enemy_heroes_and_pos:
+                            third_hero_id = str(enemy_heroes_and_pos[enemy_third_pos]['hero_id'])
+                            trio_data = duo_data['2vs1'][third_hero_id][enemy_third_pos]
+                            if len(trio_data['value']) > 2:
+                                combo = tuple(sorted([hero_id, second_hero_id, third_hero_id]))
+                                if combo not in unique_combinations:
+                                    unique_combinations.add(combo)
+                                    value = trio_data['value'].count(1) / (
+                                            trio_data['value'].count(1) + trio_data['value'].count(0))
+                                    output[f'{prefix}_2vs1'].append(value)
+
+        except KeyError:
+            pass
+    return output
 
 
+def counterpick_team(heroes_and_pos, heroes_and_pos_opposite, output, prefix, data):
+    unique_combinations = set()
+    for pos in heroes_and_pos:
+        try:
+            hero_id = str(heroes_and_pos[pos]['hero_id'])
+            hero_data = data[hero_id][pos]['counterpick_duo']
+            for second_pos in heroes_and_pos_opposite:
+                second_hero_id = str(heroes_and_pos_opposite[second_pos]['hero_id'])
+                duo_data = hero_data[second_hero_id][second_pos]
+                if len(duo_data['value']) > 4:
+                    combo = tuple(sorted([hero_id, second_hero_id]))
+                    if combo not in unique_combinations:
+                        unique_combinations.add(combo)
+                        value = duo_data['value'].count(1) / (
+                                duo_data['value'].count(1) + duo_data['value'].count(0))
+                        output[f'{prefix}_duo'].append(value)
+        except KeyError:
+            pass
+    return output
 
-def synergy_and_counterpick_copy(radiant_heroes_and_pos, dire_heroes_and_pos, output_message, over45):
+
+def synergy_and_counterpick_new(radiant_heroes_and_pos, dire_heroes_and_pos, output_message, over45=None):
+    # print('my_protracker')
+    output = {'radiant_synergy_duo': [], 'dire_synergy_duo': [], 'radiant_synergy_trio': [], 'dire_synergy_trio': [],
+              'radiant_counterpick_duo': [], 'dire_counterpick_duo': [], 'radiant_synergy_2vs1':[], 'dire_synergy_2vs1':[]}
+    unique_combinations = set()
+    with open('./1722505765_top600_heroes_data/synergy_and_counterpick_dict.txt', 'r+') as f:
+        data = json.load(f)
+        data = data['value']
+
+    # Process Radiant heroes
+    output = synergy_team(radiant_heroes_and_pos, dire_heroes_and_pos, output, 'radiant_synergy', data)
+
+    # Process Dire heroes
+    output = synergy_team(dire_heroes_and_pos, radiant_heroes_and_pos, output, 'dire_synergy', data)
+    output = counterpick_team(radiant_heroes_and_pos, dire_heroes_and_pos, output,
+                              'radiant_counterpick', data)
+    output = counterpick_team(dire_heroes_and_pos, radiant_heroes_and_pos, output,
+                              'dire_counterpick', data)
+    counterpick_dire = sum(output['dire_counterpick_duo'])/len(output['dire_counterpick_duo'])
+    counterpick_radiant = sum(output['radiant_counterpick_duo'])/len(output['radiant_counterpick_duo'])
+    if len(output['radiant_synergy_2vs1']):
+        counterpick_radiant = (counterpick_radiant + sum(output['radiant_synergy_2vs1']) / len(
+            output['radiant_synergy_2vs1'])) / 2
+    if len(output['dire_synergy_2vs1']):
+        counterpick_dire = (counterpick_dire + sum(output['dire_synergy_2vs1']) / len(
+            output['dire_synergy_2vs1'])) / 2
+    synergy_dire = sum(output['dire_synergy_duo']) / len(output['dire_synergy_duo'])
+    synergy_radiant = sum(output['radiant_synergy_duo']) / len(output['radiant_synergy_duo'])
+    if len(output['dire_synergy_trio']):
+        synergy_dire = (synergy_dire + sum(output['dire_synergy_trio']) / len(output['dire_synergy_trio'])) / 2
+    if len(output['radiant_synergy_trio']):
+        synergy_radiant = (synergy_radiant + sum(output['radiant_synergy_trio']) / len(
+            output['radiant_synergy_trio'])) / 2
+    synergy = (synergy_radiant - synergy_dire)*100
+    counterpick = (counterpick_radiant - counterpick_dire)*100
+    output_message += f'synergy: {synergy}\nCounterpick: {counterpick}\n'
+    return output_message
+
+
+def synergy_and_counterpick_orig(radiant_heroes_and_pos, dire_heroes_and_pos, output_message, over45=None):
     # print('my_protracker')
     sinergy, counterpick, pos1_vs_team, pos2_vs_team, pos3_vs_team, core_matchup = None, None, None, None, None, None
 
@@ -550,10 +688,11 @@ def synergy_and_counterpick_copy(radiant_heroes_and_pos, dire_heroes_and_pos, ou
         data = json.load(f)['value']
         radiant_pos1_with_team, radiant_pos2_with_team, radiant_pos3_with_team, dire_pos1_with_team, dire_pos2_with_team, dire_pos3_with_team = [], [], [], [], [], []
         radiant_wr_with, dire_wr_with, radiant_pos3_vs_team, dire_pos3_vs_team, radiant_wr_against, dire_wr_against, radiant_pos1_vs_team, dire_pos1_vs_team, radiant_pos2_vs_team, dire_pos2_vs_team, radiant_pos4_with_pos5, dire_pos4_with_pos5 = [], [], [], [], [], [], [], [], [], [], None, None
-        #radiant_synergy
+        # radiant_synergy
         for pos in radiant_heroes_and_pos:
             hero_id = str(radiant_heroes_and_pos[pos]['hero_id'])
-            id_pos = {str(item['hero_id']): position_name for position_name, item in radiant_heroes_and_pos.items() if position_name != pos}
+            id_pos = {str(item['hero_id']): position_name for position_name, item in radiant_heroes_and_pos.items() if
+                      position_name != pos}
             try:
                 hero_data = data[hero_id][pos]['synergy_duo']
                 for another_hero_id in hero_data:
@@ -563,41 +702,46 @@ def synergy_and_counterpick_copy(radiant_heroes_and_pos, dire_heroes_and_pos, ou
                             position_name = id_pos[another_hero_id]
                             values = hero_data[another_hero_id][position_name]['value']
                             if len(values) > 5:
-                                wr = (values.count(1) / (values.count(1) + values.count(0)))*100
+                                wr = (values.count(1) / (values.count(1) + values.count(0))) * 100
                                 radiant_pos1_with_team.append(wr)
-                        except: pass
+                        except:
+                            pass
                     elif pos == 'pos2':
                         try:
                             position_name = id_pos[another_hero_id]
                             if position_name.replace('pos', '') in ['3', '4', '5']:
                                 values = hero_data[another_hero_id][position_name]['value']
                                 if len(values) > 5:
-                                    wr = (values.count(1) / (values.count(1) + values.count(0)))*100
+                                    wr = (values.count(1) / (values.count(1) + values.count(0))) * 100
                                     radiant_pos2_with_team.append(wr)
-                        except: pass
+                        except:
+                            pass
                     elif pos == 'pos3':
                         try:
                             position_name = id_pos[another_hero_id]
                             if position_name.replace('pos', '') in ['4', '5']:
                                 values = hero_data[another_hero_id][position_name]['value']
                                 if len(values) > 5:
-                                    wr = (values.count(1) / (values.count(1) + values.count(0)))*100
+                                    wr = (values.count(1) / (values.count(1) + values.count(0))) * 100
                                     radiant_pos3_with_team.append(wr)
-                        except: pass
+                        except:
+                            pass
                     elif pos == 'pos4':
-                            try:
-                                position_name = id_pos[another_hero_id]
-                                if position_name.replace('pos', '') == '5':
-                                    values = hero_data[another_hero_id][position_name]['value']
-                                    if len(values) > 5:
-                                        wr = (values.count(1) / (values.count(1) + values.count(0)))*100
-                                        radiant_pos4_with_pos5 = wr
-                            except: pass
-            except: pass
+                        try:
+                            position_name = id_pos[another_hero_id]
+                            if position_name.replace('pos', '') == '5':
+                                values = hero_data[another_hero_id][position_name]['value']
+                                if len(values) > 5:
+                                    wr = (values.count(1) / (values.count(1) + values.count(0))) * 100
+                                    radiant_pos4_with_pos5 = wr
+                        except:
+                            pass
+            except:
+                pass
         if radiant_pos4_with_pos5 is not None:
             radiant_wr_with += [radiant_pos4_with_pos5]
         radiant_wr_with += radiant_pos3_with_team + radiant_pos2_with_team + radiant_pos1_with_team
-        #dire_synergy
+        # dire_synergy
         for pos in dire_heroes_and_pos:
             try:
                 hero_id = str(dire_heroes_and_pos[pos]['hero_id'])
@@ -611,7 +755,7 @@ def synergy_and_counterpick_copy(radiant_heroes_and_pos, dire_heroes_and_pos, ou
                             position_name = id_pos[another_hero_id]
                             values = hero_data[another_hero_id][position_name]['value']
                             if len(values) > 5:
-                                wr = (values.count(1) / (values.count(1) + values.count(0)))*100
+                                wr = (values.count(1) / (values.count(1) + values.count(0))) * 100
                                 dire_pos1_with_team.append(wr)
                         except:
                             pass
@@ -621,7 +765,7 @@ def synergy_and_counterpick_copy(radiant_heroes_and_pos, dire_heroes_and_pos, ou
                             if position_name.replace('pos', '') in ['3', '4', '5']:
                                 values = hero_data[another_hero_id][position_name]['value']
                                 if len(values) > 5:
-                                    wr = (values.count(1) / (values.count(1) + values.count(0)))*100
+                                    wr = (values.count(1) / (values.count(1) + values.count(0))) * 100
                                     dire_pos2_with_team.append(wr)
                         except:
                             pass
@@ -631,7 +775,7 @@ def synergy_and_counterpick_copy(radiant_heroes_and_pos, dire_heroes_and_pos, ou
                             if position_name.replace('pos', '') in ['4', '5']:
                                 values = hero_data[another_hero_id][position_name]['value']
                                 if len(values) > 5:
-                                    wr = (values.count(1) / (values.count(1) + values.count(0)))*100
+                                    wr = (values.count(1) / (values.count(1) + values.count(0))) * 100
                                     dire_pos3_with_team.append(wr)
                         except:
                             pass
@@ -641,15 +785,16 @@ def synergy_and_counterpick_copy(radiant_heroes_and_pos, dire_heroes_and_pos, ou
                             if position_name.replace('pos', '') == '5':
                                 values = hero_data[another_hero_id][position_name]['value']
                                 if len(values) > 5:
-                                    wr = (values.count(1) / (values.count(1) + values.count(0)))*100
+                                    wr = (values.count(1) / (values.count(1) + values.count(0))) * 100
                                     dire_pos4_with_pos5 = wr
                         except:
                             pass
-            except: pass
+            except:
+                pass
         if dire_pos4_with_pos5 is not None:
             dire_wr_with += [dire_pos4_with_pos5]
         dire_wr_with += dire_pos3_with_team + dire_pos2_with_team + dire_pos1_with_team
-        #against
+        # against
         for pos in radiant_heroes_and_pos:
             try:
                 hero_id = str(radiant_heroes_and_pos[pos]['hero_id'])
@@ -662,17 +807,18 @@ def synergy_and_counterpick_copy(radiant_heroes_and_pos, dire_heroes_and_pos, ou
                             position_name = id_pos[another_hero_id]
                             values = hero_data[another_hero_id][position_name]['value']
                             if len(values) > 5:
-                                wr = (values.count(1) / (values.count(1) + values.count(0)))*100
+                                wr = (values.count(1) / (values.count(1) + values.count(0))) * 100
                                 if position_name == 'pos1':
                                     core_matchup = wr
                                 radiant_pos1_vs_team.append(wr)
-                        except: pass
+                        except:
+                            pass
                     elif pos == 'pos2':
                         try:
                             position_name = id_pos[another_hero_id]
                             values = hero_data[another_hero_id][position_name]['value']
                             if len(values) > 5:
-                                wr = (values.count(1) / (values.count(1) + values.count(0)))*100
+                                wr = (values.count(1) / (values.count(1) + values.count(0))) * 100
                                 radiant_pos2_vs_team.append(wr)
                         except:
                             pass
@@ -681,12 +827,13 @@ def synergy_and_counterpick_copy(radiant_heroes_and_pos, dire_heroes_and_pos, ou
                             position_name = id_pos[another_hero_id]
                             values = hero_data[another_hero_id][position_name]['value']
                             if len(values) > 5:
-                                wr = (values.count(1) / (values.count(1) + values.count(0)))*100
+                                wr = (values.count(1) / (values.count(1) + values.count(0))) * 100
                                 radiant_pos3_vs_team.append(wr)
                         except:
                             pass
-            except: pass
-            #dire
+            except:
+                pass
+            # dire
             try:
                 hero_id = str(dire_heroes_and_pos[pos]['hero_id'])
                 hero_data = data[hero_id][pos]['counterpick_duo']
@@ -698,7 +845,7 @@ def synergy_and_counterpick_copy(radiant_heroes_and_pos, dire_heroes_and_pos, ou
                             position_name = id_pos[another_hero_id]
                             values = hero_data[another_hero_id][position_name]['value']
                             if len(values) > 5:
-                                wr = (values.count(1) / (values.count(1) + values.count(0)))*100
+                                wr = (values.count(1) / (values.count(1) + values.count(0))) * 100
                                 dire_pos1_vs_team.append(wr)
                         except:
                             pass
@@ -707,7 +854,7 @@ def synergy_and_counterpick_copy(radiant_heroes_and_pos, dire_heroes_and_pos, ou
                             position_name = id_pos[another_hero_id]
                             values = hero_data[another_hero_id][position_name]['value']
                             if len(values) > 5:
-                                wr = (values.count(1) / (values.count(1) + values.count(0)))*100
+                                wr = (values.count(1) / (values.count(1) + values.count(0))) * 100
                                 dire_pos2_vs_team.append(wr)
                         except:
                             pass
@@ -716,11 +863,12 @@ def synergy_and_counterpick_copy(radiant_heroes_and_pos, dire_heroes_and_pos, ou
                             position_name = id_pos[another_hero_id]
                             values = hero_data[another_hero_id][position_name]['value']
                             if len(values) > 5:
-                                wr = (values.count(1) / (values.count(1) + values.count(0)))*100
+                                wr = (values.count(1) / (values.count(1) + values.count(0))) * 100
                                 dire_pos3_vs_team.append(wr)
                         except:
                             pass
-            except: pass
+            except:
+                pass
         radiant_wr_against += radiant_pos3_vs_team + radiant_pos2_vs_team + radiant_pos1_vs_team
         dire_wr_against += dire_pos3_vs_team + dire_pos2_vs_team + dire_pos1_vs_team
         if radiant_pos4_with_pos5 is not None and dire_pos4_with_pos5 is not None:
@@ -738,32 +886,37 @@ def synergy_and_counterpick_copy(radiant_heroes_and_pos, dire_heroes_and_pos, ou
         dire_pos3_vs_team = clean_up(dire_pos3_vs_team)
 
         if len(radiant_wr_with) > 0 and len(dire_wr_with) > 0:
-            sinergy = round(((sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))), 2)
+            sinergy = round(((sum(radiant_wr_with) / len(radiant_wr_with)) - (sum(dire_wr_with) / len(dire_wr_with))),
+                            2)
         if len(radiant_wr_against) > 0 and len(dire_wr_against) > 0:
             counterpick = round((sum(radiant_wr_against) / len(radiant_wr_against)) - (
-                        sum(dire_wr_against) / len(dire_wr_against)), 2)
+                    sum(dire_wr_against) / len(dire_wr_against)), 2)
         if len(radiant_pos1_vs_team) > 0 and len(dire_pos1_vs_team) > 0:
-            pos1_vs_team = round((sum(radiant_pos1_vs_team) / len(radiant_pos1_vs_team)) - (sum(dire_pos1_vs_team) / len(
-                dire_pos1_vs_team)), 2)
+            pos1_vs_team = round(
+                (sum(radiant_pos1_vs_team) / len(radiant_pos1_vs_team)) - (sum(dire_pos1_vs_team) / len(
+                    dire_pos1_vs_team)), 2)
         if len(radiant_pos3_vs_team) > 0 and len(dire_pos3_vs_team) > 0:
-            pos3_vs_team = round((sum(radiant_pos3_vs_team) / len(radiant_pos3_vs_team)) - (sum(dire_pos3_vs_team) / len(
-                dire_pos3_vs_team)), 2)
+            pos3_vs_team = round(
+                (sum(radiant_pos3_vs_team) / len(radiant_pos3_vs_team)) - (sum(dire_pos3_vs_team) / len(
+                    dire_pos3_vs_team)), 2)
         if len(radiant_pos2_vs_team) > 0 and len(dire_pos2_vs_team) > 0:
-            pos2_vs_team = round((sum(radiant_pos2_vs_team) / len(radiant_pos2_vs_team)) - (sum(dire_pos2_vs_team) / len(
-                dire_pos2_vs_team)), 2)
+            pos2_vs_team = round(
+                (sum(radiant_pos2_vs_team) / len(radiant_pos2_vs_team)) - (sum(dire_pos2_vs_team) / len(
+                    dire_pos2_vs_team)), 2)
         if core_matchup is not None:
             core_matchup -= 50
             core_matchup = round(core_matchup, 2)
         verdict, radiant_predict, dire_predict = analyze_draft(sinergy, counterpick, pos1_vs_team, core_matchup,
                                                                pos2_vs_team, pos3_vs_team,
                                                                sups, over45)
-        output_message += (f'\nMy protracker: {verdict}\nSinergy: {sinergy}\nCounterpick: {counterpick}\nPos1_vs_team: {pos1_vs_team}\nPos2_vs_team: {pos2_vs_team}\nPos3_vs_team: {pos3_vs_team}\nCore matchup: {core_matchup}\nSups: {sups}\n')
+        output_message += (
+            f'\nMy protracker: {verdict}\nSinergy: {sinergy}\nCounterpick: {counterpick}\nPos1_vs_team: {pos1_vs_team}\nPos2_vs_team: {pos2_vs_team}\nPos3_vs_team: {pos3_vs_team}\nCore matchup: {core_matchup}\nSups: {sups}\n')
 
     return output_message
 
 
 def avg_over45(heroes_and_positions):
-    with open('./heroes_data/over45_dict.txt', 'r') as f:
+    with open('./1722505765_top600_heroes_data/over45_dict.txt', 'r') as f:
         data = json.load(f)
         data = data['value']
     # print('avg_over45')
@@ -782,7 +935,7 @@ def avg_over45(heroes_and_positions):
                         combo = tuple(sorted([hero_id, second_hero_id]))
                         if combo not in over45_unique_combinations:
                             over45_unique_combinations.add(combo)
-                            if len(duo_data['value']) >=4:
+                            if len(duo_data['value']) >= 4:
                                 over45_duo.append(sum(duo_data['value']) / len(duo_data['value']))
                         # Третий герой
                         for pos3, item3 in heroes_and_positions.items():
@@ -794,8 +947,10 @@ def avg_over45(heroes_and_positions):
                                     if combo not in over45_unique_combinations:
                                         over45_unique_combinations.add(combo)
                                         value = duo_data['over45_trio'][third_hero_id][pos3]['value']
-                                        if len(value) >=3:
-                                            over45_trio.append(sum(duo_data['over45_trio'][third_hero_id][pos3]['value']) / len(duo_data['over45_trio'][third_hero_id][pos3]['value']))
+                                        if len(value) >= 3:
+                                            over45_trio.append(
+                                                sum(duo_data['over45_trio'][third_hero_id][pos3]['value']) / len(
+                                                    duo_data['over45_trio'][third_hero_id][pos3]['value']))
                                 except:
                                     pass
                 except:
@@ -807,9 +962,10 @@ def avg_over45(heroes_and_positions):
     avg_over45 = (avg_over45_duo + avg_over45_trio) / 2 if avg_over45_trio is not None else avg_over45_duo
     return avg_over45
 
+
 def lane_report_def(my_team, enemy_team):
     # print('lane_report')
-    with open('./heroes_data/lane_dict.txt', 'r') as f:
+    with open('./1722505765_top600_heroes_data/lane_dict.txt', 'r') as f:
         heroes_data = json.load(f)['value']
     avg_kills, avg_time, team_line_report, over35, over40, over45, over50, over55 = [], [], [], [], [], [], [], []
     copy_team_pos_and_heroes = {data['hero_id']: pos for pos, data in my_team.items()}
@@ -823,33 +979,40 @@ def lane_report_def(my_team, enemy_team):
                     team_mate_data = data[pos]['lane_report']['with_hero'][team_mate_hero_id]['pos5']['value']
                 except KeyError:
                     team_mate_data = data[pos]['lane_report']['solo']['value']
-                lane = team_mate_data.count(1) / (team_mate_data.count(1) + team_mate_data.count(0) + team_mate_data.count(2))
+                lane = team_mate_data.count(1) / (
+                        team_mate_data.count(1) + team_mate_data.count(0) + team_mate_data.count(2))
                 team_line_report.append(lane)
             elif pos == 'pos3':
                 try:
                     team_mate_hero_id = str(my_team['pos 4']['hero_id'])
                     team_mate_data = \
-                    data[pos]['lane_report']['with_hero'][team_mate_hero_id]['pos4']['value']
+                        data[pos]['lane_report']['with_hero'][team_mate_hero_id]['pos4']['value']
                 except KeyError:
                     team_mate_data = data[pos]['lane_report']['solo']['value']
-                lane = team_mate_data.count(1) / (team_mate_data.count(1) + team_mate_data.count(0) + team_mate_data.count(2))
+                lane = team_mate_data.count(1) / (
+                        team_mate_data.count(1) + team_mate_data.count(0) + team_mate_data.count(2))
                 team_line_report.append(lane)
             elif pos == 'pos2':
                 try:
                     team_mate_hero_id = str(enemy_team['pos 2']['hero_id'])
                     team_mate_data = \
-                    data[pos]['lane_report']['against_hero'][team_mate_hero_id]['pos2']['value']
+                        data[pos]['lane_report']['against_hero'][team_mate_hero_id]['pos2']['value']
                 except KeyError:
                     team_mate_data = data[pos]['lane_report']['solo']['value']
-                lane = team_mate_data.count(1) / (team_mate_data.count(1) + team_mate_data.count(0) + team_mate_data.count(2))
+                lane = team_mate_data.count(1) / (
+                        team_mate_data.count(1) + team_mate_data.count(0) + team_mate_data.count(2))
                 team_line_report.append(lane)
             pass
     team_avg_lanes = sum(team_line_report) / len(team_line_report)
     return round(team_avg_lanes, 2)
 
 
+def calculate_average(values):
+    return sum(values) / len(values) if values else None
 
 def tm_kills(radiant_heroes_and_positions, dire_heroes_and_positions):
+    output_data = {'dire_kills_duo': [], 'dire_kills_trio': [], 'dire_time_duo': [], 'dire_time_trio': [],
+                   'radiant_kills_duo': [], 'radiant_kills_trio': [], 'radiant_time_duo': [], 'radiant_time_trio': []}
     # print('tm_kills')
     positions = ['1', '2', '3', '4', '5']
     radiant_time_unique_combinations, radiant_kills_unique_combinations, dire_kills_unique_combinations, dire_time_unique_combinations = set(), set(), set(), set()
@@ -954,11 +1117,8 @@ def tm_kills(radiant_heroes_and_positions, dire_heroes_and_positions):
 
                     except:
                         pass
-        except: pass
-
-    def calculate_average(values):
-        return sum(values) / len(values) if values else 0
-
+        except:
+            pass
 
     avg_time_trio = calculate_average(output_data['radiant_time_trio'] + output_data['dire_time_trio'])
     avg_kills_trio = calculate_average(output_data['radiant_kills_trio'] + output_data['dire_kills_trio'])
@@ -971,23 +1131,26 @@ def tm_kills(radiant_heroes_and_positions, dire_heroes_and_positions):
     return round(avg_kills, 2), round(avg_time, 2)
 
 
+
+
 def tm_kills_teams(radiant_heroes_and_pos, dire_heroes_and_pos, radiant_team_name, dire_team_name):
     # print('tm_kills')
+    output_data = {'dire_kills_duo': [], 'dire_kills_trio': [], 'dire_time_duo': [], 'dire_time_trio': [],
+                   'radiant_kills_duo': [], 'radiant_kills_trio': [], 'radiant_time_duo': [], 'radiant_time_trio': []}
     translate_teams = {
         'g2.invictus gaming': 'g2 x ig',
         'talon esports': 'talon',
         'wbg.xg': 'xtreme gaming'
     }
-    radiant_team_name = (translate_teams[radiant_team_name] if radiant_team_name in translate_teams else radiant_team_name)
-    dire_team_name = (translate_teams[dire_team_name] if dire_team_name in translate_teams else dire_team_name)
+    radiant_team_name = (translate_teams[radiant_team_name] if radiant_team_name in translate_teams else radiant_team_name.lower())
+    dire_team_name = (translate_teams[dire_team_name] if dire_team_name in translate_teams else dire_team_name.lower())
     positions = ['1', '2', '3', '4', '5']
     radiant_time_unique_combinations, radiant_kills_unique_combinations, dire_kills_unique_combinations, dire_time_unique_combinations = set(), set(), set(), set()
     with open('./pro_heroes_data/total_time_kills_dict.txt', 'r') as f:
         data = json.load(f)
-        work_data = data['teams'][radiant_team_name]
+    work_data = data['teams'][radiant_team_name]
     for pos in positions:
         # radiant_synergy
-
         try:
             hero_id = str(radiant_heroes_and_pos['pos' + pos]['hero_id'])
             time_data = work_data[hero_id]['pos' + pos]['total_time_duo']
@@ -1086,11 +1249,8 @@ def tm_kills_teams(radiant_heroes_and_pos, dire_heroes_and_pos, radiant_team_nam
 
                     except:
                         pass
-        except: pass
-
-    def calculate_average(values):
-        return sum(values) / len(values) if values else 0
-
+        except:
+            pass
 
     avg_time_trio = calculate_average(output_data['radiant_time_trio'] + output_data['dire_time_trio'])
     avg_kills_trio = calculate_average(output_data['radiant_kills_trio'] + output_data['dire_kills_trio'])

@@ -5,9 +5,11 @@ import traceback
 import requests
 
 import id_to_name
+from dltv_cyberscore import get_team_positions, get_map_id, send_message, add_url
+from trash import tm_kills, tm_kills_teams, synergy_and_counterpick_new, avg_over45, lane_report_def
+from test import update_pro
 from dltv_cyberscore import dota2protracker
 from egb import get_players, get_picks_and_pos, get_exac_match, get_strats_graph_match, check_players_skill
-from trash import analyze_players, syngery_and_counterpick, avg_over45
 url = "https://egb.com/bets"
 params = {
     "active": "true",
@@ -46,35 +48,28 @@ while True:
                                 answer = get_picks_and_pos(match_id=exac_match['matchId'])
                                 if answer is not None:
                                     if answer != True:
+
                                         radiant_heroes_and_pos, dire_heroes_and_pos, match_id, output_message = answer
                                         output_message, impact_diff, radiant_players_check, dire_players_check, radiant_impactandplayers, dire_impactandplayers, radiant_message_add, dire_message_add, impact_message = check_players_skill(
                                             radiant_heroes_and_pos, dire_heroes_and_pos, output_message)
-                                        radiant_lane_report = analyze_players(my_team=radiant_heroes_and_pos,
-                                                                              enemy_team=dire_heroes_and_pos,
-                                                                              heroes_data=heroes_data)
-                                        dire_lane_report = analyze_players(my_team=dire_heroes_and_pos,
-                                                                           enemy_team=radiant_heroes_and_pos,
-                                                                           heroes_data=heroes_data)
-                                        lane_report = round(((radiant_lane_report - dire_lane_report) * 100), 2)
-                                        radiant_over45 = avg_over45(radiant_heroes_and_pos, heroes_data)
-                                        dire_over45 = avg_over45(dire_heroes_and_pos, heroes_data)
-                                        over45 = (radiant_over45 - dire_over45) * 100
-                                        output_message += (
-                                            f'Radiant после 45 минуты сильнее на: {over45}\nRadiant lanes до 10 минуты: {lane_report}\n')
-                                        output_message = syngery_and_counterpick(radiant_heroes_and_pos,
-                                                                                 dire_heroes_and_pos,
-                                                                                 output_message)
                                         output = ", ".join(
                                             [f"'{pos}' : '{data['hero_name']}'" for pos, data in radiant_heroes_and_pos.items()])
                                         dire_output = ", ".join(
                                             [f"'{pos}' : '{data['hero_name']}'" for pos, data in dire_heroes_and_pos.items()])
-                                        print(f'Radint pick: {output}\nDire pick: {dire_output}')
-                                        dota2protracker(radiant_heroes_and_positions=radiant_heroes_and_pos,
-                                                        dire_heroes_and_positions=dire_heroes_and_pos,
-                                                        radiant_team_name=dire_and_radiant['radiant'],
-                                                        dire_team_name=dire_and_radiant['dire'], antiplagiat_url=match_id,
-                                                        score=[0, 0], egb=True, output_message=output_message,
-                                                        radiant_players_check=radiant_players_check, dire_players_check=dire_players_check, radiant_impactandplayers=radiant_impactandplayers, dire_impactandplayers=dire_impactandplayers, radiant_message_add=radiant_message_add, dire_message_add=dire_message_add, impact_message=impact_message)
+                                        radiant_lane_report = lane_report_def(my_team=radiant_heroes_and_pos,
+                                                                              enemy_team=dire_heroes_and_pos)
+                                        dire_lane_report = lane_report_def(my_team=dire_heroes_and_pos,
+                                                                           enemy_team=radiant_heroes_and_pos)
+                                        lane_report = round(((radiant_lane_report - dire_lane_report) * 100), 2)
+                                        output_message += f'Radiant lanes до 10 минуты: {lane_report}\n'
+                                        output_message = synergy_and_counterpick_new(
+                                            radiant_heroes_and_pos=radiant_heroes_and_pos,
+                                            dire_heroes_and_pos=dire_heroes_and_pos,
+                                            output_message=output_message)
+                                        lane_report = round(((radiant_lane_report - dire_lane_report) * 100), 2)
+                                        send_message(output_message)
+                                        add_url(url)
+
                                     else:
                                         map = True
                             else:

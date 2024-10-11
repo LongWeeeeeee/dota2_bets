@@ -1258,7 +1258,7 @@ def explore_database(mkdir, file_name, pro=False, show_prints=None, lane=None,
         players_imp_data, total_time_kills_dict, over35_dict, over45_dict, synergy_and_counterpick_dict, \
             lane_dict, team_stat_dict, total_time_kills_dict_teams, used_maps = result
 
-        # Сохранение обновленных данных
+        print('Сохранение обновленных данных')
         if protracker:
             save_json_file(f'./{mkdir}/synergy_and_counterpick_dict.txt', synergy_and_counterpick_dict)
         if over35:
@@ -1304,7 +1304,7 @@ def synergy_team(heroes_and_pos, enemy_heroes_and_pos, output, mkdir, data):
                 continue
             second_hero_id = str(heroes_and_pos[second_pos]['hero_id'])
             duo_data = hero_data.get(second_hero_id, {}).get(second_pos, {})
-            if len(duo_data.get('value', {})) >= 15:
+            if len(duo_data.get('value', {})) >= 30:
                 combo = tuple(sorted([hero_id, second_hero_id]))
                 if combo not in unique_combinations:
                     unique_combinations.add(combo)
@@ -1316,7 +1316,7 @@ def synergy_team(heroes_and_pos, enemy_heroes_and_pos, output, mkdir, data):
                 if third_pos not in [pos, second_pos]:
                     third_hero_id = str(heroes_and_pos[third_pos]['hero_id'])
                     trio_data = duo_data.get('synergy_trio', {}).get(third_hero_id, {}).get(third_pos, {})
-                    if len(trio_data.get('value', {})) >= 10:
+                    if len(trio_data.get('value', {})) >= 15:
                         combo = tuple(sorted([hero_id, second_hero_id, third_hero_id]))
                         if combo not in unique_combinations:
                             unique_combinations.add(combo)
@@ -1374,33 +1374,21 @@ def synergy_and_counterpick_new(radiant_heroes_and_pos, dire_heroes_and_pos):
                               'radiant_counterpick', data)
     output = counterpick_team(dire_heroes_and_pos, radiant_heroes_and_pos, output,
                               'dire_counterpick', data)
-    try:
-        counterpick_dire = sum(output['dire_counterpick_duo']) / len(output['dire_counterpick_duo'])
-        counterpick_radiant = sum(output['radiant_counterpick_duo']) / len(output['radiant_counterpick_duo'])
-        if len(output['radiant_synergy_2vs1']):
-            counterpick_radiant = (counterpick_radiant + sum(output['radiant_synergy_2vs1']) / len(
-                output['radiant_synergy_2vs1'])) / 2
-        if len(output['dire_synergy_2vs1']):
-            counterpick_dire = (counterpick_dire + sum(output['dire_synergy_2vs1']) / len(
-                output['dire_synergy_2vs1'])) / 2
-        counterpick = (counterpick_radiant - counterpick_dire) * 100
-    except ZeroDivisionError:
-        counterpick = None
-    try:
-        synergy_dire = sum(output['dire_synergy_duo']) / len(output['dire_synergy_duo'])
-        synergy_radiant = sum(output['radiant_synergy_duo']) / len(output['radiant_synergy_duo'])
-        if len(output['dire_synergy_trio']):
-            synergy_dire = (synergy_dire + sum(output['dire_synergy_trio']) / len(output['dire_synergy_trio'])) / 2
-        if len(output['radiant_synergy_trio']):
-            synergy_radiant = (synergy_radiant + sum(output['radiant_synergy_trio']) / len(
-                output['radiant_synergy_trio'])) / 2
-        synergy = (synergy_radiant - synergy_dire) * 100
-    except ZeroDivisionError:
-        synergy = None
+    counterpick_duo = (sum(output['radiant_counterpick_duo']) / len(output['radiant_counterpick_duo']) - sum(output['dire_counterpick_duo']) / len(output['dire_counterpick_duo']))*100
+    if len(output['radiant_synergy_2vs1']) > 0 and len(output['dire_synergy_2vs1']) > 0:
+        counterpick2vs1 = (sum(output['radiant_synergy_2vs1']) / len(
+            output['radiant_synergy_2vs1'])) / 2 - (sum(output['dire_synergy_2vs1']) / len(
+            output['dire_synergy_2vs1'])) / 2
+    synergy_duo = (sum(output['radiant_synergy_duo']) / len(output['radiant_synergy_duo']) - sum(output['dire_synergy_duo']) / len(output['dire_synergy_duo']))*100
+    if len(output['dire_synergy_trio']) > 0 and len(output['radiant_synergy_trio']) > 0:
+        synergy_trio = (((sum(output['radiant_synergy_trio']) / len(
+            output['radiant_synergy_trio'])) / 2) - ((sum(output['dire_synergy_trio']) / len(output['dire_synergy_trio'])) / 2))*100
+    else:
+        synergy_trio = None
     end_time = time.time()
     execution_time = end_time - start_time
     print(f'synergy_and_counterpick_new time: {execution_time}s')
-    return f'\nsynergy_and_counterpick_new:\nSynergy: {synergy}\nCounterpick: {counterpick}\n'
+    return f'\nsynergy_and_counterpick_new:\nSynergy_duo: {synergy_duo}\nSynergy_trio: {synergy_trio}\nCounterpick_duo: {counterpick_duo}\n'
 
 
 def calculate_over45(radiant_heroes_and_pos, dire_heroes_and_pos):
@@ -1432,7 +1420,7 @@ def avg_over45(heroes_and_positions, data):
             combo = tuple(sorted([hero_id, second_hero_id]))
             if combo not in over45_unique_combinations:
                 over45_unique_combinations.add(combo)
-                if len(duo_data.get('value', {})) >= 10:
+                if len(duo_data.get('value', {})) >= 15:
                     value = duo_data['value'].count(1)/(duo_data['value'].count(1)+duo_data['value'].count(0))
                     if value > 0.52 or value < 0.48:
                         over45_duo.append(value)
@@ -1445,7 +1433,7 @@ def avg_over45(heroes_and_positions, data):
                 if combo not in over45_unique_combinations:
                     over45_unique_combinations.add(combo)
                     trio_data = duo_data.get('over45_trio', {}).get(third_hero_id, {}).get(pos3, {}).get('value', {})
-                    if len(trio_data) >= 6:
+                    if len(trio_data) >= 10:
                         value = trio_data.count(1)/(trio_data.count(1) + trio_data.count(0))
                         if value > 0.52 or value < 0.48:
                             over45_trio.append(value)
@@ -1462,13 +1450,13 @@ def avg_over45(heroes_and_positions, data):
 def calculate_lanes(radiant_heroes_and_pos, dire_heroes_and_pos):
     with open('./1722505765_top600_heroes_data/lane_dict.txt', 'r') as f:
         heroes_data = json.load(f)
-    # lane_2vs1(radiant_heroes_and_pos, radiant_heroes_and_pos, heroes_data)
-    radiant_lane_report = lane_report_def(my_team=radiant_heroes_and_pos, enemy_team=dire_heroes_and_pos,
-                                          heroes_data=heroes_data)
-    dire_lane_report = lane_report_def(my_team=dire_heroes_and_pos, enemy_team=radiant_heroes_and_pos,
-                                       heroes_data=heroes_data)
-    lane_report = round(((radiant_lane_report - dire_lane_report) * 100), 2)
-    return f'Radiant lanes до 10 минуты: {lane_report}\n'
+    lane_2vs1(radiant_heroes_and_pos, radiant_heroes_and_pos, heroes_data)
+    # radiant_lane_report = lane_report_def(my_team=radiant_heroes_and_pos, enemy_team=dire_heroes_and_pos,
+    #                                       heroes_data=heroes_data)
+    # dire_lane_report = lane_report_def(my_team=dire_heroes_and_pos, enemy_team=radiant_heroes_and_pos,
+    #                                    heroes_data=heroes_data)
+    # lane_report = round(((radiant_lane_report - dire_lane_report) * 100), 2)
+    # return f'Radiant lanes до 10 минуты: {lane_report}\n'
 
 
 def new_lane_report_def(radiant, dire, heroes_data):

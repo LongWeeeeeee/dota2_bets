@@ -1,6 +1,7 @@
-from functions import get_maps_new, research_maps, explore_database
+from test import get_maps_new
+from functions import research_maps, explore_database
 import json
-from id_to_name import pro_teams, all_teams, top3000EU ,top_1000EU_top100_ASIA, top_2000EU_top1000_ASIA_uniq, top3000EU_top1000SE_ASIA_nonAnon
+from id_to_name import pro_teams, all_teams, top4000EU_top2000ASIA ,top_1000EU_top100_ASIA, top_2000EU_top1000_ASIA_uniq
 import asyncio, aiohttp
 
 def update_pro(show_prints=None, game_mods=None, only_in_ids=None):
@@ -33,11 +34,11 @@ def update_all_teams(show_prints=None, only_in_ids=None):
 
 
 def update_my_protracker(show_prints=None):
-    # get_maps_new(maps_to_save='./1722505765_top600_heroes_data/1722505765_top600_maps', game_mods=[2, 22],
-    #              show_prints=show_prints, ids=top3000EU.keys())
-    # research_maps(mkdir='1722505765_top600_heroes_data', maps_to_explore='1722505765_top600_maps',
-    #               file_name='1722505765_top600_output', show_prints=show_prints)
-
+    # asyncio.run(get_maps_new(maps_to_save='./1722505765_top600_heroes_data/1722505765_top600_maps', game_mods=[2, 22],
+    #              show_prints=show_prints, ids=top4000EU_top2000ASIA.keys()))
+    research_maps(mkdir='1722505765_top600_heroes_data', maps_to_explore='1722505765_top600_maps',
+                  file_name='1722505765_top600_output', show_prints=show_prints)
+    #
     explore_database(mkdir='1722505765_top600_heroes_data', file_name='1722505765_top600_output',
                      show_prints=show_prints, lane=True, over35=True,
                      over45=True, protracker=True)

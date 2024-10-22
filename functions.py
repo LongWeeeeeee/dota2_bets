@@ -12,11 +12,13 @@ from bs4 import BeautifulSoup
 
 import asyncio
 
-from test import research_map_proceed_async
+# from test import research_map_proceed_async
 import id_to_name
 import keys
 from id_to_name import pro_teams
-from keys import api_token_1, api_token_2, api_token_4, api_token_5, api_token_3
+from keys import api_token_3, api_token_4, api_token_5, api_token_2, api_token_1, api_token_6, api_token_7,\
+              api_token_8, api_token_9, api_token_10, api_token_11, api_token_12, api_token_13, api_token_14,\
+              api_token_15, api_token_16, api_token_17, api_token_18
 
 radiant_position_to_lane = {
     'pos1': 'bottomLaneOutcome',
@@ -684,26 +686,46 @@ def get_pro_players_ids(counter=0):
     return pro_ids
 
 
-def proceed_get_maps(skip, ids, only_in_ids, output_data, ids_to_graph=None, game_mods=None, check=True):
-    tokens = [api_token_3, api_token_4, api_token_5, api_token_2]
-    api_token = api_token_1
+def get_maps_new(game_mods, maps_to_save, ids,
+                 show_prints=None, skip=0, count=0, only_in_ids=False):
+    tokens = [api_token_3, api_token_4, api_token_5, api_token_2, api_token_1, api_token_6, api_token_7,
+              api_token_8, api_token_9, api_token_10, api_token_11, api_token_12, api_token_13, api_token_14,
+              api_token_15, api_token_16, api_token_17, api_token_18]
+    api_token = api_token_16
+    ids_to_graph, total_map_ids, output_data = [], [], []
+    for check_id in set(ids):
+        count += 1
+        ids_to_graph.append(check_id)
 
+        if show_prints:
+            print(f'{count}/{len(ids)}')
+
+        if len(ids_to_graph) == 5 or count == len(ids):
+            api_token, tokens = proceed_get_maps(ids=ids, skip=skip, game_mods=game_mods, only_in_ids=only_in_ids,
+                                   output_data=output_data, ids_to_graph=ids_to_graph, tokens=tokens, api_token=api_token)
+            ids_to_graph = []  # Очистка после обработки
+
+    if len(output_data) > 0:
+        with open(f'{maps_to_save}.txt', 'r+') as f:
+            data = json.load(f)
+            f.truncate()
+            f.seek(0)
+            out = list(set(output_data + data))
+            json.dump(out, f)
+
+
+def proceed_get_maps(skip, ids, only_in_ids, output_data, tokens, api_token, ids_to_graph=None, game_mods=None, check=True):
     while check:
         if game_mods == [2, 22]:
             query = '''
             {
               players(steamAccountIds: %s) {
                 steamAccountId
-                matchesFirstPeriod: matches(request: {startDateTime: 1716336000, endDateTime: 1723593600,
+                matchesFirstPeriod: matches(request: {startDateTime: 1727827200,
                  take: 100, skip: %s, gameModeIds: %s}) {
                   id
-                }
-                matchesSecondPeriod: matches(request: {startDateTime: 1724803200, take: 100, skip: %s,
-                 gameModeIds: %s}) {
-                  id
-                }
-              }
-            }''' % (ids_to_graph, skip, game_mods, skip, game_mods)
+              }}
+            }''' % (ids_to_graph, skip, game_mods)
         else:
             query = '''
             {
@@ -722,19 +744,26 @@ def proceed_get_maps(skip, ids, only_in_ids, output_data, ids_to_graph=None, gam
               }
             }''' % (ids_to_graph, skip)
 
-        headers = {"Authorization": f"Bearer {api_token}"}
+        headers = {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "Origin": "https://api.stratz.com",
+            "Referer": "https://api.stratz.com/graphiql",
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+            "Authorization": f"Bearer {api_token}"
+        }
         try:
             response = requests.post('https://api.stratz.com/graphql', json={"query": query}, headers=headers)
-            data = response.json()
+            data = json.loads(response.text)
             if game_mods == [2, 22]:
-                for player in data['data']['players']:
-                    if player['matchesFirstPeriod'] or player['matchesSecondPeriod']:
-                        for matches in [player['matchesFirstPeriod'], player['matchesSecondPeriod']]:
-                            for map_id in matches:
-                                output_data.append(map_id['id'])
+                if any(player['matchesFirstPeriod'] for player in data['data']['players']):
+                    for player in data['data']['players']:
+                        for match in player['matchesFirstPeriod']:
+                            output_data.append(match['id'])
                         skip += 100
-                    else:
-                        check = False
+                else:
+                    check = False
             else:
                 for team in data['data']['teams']:
                     for match in team['matches']:
@@ -744,41 +773,20 @@ def proceed_get_maps(skip, ids, only_in_ids, output_data, ids_to_graph=None, gam
                         else:
                             output_data.append(match['id'])
                         check = False
-            if not check:
-                break
-        except requests.exceptions.ConnectTimeout:
-            time.sleep(5)
         except Exception as e:
-            print(e)
+            print(f"Unexpected error: {e}")
             if tokens:
                 api_token = tokens.pop(0)
+                print('меняю токен')
+
             else:
-                api_token = api_token_1
-                tokens = [api_token_3, api_token_4, api_token_5, api_token_2]
-
-
-def get_maps_new(game_mods, maps_to_save, ids,
-                 show_prints=None, skip=0, count=0, only_in_ids=False):
-    ids_to_graph, total_map_ids, output_data = [], [], []
-    for check_id in set(ids):
-        count += 1
-        ids_to_graph.append(check_id)
-
-        if show_prints:
-            print(f'{count}/{len(ids)}')
-
-        if len(ids_to_graph) == 5 or count == len(ids):
-            proceed_get_maps(ids=ids, skip=skip, game_mods=game_mods, only_in_ids=only_in_ids,
-                             output_data=output_data, ids_to_graph=ids_to_graph)
-            ids_to_graph = []  # Очистка после обработки
-
-    if len(output_data) > 0:
-        with open(f'{maps_to_save}.txt', 'r+') as f:
-            data = json.load(f)
-            f.truncate()
-            f.seek(0)
-            out = list(set(output_data+data))
-            json.dump(out, f)
+                tokens = [api_token_3, api_token_4, api_token_5, api_token_2, api_token_1, api_token_6, api_token_7,
+                          api_token_8, api_token_9, api_token_10, api_token_11, api_token_12, api_token_13,
+                          api_token_14,
+                          api_token_15, api_token_16, api_token_17]
+                api_token = tokens.pop(0)
+                print('обновляю токены')
+    return api_token, tokens
 
 
 def eat_temp_files(mkdir, file_data, file_name):
@@ -791,15 +799,19 @@ def eat_temp_files(mkdir, file_data, file_name):
                 for map_id in data:
                     if map_id not in file_data:
                         file_data[map_id] = data[map_id]
-        with open(f'./{mkdir}/{file_name}.txt', 'w') as f:
+        with open(f'./{mkdir}/{file_name}_new.txt', 'w') as f:
             json.dump(file_data, f)
+        os.remove(f'./{mkdir}/{file_name}.txt')
+        os.rename(f'./{mkdir}/{file_name}_new.txt', f'./{mkdir}/{file_name}.txt')
         shutil.rmtree(f'./{mkdir}/temp_files')
         return file_data
 
 
 def research_map_proceed(maps_to_explore, file_data, file_name, mkdir, counter=0, another_counter=0,
                          show_prints=None):
-    tokens = [api_token_3, api_token_4, api_token_5, api_token_2, api_token_1]
+    tokens = [api_token_3, api_token_4, api_token_5, api_token_2, api_token_1, api_token_6, api_token_7,
+              api_token_8, api_token_9, api_token_10, api_token_11, api_token_12, api_token_13, api_token_14,
+              api_token_15, api_token_16, api_token_17]
     api_token = tokens.pop()
     new_data, error_maps = {}, set()
     # Попытка загрузить временные данные
@@ -865,7 +877,15 @@ def research_map_proceed(maps_to_explore, file_data, file_name, mkdir, counter=0
               }
             }''' % map_id
 
-            headers = {"Authorization": f"Bearer {api_token}"}
+            headers = {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Accept-Encoding": "gzip, deflate, br, zstd",
+                "Origin": "https://api.stratz.com",
+                "Referer": "https://api.stratz.com/graphiql",
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+                "Authorization": f"Bearer {api_token}"
+            }
             response = requests.post('https://api.stratz.com/graphql', json={"query": query},
                                      headers=headers, timeout=5)
             if 'data' in response.json():
@@ -875,21 +895,20 @@ def research_map_proceed(maps_to_explore, file_data, file_name, mkdir, counter=0
                 raise requests.exceptions.RequestException
             if data['direKills'] is not None:
                 new_data[map_id] = data  # Сохраняем данные карты
-        except requests.exceptions.ConnectTimeout as e:
-            print(f"Request failed: {e}")
-            error_maps.add(map_id)
         except Exception as e:
-            print(e)
+            print(f"Unexpected error: {e}")
             if tokens:
                 api_token = tokens.pop(0)
+                print('меняю токен')
+
             else:
-                api_token = api_token_1
-                tokens = [api_token_3, api_token_4, api_token_5, api_token_2]
-
-    # Сохранение данных в файл после обработки всех карт
-    if another_counter > 0:
-        save_final_file(file_data, mkdir, file_name)
-
+                tokens = [api_token_3, api_token_4, api_token_5, api_token_2, api_token_1, api_token_6, api_token_7,
+                          api_token_8, api_token_9, api_token_10, api_token_11, api_token_12, api_token_13,
+                          api_token_14,
+                          api_token_15, api_token_16, api_token_17]
+                api_token = tokens.pop(0)
+                print('обновляю токены')
+    eat_temp_files(mkdir, file_data, file_name)
 
 def save_temp_file(new_data, mkdir, another_counter):
     print('Сохраняю результат')
@@ -923,12 +942,10 @@ def research_maps(maps_to_explore, file_name, mkdir, show_prints=None):
         maps_to_explore = json.load(f)
     with open(f'./{mkdir}/{file_name}.txt', 'r+') as f:
         file_data = json.load(f)
-    asyncio.run(research_map_proceed_async(
+    research_map_proceed(
         maps_to_explore=maps_to_explore, file_data=file_data,
-        file_name='1722505765_top600_output', mkdir='1722505765_top600_heroes_data', show_prints=True))
+        file_name='1722505765_top600_output', mkdir='1722505765_top600_heroes_data', show_prints=True)
 
-    # research_map_proceed(maps_to_explore=maps_to_explore, file_data=file_data, file_name=file_name,
-    #                      mkdir=mkdir, show_prints=show_prints)
 
 
 def update_2v1_lanes(dire_heroes_and_pos, radiant_heroes_and_pos, match, lane_dict):

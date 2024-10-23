@@ -47,7 +47,7 @@ def proceed_map(url, radiant_team_name, dire_team_name, score, tier, radiant_her
                     dire_heroes_and_pos[pos]['hero_id'] = hero_id
         output_message += f'{radiant_team_name} VS {dire_team_name}\nСчет: {score}\n{url}\n'
         print(f'{radiant_team_name} VS {dire_team_name}\nСчет: {score}\n')
-        # output_message += calculate_over45(radiant_heroes_and_pos, dire_heroes_and_pos)
+        output_message += calculate_over45(radiant_heroes_and_pos, dire_heroes_and_pos)
         output_message += calculate_lanes(radiant_heroes_and_pos, dire_heroes_and_pos)
         output_message += synergy_and_counterpick_new(
             radiant_heroes_and_pos=radiant_heroes_and_pos,
@@ -91,25 +91,25 @@ def proceed_map(url, radiant_team_name, dire_team_name, score, tier, radiant_her
         #         output_message += (
         #             f'\nСреднее кол-во убийств: {avg_kills_teams}\n'
         #             f'Среднее время: {avg_time_teams}\n')
-        print(output_message)
+        send_message(output_message)
         add_url(url)
 
 
 if __name__ == "__main__":
     # update_pro(show_prints=True)
     # update_all_teams(show_prints=True)
-    update_my_protracker(show_prints=True)
+    # update_my_protracker(show_prints=True)
     # update_all_teams(show_prints=True, only_in_ids=['BetBoom Team', 'Team Liquid'])
     # general(['https://cyberscore.live/en/matches/112515/'], radiant_team_name='Aurora Gaming', dire_team_name='Beastcoast', tier=1)
 
-    # proceed_map(url='', radiant_team_name='Radiant', dire_team_name='Dire', score=[0, 0], tier=1,
-    #             radiant_heroes_and_pos= {'pos1': {'hero_name': "muerta"}, 'pos2': {'hero_name': 'puck'},
-    #                                      'pos3': {'hero_name': 'sand king'}, 'pos4': {'hero_name': 'magnus'},
-    #                                      'pos5': {'hero_name': 'clockwerk'}},
-    #             dire_heroes_and_pos={'pos1': {'hero_name': 'shadow fiend'}, 'pos2': {'hero_name': "monkey king"},
-    #                                     'pos3': {'hero_name': 'visage'}, 'pos4': {'hero_name': 'dark willow'},
-    #                                     'pos5': {'hero_name': 'tusk'}},
-    #             output_message='')
+    proceed_map(url='', radiant_team_name='Radiant', dire_team_name='Dire', score=[0, 0], tier=1,
+                radiant_heroes_and_pos= {'pos1': {'hero_name': "gyrocopter"}, 'pos2': {'hero_name': 'earth spirit'},
+                                         'pos3': {'hero_name': 'visage'}, 'pos4': {'hero_name': 'muerta'},
+                                         'pos5': {'hero_name': 'tusk'}},
+                dire_heroes_and_pos={'pos1': {'hero_name': "nature's prophet"}, 'pos2': {'hero_name': "sand king"},
+                                        'pos3': {'hero_name': 'underlord'}, 'pos4': {'hero_name': 'hoodwink'},
+                                        'pos5': {'hero_name': 'clockwerk'}},
+                output_message='')
 
 
     # while True:

@@ -35,12 +35,12 @@ def update_all_teams(show_prints=None, only_in_ids=None):
 def update_my_protracker(show_prints=None):
     # get_maps_new(maps_to_save='./1722505765_top600_heroes_data/1722505765_top600_maps', game_mods=[2, 22],
     #              show_prints=show_prints, ids=list(top4000EU_top2000ASIA.keys()) + list(top_1000EU_top100_ASIA.keys()) + list(top_2000EU_top1000_ASIA_uniq.keys()))
-    research_maps(mkdir='1722505765_top600_heroes_data', maps_to_explore='1722505765_top600_maps',
-                  file_name='1722505765_top600_output', show_prints=show_prints)
+    # research_maps(mkdir='1722505765_top600_heroes_data', maps_to_explore='1722505765_top600_maps',
+    #               file_name='1722505765_top600_output', show_prints=show_prints)
     # #
-    # explore_database(mkdir='1722505765_top600_heroes_data', file_name='1722505765_top600_output',
-    #                  show_prints=show_prints, lane=True, over35=True,
-    #                  over45=True, protracker=True)
+    explore_database(mkdir='1722505765_top600_heroes_data', file_name='1722505765_top600_output',
+                     show_prints=show_prints, lane=True, over35=True,
+                     over45=True, protracker=True)
 
 
 # def update_heroes_data(database_list=None, mkdir=None):
